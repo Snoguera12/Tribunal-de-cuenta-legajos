@@ -1,0 +1,13 @@
+{% extends 'apoyo/base_usuario.html' %}
+
+{% block titulo %}Iniciar sesión{% endblock %}
+
+{% block principal %}
+
+<form accept="" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Iniciar sesión</button>
+</form>
+
+{% endblock %}

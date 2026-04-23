@@ -1,0 +1,91 @@
+{% extends 'apoyo/base.html' %}
+
+{% block titulo %}Listado de legajos{% endblock %}
+
+{% block principal %}
+
+<section class="legajos">
+    <form method="GET" action="{% url 'legajos' %}">
+        <aside class="busqueda-legajos">
+            <fieldset class="busqueda-campos">
+                <legend>Busqueda</legend>
+                <input type="text" name="n_legajo" placeholder="Número de legajo" value="{{ request.GET.n_legajo }}">
+                <input type="text" name="nombre" placeholder="Nombre" value="{{ request.GET.nombre }}">
+                <input type="text" name="dni" placeholder="DNI" value="{{ request.GET.dni }}">
+                <input type="text" name="cargo" placeholder="Cargo" value="{{ request.GET.cargo }}">
+            </fieldset>
+
+            <nav class="busqueda-boton">
+                <a href="{% url 'legajos' %}"><button type="button">Limpiar</button></a>
+                <a href="buscar/"><button type="submit">Buscar</button></a>
+            </nav>
+        </aside>
+    </form>
+    
+
+    <article class="tabla-legajos">
+        {% if Legajos %}
+        <table class="tabla-listado">
+            <tr class="header-listado">
+                <th>Número de legajo</th>
+                <th>Nombre</th>
+                <th>DNI</th>
+                <th>Cargo</th>
+            </tr>
+            
+            {% for l in Legajos %}
+            {% if l.estado == 0 and user.is_staff %}
+            <tr>
+                <td class="datos_baja">{{l.n_legajo}}</td>
+                <td class="datos_baja">{{l.nombre}}</td>
+                <td class="datos_baja">{{l.dni}}</td>
+                <td class="datos_baja">{{l.cargo}}</td>
+
+                <td>
+                    <a href="editar/{{l.id}}"><button>Editar</button></a>
+                </td>
+                
+                <td>
+                    <a href="alta/{{l.id}}"><button>Alta</button></a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td class="datos">{{l.n_legajo}}</td>
+                <td class="datos">{{l.nombre}}</td>
+                <td class="datos">{{l.dni}}</td>
+                <td class="datos">{{l.cargo}}</td>
+
+                <td>
+                    <a href="editar/{{l.id}}"><button>Editar</button></a>
+                </td>
+                
+                <td>
+                    <a href="bajar/{{l.id}}"><button>Baja</button></a>
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+        {% for i in Legajos.paginator.page_range %}
+            {% if Legajos.number == i %}
+                <span>
+                    {{ i }}
+                </span>
+            {% else %}
+                <a href="?page={{ i }}&n_legajo={{ request.GET.n_legajo }}&nombre={{ request.GET.nombre }}&dni={{ request.GET.dni }}&cargo={{ request.GET.cargo }}">
+                    {{ i }}
+                </a>
+            {% endif %}
+        {% endfor %}
+        {% else %}
+            {% if request.GET.n_legajo or request.GET.nombre or request.GET.dni or request.GET.cargo %}
+                <b>No se logró encontrar la busqueda.</b>
+            {% else %}
+                <b>No hay información en la Base de Datos.</b>
+            {% endif %}
+        {% endif %}
+    </article>
+</section>
+
+{% endblock %}

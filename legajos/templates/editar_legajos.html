@@ -1,0 +1,23 @@
+{% extends 'apoyo/base.html' %}
+
+{% block titulo %}Editar legajo{% endblock %}
+
+{% block principal %}
+<section class="registrar">
+	<form action="{% url 'editar' ID %}" method="POST">
+		{% csrf_token %}
+		<fieldset class="registrar-legajos-campos">
+			<legend>Editar</legend>
+			
+			<table class="registrar-tabla">
+				{{ form_legajo }}
+			</table>
+			
+		</fieldset>
+		<nav class="registrar-boton">
+			<a href="/legajos/"><button type="button">Volver</button></a>
+			<button type="submit">Editar</button>
+		</nav>
+	</form>
+</section>
+{% endblock %}

@@ -1,0 +1,228 @@
+/*======*/
+/* Base */
+/*======*/
+html{
+	background-color: whitesmoke;
+}
+
+body{
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	height: 100vh;
+}
+
+button:hover{
+	cursor: pointer;
+}
+
+input[type="button"]{
+	cursor: pointer;
+}
+
+main{
+	background-color: white;
+	flex-grow: 1;
+	padding: 0px 8px;
+}
+
+.principal-encabezado{
+	background-color: floralwhite;
+	padding: 5px;
+	border-bottom: 2px black solid;
+	*{
+		margin: inherit;
+	}
+}
+
+.principal-pie{
+	background-color: dimgrey;
+    color: aliceblue;
+	border-top: 2px black solid;
+}
+
+.pagina{
+	font-size: 32px;
+	font-weight: bold;
+}
+
+.lista-encabezado{
+	text-align: center;
+}
+
+.principal-pie{
+	padding: 5px;
+	*{
+		margin: inherit;
+	}
+}
+
+.menu{
+	list-style: none;
+	padding: 0;
+	/*
+	background-color: bisque;
+	padding: 20px;
+	*/
+}
+
+.menu li{
+	position: relative;
+	display: inline-block;
+	margin: 1px;
+	a{
+		text-decoration: none;
+	}
+}
+
+.menu li:hover ul{
+	display: block;
+}
+
+.menu ul{
+	display: none;
+	position: absolute;
+	background-color: bisque;
+	padding: 0;
+	border: 2px black solid;
+	margin: auto;
+}
+
+.main ul li a:hover{
+	background-color: aqua;
+}
+
+.main-encabezado{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+
+/*=================*/
+/* APP Torres Home */
+/*=================*/
+
+.noticias{
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.arcticulos-noticas{
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	margin: 4px;
+}
+
+.item-noticias{
+	display: flex;
+	justify-content: center;
+	border: 1px black solid;
+	width: 20em;
+	padding: 8px;
+	margin: 4px;
+}
+
+/*=====================*/
+/* APP legajos Listado */
+/*=====================*/
+
+.legajos{
+	display: flex;
+}
+
+.legajos:last-child{
+	justify-content: center;
+}
+
+.busqueda-campos{
+	display: flex;
+	flex-direction: column;
+	border: 1px black solid;
+	background-color: thistle;
+	
+	legend{
+		border: inherit;
+		background-color: inherit;
+		font-weight: bolder;
+	}
+	input{
+		margin: 2px 0px;
+	}
+}
+
+.busqueda-boton{
+	margin-top: 4px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.tabla-legajos{
+	display: flex;
+    flex-grow: 1;
+    justify-content: center;
+	align-items: flex-start;
+}
+
+.tabla-listado{
+	border-collapse: collapse;
+	text-align: center;
+	.header-listado{
+		background: navajowhite;
+	}
+
+	th{
+		border: 1px black solid;
+		padding: 3px;
+	}
+
+	.datos {
+		background: antiquewhite;
+		border: 1px black solid;
+		padding: 3px;
+	}
+
+	.datos_baja{
+		background: lightcoral;
+		border: 1px black solid;
+		padding: 3px;
+	}
+}
+
+/*=======================*/
+/* APP legajos registrar_legajos */
+/*=======================*/
+.registrar{
+	display: flex;
+	justify-content: center;
+}
+
+.registrar-legajos-campos{
+	display: flex;
+	flex-direction: column;
+	border: 1px black solid;
+	background-color: thistle;
+	
+	legend{
+		border: inherit;
+		background-color: inherit;
+		font-weight: bolder;
+	}
+	input{
+		margin: 2px 0px;
+	}
+}
+
+.registrar-boton{
+	display: flex;
+	justify-content: space-around;
+	margin-top: 5px;
+}
+
+.tabla-campos{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}

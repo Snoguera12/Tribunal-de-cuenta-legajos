@@ -1,0 +1,9 @@
+<p class="pagina">Torres</p>
+{% if user.is_authenticated %}
+    {{ user.username }} <a href="{% url 'logout' %}">Cerrar sesión</a>
+    {% else %}
+    <nav>
+        <a href="{% url 'login' %}">Iniciar sesión</a>
+        <a href="{% url 'registrar_usuario' %}">Registrar</a>
+    </nav>
+{% endif %}

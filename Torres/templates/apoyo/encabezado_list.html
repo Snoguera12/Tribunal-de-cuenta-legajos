@@ -1,0 +1,11 @@
+<nav class="lista-encabezado">
+	<ul class="menu">
+		<li><a href="{% url 'home' %}">Inicio</a></li>
+		<li><a href="{% url 'legajos' %}">Legajos</a>
+			<ul>
+				<li><a href="{% url 'legajos' %}">Listado</a></li>
+				<li><a href="{% url 'registrar_legajos' %}">Registrar</a></li>
+			</ul>
+		</li>
+	</ul>
+</nav>

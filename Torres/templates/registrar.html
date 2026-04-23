@@ -1,0 +1,13 @@
+{% extends 'apoyo/base_usuario.html' %}
+
+{% block titulo %}Registrar Usuario{% endblock %}
+
+{% block principal %}
+
+<form accept="" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Registrar</button>
+</form>
+
+{% endblock %}
