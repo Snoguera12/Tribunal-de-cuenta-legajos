@@ -15,10 +15,13 @@ class EstudiosTable
         return $table
             ->columns([
                 TextColumn::make('titulo')
+                    ->label("Título")
                     ->searchable(),
                 TextColumn::make('institucion')
+                    ->label("Institución")
                     ->searchable(),
                 TextColumn::make('fecha_inicio')
+                    ->label("Fecha de inicio")
                     ->date()
                     ->sortable(),
                 TextColumn::make('fecha_fin')

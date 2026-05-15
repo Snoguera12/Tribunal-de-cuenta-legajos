@@ -18,8 +18,10 @@ class PersonaForm
                 TextInput::make('apellido')
                     ->required(),
                 TextInput::make('dni')
+                    ->label("DNI")
                     ->required(),
                 TextInput::make('cuil')
+                    ->label("CUIL")
                     ->required(),
                 TextInput::make('email')
                     ->label('Correo Electróico')
@@ -32,11 +34,16 @@ class PersonaForm
                     ])
                     ->required(),
                 DatePicker::make('fecha_de_nacimiento')
+                ->maxDate(now()->subYears(18)->toDateString()) // Máximo hace 18 años
+                ->rules(['date', 'before_or_equal:' . now()->subYears(18)->toDateString()])
+                ->helperText('La persona tiene que ser mayor de edad.')
                     ->required(),
                 TextInput::make('domicilio'),
                 TextInput::make('telefono')
+                    ->label('Teléfono')
                     ->tel(),
                 TextInput::make('telefono_emergencia')
+                    ->label('Teléfono de emergencia')
                     ->tel(),
             ]);
     }

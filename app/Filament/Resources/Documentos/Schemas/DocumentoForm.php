@@ -14,17 +14,20 @@ class DocumentoForm
     {
         return $schema
             ->components([
+                Select::make("legajo_id")
+                    ->label("Número de legajo")
+                    ->options(Legajo::all()->pluck("número de legajo", "id")),
+                TextInput::make('descripcion')
+                    ->required(),
+                TextInput::make('estado')
+                    ->required(),
                 TextInput::make('Tipo_de_documento')
                     ->required(),
                 DatePicker::make('fecha_subida')
                     ->required(),
-                TextInput::make('estado')
-                    ->required(),
-                TextInput::make('descripcion')
-                    ->required(),
-                Select::make("legajo_id")
-                    ->label("Número de legajo")
-                    ->options(Legajo::all()->pluck("número de legajo", "id")),
+                
+                
+                
             ]);
     }
 }

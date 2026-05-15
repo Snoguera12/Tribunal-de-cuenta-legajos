@@ -19,8 +19,13 @@ class LegajosTable
             ->columns([
                 TextColumn::make('número de legajo')
                     ->searchable(),
-                TextColumn::make('fecha_de_ingreso')
-                    ->date()
+                TextColumn::make('persona.nombre')
+                    ->label("Nombre")
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('persona.apellido')
+                    ->label("Apellido")
+                    ->numeric()
                     ->sortable(),
                 IconColumn::make('estado')
                     ->boolean(),
@@ -29,13 +34,8 @@ class LegajosTable
                     ->sortable(),
                 TextColumn::make('categoria')
                     ->searchable(),
-                TextColumn::make('persona.nombre')
-                    ->label("Nombre")
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('persona.apellido')
-                    ->label("Apellido")
-                    ->numeric()
+                TextColumn::make('fecha_de_ingreso')
+                    ->date()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

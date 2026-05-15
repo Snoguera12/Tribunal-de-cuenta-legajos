@@ -15,15 +15,16 @@ class CursoForm
         return $schema
             ->components([
                 TextInput::make('nombre')
+                    ->label('Nombre de Curso')
                     ->required(),
+                Select::make("persona_id")
+                    ->label("Persona")
+                    ->options(Persona::selectRaw('id, CONCAT(nombre, " ", apellido) AS nombre_completo')->pluck('nombre_completo', 'id')),
                 DatePicker::make('fecha')
                     ->required(),
                 TextInput::make('horas')
                     ->required()
                     ->numeric(),
-                Select::make("persona_id")
-                    ->label("Persona")
-                    ->options(Persona::all()->pluck("nombre", "id")),
             ]);
     }
 }

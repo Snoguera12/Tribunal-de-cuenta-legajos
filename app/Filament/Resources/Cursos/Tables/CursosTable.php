@@ -15,15 +15,21 @@ class CursosTable
         return $table
             ->columns([
                 TextColumn::make('nombre')
+                    ->label('Nombre de Curso')
                     ->searchable(),
-                TextColumn::make('fecha')
-                    ->date()
+                TextColumn::make('persona.nombre')
+                    ->label('Nombre')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('persona.apellido')
+                    ->label('Apellido')
+                    ->numeric()
                     ->sortable(),
                 TextColumn::make('horas')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('persona.nombre')
-                    ->numeric()
+                TextColumn::make('fecha')
+                    ->date()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

@@ -20,8 +20,10 @@ class PersonasTable
                 TextColumn::make('apellido')
                     ->searchable(),
                 TextColumn::make('dni')
+                    ->label("DNI")
                     ->searchable(),
                 TextColumn::make('cuil')
+                    ->label("CUIL")
                     ->searchable(),
                 TextColumn::make('email')
                     ->label('Email address')
@@ -39,8 +41,10 @@ class PersonasTable
                 TextColumn::make('domicilio')
                     ->searchable(),
                 TextColumn::make('telefono')
+                    ->label("Teléfono")
                     ->searchable(),
                 TextColumn::make('telefono_emergencia')
+                    ->label("Teléfono de emergencia")
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()

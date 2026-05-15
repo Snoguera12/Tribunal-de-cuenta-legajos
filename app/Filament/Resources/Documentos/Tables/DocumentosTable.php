@@ -14,17 +14,17 @@ class DocumentosTable
     {
         return $table
             ->columns([
+                TextColumn::make('legajo.número de legajo')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('descripcion')
+                    ->searchable(),
+                TextColumn::make('estado')
+                    ->searchable(),
                 TextColumn::make('Tipo_de_documento')
                     ->searchable(),
                 TextColumn::make('fecha_subida')
                     ->date()
-                    ->sortable(),
-                TextColumn::make('estado')
-                    ->searchable(),
-                TextColumn::make('descripcion')
-                    ->searchable(),
-                TextColumn::make('legajo.número de legajo')
-                    ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

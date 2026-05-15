@@ -14,13 +14,20 @@ class IdiomasTable
     {
         return $table
             ->columns([
+                TextColumn::make('persona.nombre')
+                    ->label('Nombre')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('persona.apellido')
+                    ->label('Apellido')
+                    ->numeric()
+                    ->sortable(),
                 TextColumn::make('nombre')
+                    ->label('Idioma')
                     ->searchable(),
                 TextColumn::make('nivel')
                     ->searchable(),
-                TextColumn::make('persona.nombre')
-                    ->numeric()
-                    ->sortable(),
+                
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
