@@ -6,6 +6,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class PersonasTable
@@ -26,7 +27,12 @@ class PersonasTable
                     ->label('Email address')
                     ->searchable(),
                 TextColumn::make('sexo')
-                    ->searchable(),
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    '0' => 'Femenino',
+                    '1' => 'Masculino',
+                    default => 'Desconocido',
+                })
+                ->searchable(),
                 TextColumn::make('fecha_de_nacimiento')
                     ->date()
                     ->sortable(),

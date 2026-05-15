@@ -20,6 +20,8 @@ class FamiliarResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static ?string $modelLabel = "Familiares";
+
     public static function form(Schema $schema): Schema
     {
         return FamiliarForm::configure($schema);

@@ -20,7 +20,6 @@ class LegajoForm
                     ->required(),
                 DatePicker::make('fecha_de_ingreso')
                     ->required(),
-
                 Select::make("cargo_id")
                     ->label("Cargo")
                     ->options(Cargo::all()->pluck("nombre", "id")),

@@ -22,11 +22,15 @@ class PersonaForm
                 TextInput::make('cuil')
                     ->required(),
                 TextInput::make('email')
-                    ->label('Email address')
+                    ->label('Correo Electróico')
                     ->email(),
                 Select::make("sexo")
                     ->label("Sexo")
-                    ->options(["F", "M"]),
+                    ->options([
+                        "0" => "Femenino",
+                        "1" => "Masculino",
+                    ])
+                    ->required(),
                 DatePicker::make('fecha_de_nacimiento')
                     ->required(),
                 TextInput::make('domicilio'),
