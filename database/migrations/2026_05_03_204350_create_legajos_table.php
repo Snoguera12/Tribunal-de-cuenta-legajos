@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('legajos', function (Blueprint $table) {
             $table->id();
-            $table->string("número de legajo", 16);
+            $table->string("num_legajo", 16)->nullable()->unique();
             $table->string("estado", 4);
             $table->date("fecha_de_ingreso");
             $table->foreignId("cargo_id")->constrained()->onDelete("cascade");

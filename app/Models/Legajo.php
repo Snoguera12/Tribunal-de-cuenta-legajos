@@ -11,7 +11,7 @@ class Legajo extends Model
     ];
 
     protected $fillable = [
-        "número de legajo",
+        "num_legajo",
         "fecha_de_ingreso",
         "estado",
         "cargo_id",

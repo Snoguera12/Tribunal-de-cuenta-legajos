@@ -5,7 +5,9 @@ namespace App\Filament\Resources\Personas\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
@@ -33,30 +35,42 @@ class PersonasTable
                     '0' => 'Femenino',
                     '1' => 'Masculino',
                     default => 'Desconocido',
-                })
-                ->searchable(),
+                }),
                 TextColumn::make('fecha_de_nacimiento')
-                    ->date()
+                    ->date('d/m/Y')
                     ->sortable(),
-                TextColumn::make('domicilio')
-                    ->searchable(),
+                TextColumn::make('domicilio'),
                 TextColumn::make('telefono')
-                    ->label("Teléfono")
-                    ->searchable(),
+                    ->label("Teléfono"),
                 TextColumn::make('telefono_emergencia')
-                    ->label("Teléfono de emergencia")
-                    ->searchable(),
+                    ->label("Teléfono de emergencia"),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Filter::make('fecha_de_nacimiento')
+                ->label("Fecha de Nacimiento")
+                ->schema([
+                    DatePicker::make('fecha_de_nacimiento')
+                    ->label("Fecha de Nacimiento")
+                ])
+                ->query(function($query, $data){
+                    return $query->when($data['fecha_de_nacimiento'], function($q, $date){
+                        $q->whereDate('fecha_de_nacimiento', $date);
+                    });
+                }),
+                SelectFilter::make('sexo')
+                ->label("Sexo")
+                ->options([
+                    '0' => 'Femenino',
+                    '1' => 'Masculino'
+                ])
             ])
             ->recordActions([
                 EditAction::make(),

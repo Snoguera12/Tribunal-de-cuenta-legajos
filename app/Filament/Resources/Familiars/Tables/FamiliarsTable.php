@@ -17,12 +17,12 @@ class FamiliarsTable
                 TextColumn::make('nombre')
                     ->searchable(),
                 TextColumn::make('dni')
+                    ->label('DNI')
                     ->searchable(),
                 TextColumn::make('fecha_de_nacimiento')
                     ->date()
                     ->sortable(),
-                TextColumn::make('estado')
-                    ->searchable(),
+                TextColumn::make('estado'),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

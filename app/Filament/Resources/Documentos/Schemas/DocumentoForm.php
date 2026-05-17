@@ -16,15 +16,27 @@ class DocumentoForm
             ->components([
                 Select::make("legajo_id")
                     ->label("Número de legajo")
-                    ->options(Legajo::all()->pluck("número de legajo", "id")),
-                TextInput::make('descripcion')
-                    ->required(),
+                    ->required()
+                    ->options(Legajo::all()->pluck("número de legajo", "id"))
+                    ->validationMessages([
+                        "required" => "Requiere asociar a un legajo.",
+                    ]),
+                TextInput::make('descripcion'),
                 TextInput::make('estado')
-                    ->required(),
+                    ->required()
+                    ->validationMessages([
+                        "required" => "Requiere introducir un estado del documento.",
+                    ]),
                 TextInput::make('Tipo_de_documento')
-                    ->required(),
+                    ->required()
+                    ->validationMessages([
+                        "required" => "Requiere introducir el tipo de documento.",
+                    ]),
                 DatePicker::make('fecha_subida')
-                    ->required(),
+                    ->required()
+                    ->validationMessages([
+                        "required" => "Requiere introducir la fecha de subida.",
+                    ]),
                 
                 
                 

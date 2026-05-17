@@ -13,14 +13,26 @@ class IdiomaForm
     {
         return $schema
             ->components([
+                 Select::make('persona_id')
+                    ->label('Persona')
+                    ->required()
+                    ->options(Persona::selectRaw('id, CONCAT(nombre, " ", apellido) AS nombre_completo')->pluck('nombre_completo', 'id'))
+                    ->validationMessages([
+                        "required" => "Requiere asociar a una Persona.",
+                    ]),
                 TextInput::make('nombre')
                     ->label('Idioma')
-                    ->required(),
+                    ->required()
+                    ->validationMessages([
+                        "required" => "Requiere introducir el idioma.",
+                    ]),
                 TextInput::make('nivel')
-                    ->required(),
-                Select::make('persona_id')
-                    ->label('Persona')
-                    ->options(Persona::selectRaw('id, CONCAT(nombre, " ", apellido) AS nombre_completo')->pluck('nombre_completo', 'id')),
+                    ->required()
+                    ->validationMessages([
+                        "required" => "Requiere introducir el nivel.",
+                    ]),
+               
+                    
             ]);
     }
 }

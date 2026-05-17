@@ -15,16 +15,29 @@ class CursoForm
         return $schema
             ->components([
                 TextInput::make('nombre')
-                    ->label('Nombre de Curso')
-                    ->required(),
+                    ->label('Nombre del Curso')
+                    ->required()
+                    ->validationMessages([
+                        "required" => "Requiere introducir el nombre del curso.",
+                    ]),
                 Select::make("persona_id")
                     ->label("Persona")
-                    ->options(Persona::selectRaw('id, CONCAT(nombre, " ", apellido) AS nombre_completo')->pluck('nombre_completo', 'id')),
+                    ->required()
+                    ->options(Persona::selectRaw('id, CONCAT(nombre, " ", apellido) AS nombre_completo')->pluck('nombre_completo', 'id'))
+                    ->validationMessages([
+                        "required" => "Requiere asociar a una Persona.",
+                    ]),
                 DatePicker::make('fecha')
-                    ->required(),
+                    ->required()
+                    ->validationMessages([
+                        "required" => "Requiere introducir la fecha.",
+                    ]),
                 TextInput::make('horas')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->validationMessages([
+                        "required" => "Requiere introducir las horas.",
+                    ]),
             ]);
     }
 }

@@ -17,6 +17,16 @@ class EstudiosTable
                 TextColumn::make('titulo')
                     ->label("Título")
                     ->searchable(),
+                TextColumn::make('persona.nombre')
+                    ->label('Nombre')
+                    ->numeric()
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('persona.apellido')
+                    ->label('Apellido')
+                    ->numeric()
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('institucion')
                     ->label("Institución")
                     ->searchable(),
@@ -26,9 +36,6 @@ class EstudiosTable
                     ->sortable(),
                 TextColumn::make('fecha_fin')
                     ->date()
-                    ->sortable(),
-                TextColumn::make('persona.nombre')
-                    ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

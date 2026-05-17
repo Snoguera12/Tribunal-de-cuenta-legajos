@@ -16,18 +16,35 @@ class LegajoForm
     {
         return $schema
             ->components([
-                TextInput::make('número de legajo')
-                    ->required(),
+                TextInput::make('num_legajo')
+                    ->label('Número de legajo')
+                    ->required()
+                    ->validationMessages([
+                        "required" => "Requiere introducir el Número de legajo.",
+                    ]),
                 Select::make('persona_id')
                     ->label('Persona')
-                    ->options(Persona::selectRaw('id, CONCAT(nombre, " ", apellido) AS nombre_completo')->pluck('nombre_completo', 'id')),
+                    ->required()
+                    ->options(Persona::selectRaw('id, CONCAT(nombre, " ", apellido) AS nombre_completo')->pluck('nombre_completo', 'id'))
+                    ->validationMessages([
+                        "required" => "Requiere asociar una Persona.",
+                    ]),
                 Select::make("cargo_id")
                     ->label("Cargo")
-                    ->options(Cargo::all()->pluck("nombre", "id")),
+                    ->required()
+                    ->options(Cargo::all()->pluck("nombre", "id"))->validationMessages([
+                        "required" => "Requiere asociar un cargo.",
+                    ]),
                 TextInput::make('categoria')
-                    ->required(),
+                    ->required()
+                    ->validationMessages([
+                        "required" => "Requiere introducir la categoría.",
+                    ]),
                 DatePicker::make('fecha_de_ingreso')
-                    ->required(),
+                    ->required()
+                    ->validationMessages([
+                        "required" => "Requiere introducir la Fecha de ingreso.",
+                    ]),
             ]);
     }
 }
