@@ -7,7 +7,6 @@ use App\Models\Persona;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 
 class LegajoForm
@@ -25,6 +24,7 @@ class LegajoForm
                 Select::make('persona_id')
                     ->label('Persona')
                     ->required()
+                    ->searchable()
                     ->options(Persona::selectRaw('id, CONCAT(nombre, " ", apellido) AS nombre_completo')->pluck('nombre_completo', 'id'))
                     ->validationMessages([
                         "required" => "Requiere asociar una Persona.",
@@ -32,7 +32,8 @@ class LegajoForm
                 Select::make("cargo_id")
                     ->label("Cargo")
                     ->required()
-                    ->options(Cargo::all()->pluck("nombre", "id"))->validationMessages([
+                    ->options(Cargo::all()->pluck("nombre", "id"))
+                    ->validationMessages([
                         "required" => "Requiere asociar un cargo.",
                     ]),
                 TextInput::make('categoria')

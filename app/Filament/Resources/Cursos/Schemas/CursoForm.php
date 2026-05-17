@@ -23,6 +23,7 @@ class CursoForm
                 Select::make("persona_id")
                     ->label("Persona")
                     ->required()
+                    ->searchable()
                     ->options(Persona::selectRaw('id, CONCAT(nombre, " ", apellido) AS nombre_completo')->pluck('nombre_completo', 'id'))
                     ->validationMessages([
                         "required" => "Requiere asociar a una Persona.",

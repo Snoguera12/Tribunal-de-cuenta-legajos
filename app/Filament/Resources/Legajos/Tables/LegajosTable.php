@@ -7,11 +7,10 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\TextInput;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
@@ -40,7 +39,7 @@ class LegajosTable
                 TextColumn::make('categoria')
                     ->searchable(),
                 TextColumn::make('fecha_de_ingreso')
-                    ->date()
+                    ->date('d/m/Y')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
@@ -52,17 +51,16 @@ class LegajosTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Filter::make('número_de_legajo')
-                ->label("Número de legajo")
-                ->schema([
-                    TextInput::make('número_de_legajo')
-                    ->label("Número de legajo")
-                ])->query(
-                    function($query, $data){
-                    return $query->when($data['número_de_legajo'], function($q, $numero){
-                        $q->whereDate('número_de_legajo', $numero);
-                    });
-                })
+                SelectFilter::make('cargo_id')
+                ->options(Cargo::all()->pluck("nombre", "id")),
+                SelectFilter::make('estado')
+                ->options([
+                    0 => 'Baja',
+                    1 => 'Alta'
+                ])
+                ->default(true),
+                
+                
             ])
             ->recordActions([
                 Action::make('estado')

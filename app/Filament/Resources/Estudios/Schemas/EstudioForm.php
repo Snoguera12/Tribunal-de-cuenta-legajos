@@ -27,6 +27,7 @@ class EstudioForm
                     ->required(),
                 Select::make('persona_id')
                     ->label('Persona')
+                    ->searchable()
                     ->options(Persona::selectRaw('id, CONCAT(nombre, " ", apellido) AS nombre_completo')->pluck('nombre_completo', 'id')),
             ]);
     }

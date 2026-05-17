@@ -17,11 +17,10 @@ class DocumentoForm
                 Select::make("legajo_id")
                     ->label("Número de legajo")
                     ->required()
-                    ->options(Legajo::all()->pluck("número de legajo", "id"))
-                    ->validationMessages([
-                        "required" => "Requiere asociar a un legajo.",
-                    ]),
-                TextInput::make('descripcion'),
+                    ->searchable()
+                    ->options(Legajo::all()->where('estado', true)->pluck("num_legajo", "id")),
+                TextInput::make('descripcion')
+                ->label('Descripción'),
                 TextInput::make('estado')
                     ->required()
                     ->validationMessages([
@@ -37,9 +36,6 @@ class DocumentoForm
                     ->validationMessages([
                         "required" => "Requiere introducir la fecha de subida.",
                     ]),
-                
-                
-                
             ]);
     }
 }
