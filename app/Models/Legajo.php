@@ -27,8 +27,4 @@ class Legajo extends Model
         //return $this->hasMany(Cargo::class);
         return $this->belongsTo(Cargo::class);
     }
-    public function baja(){
-        //return $this->hasMany(Cargo::class);
-        return $this->hasOne(Historialbaja::class);
-    }
 }

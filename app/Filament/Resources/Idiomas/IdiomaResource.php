@@ -19,7 +19,13 @@ class IdiomaResource extends Resource
     protected static ?string $model = Idioma::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    public static function getNavigationBadge(): ?string{
+        return Idioma::count();
+    }
 
+    public static function getNavigationBadgeColor(): string|array|null{
+        return "succes";
+    }
     public static function form(Schema $schema): Schema
     {
         return IdiomaForm::configure($schema);

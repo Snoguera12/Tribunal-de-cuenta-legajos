@@ -20,6 +20,13 @@ class CargoResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
+    public static function getNavigationBadge(): ?string{
+        return Cargo::count();
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null{
+        return "succes";
+    }
     public static function form(Schema $schema): Schema
     {
         return CargoForm::configure($schema);

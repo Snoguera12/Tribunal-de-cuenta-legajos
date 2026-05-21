@@ -19,7 +19,13 @@ class CursoResource extends Resource
     protected static ?string $model = Curso::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    public static function getNavigationBadge(): ?string{
+        return Curso::count();
+    }
 
+    public static function getNavigationBadgeColor(): string|array|null{
+        return "succes";
+    }
     public static function form(Schema $schema): Schema
     {
         return CursoForm::configure($schema);

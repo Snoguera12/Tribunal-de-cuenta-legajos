@@ -8,6 +8,7 @@ use App\Filament\Resources\Historialbajas\Pages\ListHistorialbajas;
 use App\Filament\Resources\Historialbajas\Schemas\HistorialbajaForm;
 use App\Filament\Resources\Historialbajas\Tables\HistorialbajasTable;
 use App\Models\Historialbaja;
+use App\Models\Legajo;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -21,7 +22,15 @@ class HistorialbajaResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
     protected static ?int $navigationSoft = 1;
-    protected static ?string $modelLabel = "Historial de legajos";
+    protected static ?string $modelLabel = "Historial de bajas de legajos";
+
+    public static function getNavigationBadge(): ?string{
+        return Historialbaja::count();
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null{
+        return "succes";
+    }
     public static function form(Schema $schema): Schema
     {
         return HistorialbajaForm::configure($schema);

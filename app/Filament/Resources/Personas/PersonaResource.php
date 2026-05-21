@@ -19,7 +19,13 @@ class PersonaResource extends Resource
     protected static ?string $model = Persona::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    public static function getNavigationBadge(): ?string{
+        return Persona::count();
+    }
 
+    public static function getNavigationBadgeColor(): string|array|null{
+        return "succes";
+    }
     public static function form(Schema $schema): Schema
     {
         return PersonaForm::configure($schema);

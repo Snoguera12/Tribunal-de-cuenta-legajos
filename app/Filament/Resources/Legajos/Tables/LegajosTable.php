@@ -7,12 +7,16 @@ use App\Models\Historialbaja;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
+
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use \Filament\Notifications\Notification;
 use Illuminate\Support\Carbon;
@@ -28,22 +32,19 @@ class LegajosTable
                     ->searchable(),
                 TextColumn::make('persona.nombre')
                     ->label("Nombre")
-                    ->numeric()
                     ->sortable(),
                 TextColumn::make('persona.apellido')
                     ->label("Apellido")
-                    ->numeric()
                     ->sortable(),
                 IconColumn::make('estado')
                     ->boolean(),
                 TextColumn::make('cargo.nombre')
-                    ->numeric()
                     ->sortable(),
                 TextColumn::make('categoria')
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('fecha_de_ingreso')
-                    ->date('d/m/Y')
+                    ->dateTime('d/m/Y H:i:s')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
@@ -55,6 +56,26 @@ class LegajosTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Filter::make('fecha_de_ingreso')
+                ->form([
+                    DateTimePicker::make('desde')
+                    ->label('Fecha de ingreso desde'),
+                    DateTimePicker::make('hasta')
+                    ->label('Fecha de ingreso hasta'),
+                ])
+                ->query(
+                    function(Builder $query, array $data): Builder{
+                        return $query
+                        ->when(
+                            $data['desde'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('fecha_de_ingreso', '>=', $date),
+                        )
+                        ->when(
+                            $data['hasta'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('fecha_de_ingreso', '<=', $date),
+                        );
+                    }
+                ),
                 SelectFilter::make('cargo_id')
                 ->label('Cargo')
                 ->options(Cargo::all()->pluck('nombre', 'id')),

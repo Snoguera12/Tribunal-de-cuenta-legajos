@@ -20,6 +20,14 @@ class EstudioResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::AcademicCap;
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
+    
+    public static function getNavigationBadge(): ?string{
+        return Estudio::count();
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null{
+        return "succes";
+    }
     public static function form(Schema $schema): Schema
     {
         return EstudioForm::configure($schema);

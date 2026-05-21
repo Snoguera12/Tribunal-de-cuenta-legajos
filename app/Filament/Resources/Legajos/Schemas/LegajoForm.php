@@ -6,6 +6,7 @@ use App\Models\Cargo;
 use App\Models\Persona;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -44,12 +45,11 @@ class LegajoForm
                     ->validationMessages([
                         "required" => "Requiere introducir la categoría.",
                     ]),
-                DatePicker::make('fecha_de_ingreso')
-                    ->default(Carbon::now())
-                    ->required()
+                DateTimePicker::make('fecha_de_ingreso')
                     ->validationMessages([
                         "required" => "Requiere introducir la Fecha de ingreso.",
-                    ]),
+                    ])
+                    ->helperText('Si no introduce la fecha, se asigna la fecha de hoy.'),
             ]);
     }
 }

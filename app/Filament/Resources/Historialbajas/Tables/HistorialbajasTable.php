@@ -14,8 +14,8 @@ class HistorialbajasTable
     {
         return $table
             ->columns([
-                TextColumn::make('legajo_id')
-                    ->numeric()
+                TextColumn::make('legajo.num_legajo')
+                    ->label("Número de legajo")
                     ->sortable(),
                 TextColumn::make('descripcion')
                     ->searchable(),
