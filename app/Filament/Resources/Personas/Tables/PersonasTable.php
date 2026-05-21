@@ -18,13 +18,17 @@ class PersonasTable
         return $table
             ->columns([
                 TextColumn::make('nombre')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('apellido')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('dni')
+                    ->sortable()
                     ->label("DNI")
                     ->searchable(),
                 TextColumn::make('cuil')
+                    ->sortable()
                     ->label("CUIL")
                     ->searchable(),
                 TextColumn::make('email')

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Legajos\Schemas;
 
 use App\Models\Cargo;
 use App\Models\Persona;
+use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -18,6 +19,7 @@ class LegajoForm
                 TextInput::make('num_legajo')
                     ->label('Número de legajo')
                     ->required()
+                    ->maxLength(16)
                     ->validationMessages([
                         "required" => "Requiere introducir el Número de legajo.",
                     ]),
@@ -38,10 +40,12 @@ class LegajoForm
                     ]),
                 TextInput::make('categoria')
                     ->required()
+                    ->maxLength(3)
                     ->validationMessages([
                         "required" => "Requiere introducir la categoría.",
                     ]),
                 DatePicker::make('fecha_de_ingreso')
+                    ->default(Carbon::now())
                     ->required()
                     ->validationMessages([
                         "required" => "Requiere introducir la Fecha de ingreso.",

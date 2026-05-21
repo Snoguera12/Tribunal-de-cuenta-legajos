@@ -3,16 +3,19 @@
 namespace App\Filament\Resources\Legajos\Tables;
 
 use App\Models\Cargo;
+use App\Models\Historialbaja;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Textarea;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use \Filament\Notifications\Notification;
+use Illuminate\Support\Carbon;
 
 class LegajosTable
 {
@@ -37,6 +40,7 @@ class LegajosTable
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('categoria')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('fecha_de_ingreso')
                     ->date('d/m/Y')
@@ -52,7 +56,8 @@ class LegajosTable
             ])
             ->filters([
                 SelectFilter::make('cargo_id')
-                ->options(Cargo::all()->pluck("nombre", "id")),
+                ->label('Cargo')
+                ->options(Cargo::all()->pluck('nombre', 'id')),
                 SelectFilter::make('estado')
                 ->options([
                     0 => 'Baja',
@@ -63,25 +68,71 @@ class LegajosTable
                 
             ])
             ->recordActions([
+                /* Action::make('menaje_razon')
+                ->label('Razón de la baja')
+                ->icon(Heroicon::Bars3)
+                ->color('danger')
+                ->visible(fn (Model $record) => $record->estado == 0)
+                ->modalHeading('El motivo de la baja del legajo.')
+                ->modalDescription(
+                    function(Model $record){
+                        $ultimo = Historialbaja::where('legajo_id', '$record->id');
+                        return $ultimo->descripcion;
+                    }
+                )
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Cerrar')
+                ->modalCancelAction(fn ($action) => $action->color('info')),*/
+
                 Action::make('estado')
                 ->label(fn (Model $record) => $record->estado ? 'Dar de Baja' : 'Dar de Alta')
-                ->icon(fn (Model $record) => $record->estado ? Heroicon::DocumentArrowDown : Heroicon::DocumentArrowUp)
+                ->icon(fn (Model $record) => $record->estado ? Heroicon::ArrowDown : Heroicon::ArrowUp)
                 ->color(fn (Model $record) => $record->estado ? 'danger' : 'success')
                 ->requiresConfirmation()
                 ->successNotification(NULL)
                 ->modalHeading(fn (Model $record) => $record->estado ? 'Cambiar estado a "Baja"' : 'Cambiar estado a "Alta"')
                 ->modalDescription('¿Estás seguro de que quieres cambiar el estado de este registro?')
                 ->modalSubmitActionLabel('Sí, cambiar estado')
-                ->action(function (Model $record){
+                ->form(function (Model $record){
+                    if($record->estado){
+                        return [
+                            Textarea::make('razon')
+                            ->label('Motivo de la baja')
+                            ->required()
+                            ->placeholder('Escribe aquí la razón...')
+                            ->extraInputAttributes([
+                            'oninvalid' => "this.setCustomValidity('Por favor, escribe el motivo de la baja.')",
+                            'oninput' => "this.setCustomValidity('')",],
+                        )];
+                    }
+                })
+                ->action(function (array $data, Model $record): void{
+                    $fecha_actual = Carbon::now();
+
+                    if($record->estado == 1){ 
+                    Historialbaja::create([
+                        'legajo_id' => $record->id,
+                        'descripcion' => $data['razon'],
+                        'fecha_baja' => $fecha_actual
+                    ]);
+                    }
+
                     $record->update([
                         'estado' => $record->estado ? false : true,
                     ]);
+                    
+                    Notification::make('estado')
+                        ->success()
+                        ->title('Se cambió el estado del legajo.')
+                        ->body(fn () => $record->estado ? 'El registro ha sido cambiado a "Dado de alta" correctamente.' : 'El registro ha sido cambiado a "Dado de baja" correctamente.')
+                        ->send()
+                    ;
                 }),
                 EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    //DeleteBulkAction::make(),
                 ]),
             ]);
     }
