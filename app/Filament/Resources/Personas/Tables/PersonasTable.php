@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Personas\Tables;
 
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -35,10 +36,12 @@ class PersonasTable
                 TextColumn::make('email')
                     ->label('Email address')
                     ->searchable(),
-                TextColumn::make('sexo')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                    '0' => 'Femenino',
-                    '1' => 'Masculino',
+                TextColumn::make('genero')
+                    ->label('Género')
+                    ->formatStateUsing(fn (int $state): string => match ($state) {
+                    0 => 'Femenino',
+                    1 => 'Masculino',
+                    2 => 'Otro',
                     default => 'Desconocido',
                 }),
                 TextColumn::make('fecha_de_nacimiento')
@@ -92,13 +95,18 @@ class PersonasTable
                         $q->whereDate('fecha_de_nacimiento', $date);
                     });
                 }),*/
-                SelectFilter::make('sexo')
-                ->label("Sexo")
+                SelectFilter::make('genero')
+                ->label("Género")
                 ->options([
-                    '0' => 'Femenino',
-                    '1' => 'Masculino'
+                    0 => 'Femenino',
+                    1 => 'Masculino',
+                    2 => 'Otro',
                 ])
             ])
+            /*->headerActions([
+            CreateAction::make()
+                ->label('Registrar Persona'),
+            ])*/
             ->recordActions([
                 EditAction::make(),
             ])

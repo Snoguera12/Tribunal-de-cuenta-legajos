@@ -8,7 +8,7 @@ class Historialbaja extends Model
 {
     protected $fillable = [
         "legajo_id",
-        "descripcion",
+        "motivo",
         "fecha_baja",
     ];
     public function legajo(){

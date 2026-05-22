@@ -12,7 +12,7 @@ class Persona extends Model
         "dni",
         "cuil",
         "email",
-        "sexo",
+        "genero",
         "fecha_de_nacimiento",
         "domicilio",
         "telefono",

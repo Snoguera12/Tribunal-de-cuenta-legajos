@@ -9,6 +9,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListHistorialbajas extends ListRecords
 {
     protected static string $resource = HistorialbajaResource::class;
+
     protected function getHeaderActions(): array
     {
         return [

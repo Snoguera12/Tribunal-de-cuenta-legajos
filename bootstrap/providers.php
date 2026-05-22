@@ -2,5 +2,5 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    App\Providers\Filament\LegajosPanelProvider::class,
+    App\Providers\Filament\LejagosPanelProvider::class,
 ];

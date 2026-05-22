@@ -62,18 +62,34 @@ class PersonaForm
                         'oninvalid' => "this.setCustomValidity('Por favor, escribir correctamente el correo electrónico.')",
                         'oninput' => "this.setCustomValidity('')",
                     ]),
-                Select::make("sexo")
-                    ->label("Sexo")
+                Select::make('estado_civil')
+                    ->label('Estado Civil')
                     ->options([
-                        "0" => "Femenino",
-                        "1" => "Masculino",
+                        0 => 'Soltero/a',
+                        1 => 'Casado/a',
+                        2 => 'Viúdo/a',
                     ])
                     ->required()
                     ->validationMessages([
-                        "required" => "Requiere selecionar el sexo.",
+                        "required" => "Requiere selecionar el estado civil.",
                     ])
                     ->extraInputAttributes([
-                        'oninvalid' => "this.setCustomValidity('Por favor, selecione el sexo.')",
+                        'oninvalid' => "this.setCustomValidity('Por favor, selecione el género.')",
+                        'oninput' => "this.setCustomValidity('')",
+                    ]),
+                Select::make("genero")
+                    ->label("Género")
+                    ->options([
+                        0 => "Femenino",
+                        1 => "Masculino",
+                        2 => 'Otro',
+                    ])
+                    ->required()
+                    ->validationMessages([
+                        "required" => "Requiere selecionar el género.",
+                    ])
+                    ->extraInputAttributes([
+                        'oninvalid' => "this.setCustomValidity('Por favor, selecione el género.')",
                         'oninput' => "this.setCustomValidity('')",
                     ]),
                 DatePicker::make('fecha_de_nacimiento')

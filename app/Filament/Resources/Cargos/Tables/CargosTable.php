@@ -15,8 +15,7 @@ class CargosTable
         return $table
             ->columns([
                 TextColumn::make('nombre')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

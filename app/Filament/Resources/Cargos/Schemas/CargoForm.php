@@ -12,10 +12,7 @@ class CargoForm
         return $schema
             ->components([
                 TextInput::make('nombre')
-                    ->required()
-                    ->validationMessages([
-                        "required" => "Requiere introducir el nombre del cargo.",
-                    ]),
+                    ->required(),
             ]);
     }
 }

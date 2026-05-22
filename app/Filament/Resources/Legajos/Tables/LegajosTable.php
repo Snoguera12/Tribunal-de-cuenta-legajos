@@ -4,12 +4,14 @@ namespace App\Filament\Resources\Legajos\Tables;
 
 use App\Models\Cargo;
 use App\Models\Historialbaja;
+use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -18,8 +20,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use \Filament\Notifications\Notification;
-use Illuminate\Support\Carbon;
 
 class LegajosTable
 {
@@ -27,7 +27,7 @@ class LegajosTable
     {
         return $table
             ->columns([
-                TextColumn::make('num_legajo')
+            TextColumn::make('num_legajo')
                     ->label('Número de legajo')
                     ->searchable(),
                 TextColumn::make('persona.nombre')
@@ -35,6 +35,9 @@ class LegajosTable
                     ->sortable(),
                 TextColumn::make('persona.apellido')
                     ->label("Apellido")
+                    ->sortable(),
+                TextColumn::make('persona.dni')
+                    ->label("DNI")
                     ->sortable(),
                 IconColumn::make('estado')
                     ->boolean(),
@@ -58,9 +61,9 @@ class LegajosTable
             ->filters([
                 Filter::make('fecha_de_ingreso')
                 ->form([
-                    DateTimePicker::make('desde')
+                    DatePicker::make('desde')
                     ->label('Fecha de ingreso desde'),
-                    DateTimePicker::make('hasta')
+                    DatePicker::make('hasta')
                     ->label('Fecha de ingreso hasta'),
                 ])
                 ->query(
@@ -117,14 +120,23 @@ class LegajosTable
                 ->form(function (Model $record){
                     if($record->estado){
                         return [
-                            Textarea::make('razon')
+                            Select::make('select_motivo')
                             ->label('Motivo de la baja')
                             ->required()
-                            ->placeholder('Escribe aquí la razón...')
+                            ->options([
+                                0 => 'Renuncia',
+                                1 => 'Despido',
+                                2 => 'Vencimiento de Contrato',
+                                3 => 'Jubilación',
+                                4 => 'Fallecimiento',
+                                5 => 'Incapacidad',
+                                6 => 'Traslado'
+                            ])
+                            ->searchable()
                             ->extraInputAttributes([
-                            'oninvalid' => "this.setCustomValidity('Por favor, escribe el motivo de la baja.')",
-                            'oninput' => "this.setCustomValidity('')",],
-                        )];
+                            'oninvalid' => "this.setCustomValidity('Por favor, seleccione el motivo de la baja.')",
+                            'oninput' => "this.setCustomValidity('')",])
+                        ];
                     }
                 })
                 ->action(function (array $data, Model $record): void{
@@ -133,7 +145,7 @@ class LegajosTable
                     if($record->estado == 1){ 
                     Historialbaja::create([
                         'legajo_id' => $record->id,
-                        'descripcion' => $data['razon'],
+                        'motivo' => $data['select_motivo'],
                         'fecha_baja' => $fecha_actual
                     ]);
                     }
@@ -153,7 +165,7 @@ class LegajosTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    //DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
