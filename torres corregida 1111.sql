@@ -2,6 +2,45 @@ DROP DATABASE IF EXISTS torres_corregida1;
 CREATE DATABASE IF NOT EXISTS torres_corregida1;
 USE torres_corregida1;
 
+USE torres_corregida1;
+
+
+-- 2. Borrado de tablas maestras y principales
+DROP TABLE IF EXISTS categorias;
+DROP TABLE IF EXISTS cargos;
+DROP TABLE IF EXISTS oficinas;
+DROP TABLE IF EXISTS personas;
+DROP TABLE IF EXISTS legajos;
+DROP TABLE IF EXISTS usuario;
+
+-- 3. Borrado de tablas de detalle
+DROP TABLE IF EXISTS titulos;
+DROP TABLE IF EXISTS cursos;
+DROP TABLE IF EXISTS idiomas;
+DROP TABLE IF EXISTS familiar;
+DROP TABLE IF EXISTS antecedente_laboral;
+DROP TABLE IF EXISTS historial_legajos;
+DROP TABLE IF EXISTS sumarios;
+DROP TABLE IF EXISTS documentos;
+
+-- 4. Borrado de tablas históricas / auditoría
+DROP TABLE IF EXISTS historico_personas;
+DROP TABLE IF EXISTS historico_legajos;
+DROP TABLE IF EXISTS historico_titulos;
+DROP TABLE IF EXISTS historico_cursos;
+DROP TABLE IF EXISTS historico_idiomas;
+DROP TABLE IF EXISTS historico_familiar;
+DROP TABLE IF EXISTS historico_antecedente_laboral;
+DROP TABLE IF EXISTS historico_historial_legajos;
+DROP TABLE IF EXISTS historico_sumarios;
+DROP TABLE IF EXISTS historico_documentos;
+
+-- 5. Volver a activar la revisión de claves foráneas
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+
+
 
 
 CREATE TABLE categorias (
