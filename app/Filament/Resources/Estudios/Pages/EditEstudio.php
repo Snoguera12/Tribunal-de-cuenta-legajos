@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\Cargos\Pages;
+namespace App\Filament\Resources\Estudios\Pages;
 
-use App\Filament\Resources\Cargos\CargoResource;
+use App\Filament\Resources\Estudios\EstudioResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditCargo extends EditRecord
+class EditEstudio extends EditRecord
 {
-    protected static string $resource = CargoResource::class;
+    protected static string $resource = EstudioResource::class;
 
     protected function getHeaderActions(): array
     {

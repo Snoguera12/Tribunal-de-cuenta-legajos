@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('documentos', function (Blueprint $table) {
+            $table->id();
+            $table->integer('tipodoc')->nullable();
+            $table->string('archivo')->nullable();
+            $table->text('descripcion');
+            $table->boolean('activo');
+            $table->dateTime("fecha_de_creacion");
+            $table->dateTime("fecha_de_subida");
+            $table->foreignId("legajo_id")->constrained()->onDelete("cascade");
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('documentos');
+    }
+};

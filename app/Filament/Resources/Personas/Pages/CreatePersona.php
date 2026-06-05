@@ -14,6 +14,11 @@ class CreatePersona extends CreateRecord
         return 'Registrar Persona';
     }
 
+    public function getBreadcrumb(): string
+    {
+        return 'Registrar';
+    }
+
     // Cambia el texto del botón de enviar del formulario
     protected function getCreateFormAction(): Action
     {

@@ -20,12 +20,15 @@ class HistorialbajaResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
-    public static function getNavigationBadge(): ?string{
+    protected static ?string $modelLabel = "Historial de legajos";
+    protected static ?string $navigationParentItem = "Legajos";
+    protected static ?int $navigationSort = 1;
+    /*public static function getNavigationBadge(): ?string{
         return Historialbaja::count();
-    }
+    }*/
 
     public static function getNavigationBadgeColor(): string|array|null{
-        return "succes";
+        return "success";
     }
     public static function form(Schema $schema): Schema
     {
@@ -48,8 +51,8 @@ class HistorialbajaResource extends Resource
     {
         return [
             'index' => ListHistorialbajas::route('/'),
-            'create' => CreateHistorialbaja::route('/create'),
-            'edit' => EditHistorialbaja::route('/{record}/edit'),
+            //'create' => CreateHistorialbaja::route('/create'),
+            //'edit' => EditHistorialbaja::route('/{record}/edit'),
         ];
     }
 }

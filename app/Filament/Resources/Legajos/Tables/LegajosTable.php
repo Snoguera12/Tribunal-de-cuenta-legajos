@@ -6,8 +6,6 @@ use App\Models\Cargo;
 use App\Models\Historialbaja;
 use Carbon\Carbon;
 use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -27,25 +25,35 @@ class LegajosTable
     {
         return $table
             ->columns([
-            TextColumn::make('num_legajo')
+                TextColumn::make('num_legajo')
                     ->label('Número de legajo')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('persona.nombre')
                     ->label("Nombre")
-                    ->sortable(),
-                TextColumn::make('persona.apellido')
-                    ->label("Apellido")
-                    ->sortable(),
-                TextColumn::make('persona.dni')
-                    ->label("DNI")
-                    ->sortable(),
-                IconColumn::make('estado')
-                    ->boolean(),
-                TextColumn::make('cargo.nombre')
-                    ->sortable(),
-                TextColumn::make('categoria')
                     ->sortable()
                     ->searchable(),
+                TextColumn::make('persona.apellido')
+                    ->label("Apellido")
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('persona.dni')
+                    ->label("DNI")
+                    ->sortable()
+                    ->searchable(),
+                IconColumn::make('estado')
+                    ->boolean(),
+                TextColumn::make('area.nombre')
+                    ->label("Área")
+                    ->sortable(),
+                TextColumn::make('cargo.nombre')
+                    ->sortable(),
+                TextColumn::make('categoria.id')
+                    ->label("Categoría")
+                    ->sortable()
+                    ->formatStateUsing(
+                        fn ($record) => $record->categoria ? "{$record->categoria->nombre} {$record->categoria->descripcion}" : 'Sin asignar'
+                    ),
                 TextColumn::make('fecha_de_ingreso')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable(),
@@ -112,6 +120,7 @@ class LegajosTable
                 ->label(fn (Model $record) => $record->estado ? 'Dar de Baja' : 'Dar de Alta')
                 ->icon(fn (Model $record) => $record->estado ? Heroicon::ArrowDown : Heroicon::ArrowUp)
                 ->color(fn (Model $record) => $record->estado ? 'danger' : 'success')
+                ->visible(fn (Model $record) => $record->estado)
                 ->requiresConfirmation()
                 ->successNotification(NULL)
                 ->modalHeading(fn (Model $record) => $record->estado ? 'Cambiar estado a "Baja"' : 'Cambiar estado a "Alta"')
@@ -146,7 +155,8 @@ class LegajosTable
                     Historialbaja::create([
                         'legajo_id' => $record->id,
                         'motivo' => $data['select_motivo'],
-                        'fecha_baja' => $fecha_actual
+                        'fecha_baja' => $fecha_actual,
+                        'user_id' => auth()->id(),
                     ]);
                     }
 
@@ -162,11 +172,6 @@ class LegajosTable
                     ;
                 }),
                 EditAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }

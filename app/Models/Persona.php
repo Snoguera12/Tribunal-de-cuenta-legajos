@@ -13,9 +13,10 @@ class Persona extends Model
         "cuil",
         "email",
         "genero",
+        "estado_civil",
         "fecha_de_nacimiento",
         "domicilio",
         "telefono",
-        "telefono_emergencia"
+        "telefono_emergencia",
     ];
 }

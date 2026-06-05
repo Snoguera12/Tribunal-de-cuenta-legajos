@@ -33,7 +33,10 @@ class PersonaForm
                     ]),
                 TextInput::make('dni')
                     ->label("DNI")
+                    ->numeric()
                     ->unique()
+                    ->minValue(1)
+                    ->rules(['digits_between:1,9'])
                     ->required()
                     ->validationMessages([
                         "required" => "Requiere introducir el DNI.",
@@ -45,7 +48,10 @@ class PersonaForm
                     ]),
                 TextInput::make('cuil')
                     ->label("CUIL")
+                    ->numeric()
                     ->unique()
+                    ->minValue(1)
+                    ->rules(['digits_between:1,12'])
                     ->required()
                     ->validationMessages([
                         "required" => "Requiere introducir el CUIL.",

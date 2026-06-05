@@ -19,9 +19,14 @@ class PersonaResource extends Resource
     protected static ?string $model = Persona::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-    public static function getNavigationBadge(): ?string{
+    //protected static ?string $recordTitleAttribute = 'nombre'; 
+    protected static string|\UnitEnum|null $navigationGroup = "Agentes";
+    protected static ?string $modelLabel = "Datos Personales";
+    protected static ?int $navigationSort = 1;
+    
+    /*public static function getNavigationBadge(): ?string{
         return Persona::count();
-    }
+    }*/
 
     public static function getNavigationBadgeColor(): string|array|null{
         return "succes";
@@ -47,8 +52,8 @@ class PersonaResource extends Resource
     {
         return [
             'index' => ListPersonas::route('/'),
-            'create' => CreatePersona::route('/create'),
-            'edit' => EditPersona::route('/{record}/edit'),
+            'create' => CreatePersona::route('/registar'),
+            'edit' => EditPersona::route('/{record}/editar'),
         ];
     }
 }

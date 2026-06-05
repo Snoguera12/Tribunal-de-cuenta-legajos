@@ -44,6 +44,14 @@ class PersonasTable
                     2 => 'Otro',
                     default => 'Desconocido',
                 }),
+                TextColumn::make('estado_civil')
+                    ->label('Estado Civil')
+                    ->formatStateUsing(fn (int $state): string => match ($state) {
+                    0 => 'Soltero/a',
+                    1 => 'Casado/a',
+                    2 => 'Viúdo/a',
+                    default => 'Desconocido',
+                }),
                 TextColumn::make('fecha_de_nacimiento')
                     ->date('d/m/Y')
                     ->sortable(),

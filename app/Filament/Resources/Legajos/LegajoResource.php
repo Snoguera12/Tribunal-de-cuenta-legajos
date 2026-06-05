@@ -20,9 +20,12 @@ class LegajoResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
-    public static function getNavigationBadge(): ?string{
+    
+    protected static ?int $navigationSort = 1;
+    
+    /*public static function getNavigationBadge(): ?string{
         return Legajo::count();
-    }
+    }*/
 
     public static function getNavigationBadgeColor(): string|array|null{
         return "succes";
@@ -48,8 +51,8 @@ class LegajoResource extends Resource
     {
         return [
             'index' => ListLegajos::route('/'),
-            'create' => CreateLegajo::route('/create'),
-            'edit' => EditLegajo::route('/{record}/edit'),
+            'create' => CreateLegajo::route('/crear'),
+            'edit' => EditLegajo::route('/{record}/editar'),
         ];
     }
 }

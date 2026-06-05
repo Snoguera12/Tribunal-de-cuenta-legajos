@@ -14,17 +14,22 @@ class Legajo extends Model
         "num_legajo",
         "fecha_de_ingreso",
         "estado",
-        "cargo_id",
-        "categoria",
         "persona_id",
+        "categoria_id",
+        "cargo_id",
+        "area_id",
     ];
 
     public function persona(){
-        //return $this->hasMany(Persona::class);
-        return $this->belongsTo(Persona::class);
+        return $this->belongsTo(Persona::class, 'persona_id');
+    }
+    public function categoria(){
+        return $this->belongsTo(Categoria::class, 'categoria_id');
     }
     public function cargo(){
-        //return $this->hasMany(Cargo::class);
-        return $this->belongsTo(Cargo::class);
+        return $this->belongsTo(Cargo::class, 'cargo_id');
+    }
+    public function area(){
+        return $this->belongsTo(Area::class, 'area_id');
     }
 }

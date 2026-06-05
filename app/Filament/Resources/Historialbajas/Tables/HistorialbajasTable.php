@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Historialbajas\Tables;
 
+use App\Models\Persona;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -18,6 +19,17 @@ class HistorialbajasTable
                 TextColumn::make('legajo.num_legajo')
                     ->label("Número de legajo")
                     ->sortable(),
+                TextColumn::make('legajo.persona.nombre')
+                    ->label("Nombre")
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('legajo.persona.apellido')
+                    ->label("Apellido")
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('legajo.persona.dni')
+                    ->label("DNI")
+                    ->searchable(),
                 TextColumn::make('motivo')
                     ->label('Motivo de la baja')
                         ->formatStateUsing(fn (int $state): string => match ($state) {
@@ -46,12 +58,13 @@ class HistorialbajasTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                //EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    //DeleteBulkAction::make(),
                 ]),
             ]);
+            
     }
 }
