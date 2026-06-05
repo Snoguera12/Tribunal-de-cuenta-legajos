@@ -33,7 +33,7 @@ CREATE TABLE personas (
     genero ENUM('masculino', 'femenino', 'sin_determinar'),
     fecha_nacimiento DATE NOT NULL,
     estado_civil ENUM('soltero/a', 'viudo/a', 'casado/a', 'concubinato') NOT NULL,
-    cantidad_hijos INT (2) NOT NULL DEFAULT 0 CHECK (cantidad_hijos >= 0),
+    cantidad_hijos INT NOT NULL DEFAULT 0 CHECK (cantidad_hijos >= 0),
     provincia_residencia VARCHAR(50) NOT NULL, 
     ciudad_residencia VARCHAR(50) NOT NULL,
     domicilio_datos VARCHAR(300),    
@@ -41,7 +41,8 @@ CREATE TABLE personas (
     telefono VARCHAR(20) NOT NULL,
     telefono_emergencia VARCHAR(20) NOT NULL,
     email VARCHAR(50),
-    eliminado_logico TINYINT(1) NOT NULL DEFAULT 0
+    primer_ingreso TINYINT(1) NOT NULL ,
+   activo TINYINT(1) NOT NULL DEFAULT 1
 );
 
 CREATE TABLE legajos (
@@ -61,48 +62,51 @@ CREATE TABLE legajos (
     FOREIGN KEY (id_oficina) REFERENCES oficinas(id_oficina)
 );
 
-CREATE TABLE IF NOT EXISTS usuario (
+CREATE TABLE  usuario (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     usuario VARCHAR(50) NOT NULL UNIQUE,
     pass VARCHAR(255) NOT NULL,
     tipo ENUM('funcionario', 'rrhh', 'empleado') NOT NULL,
     id_legajo INT(8) NOT NULL UNIQUE,
     primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
-    activo TINYINT(1) NOT NULL DEFAULT 1,
+    activo TINYINT(1) NOT NULL ,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ultimo_login TIMESTAMP NULL,
-    FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo) ON DELETE RESTRICT
-);
+    FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo) 
+    );
 
-CREATE TABLE estudio (
-    id_estudio INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE titulos (
+    id_titulo INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(100) NOT NULL,
     nivel_estudio ENUM('primaria', 'secundaria', 'terciario', 'universitario', 'doctorado', 'maestria', 'sin_estudios'),
     institucion VARCHAR(100) NOT NULL,
     fecha_inicio DATE NOT NULL,
     fecha_fin DATE NOT NULL,
     id_legajo INT (8) NOT NULL,
-    activo TINYINT(1) NOT NULL DEFAULT 1,
+    primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
+    activo TINYINT(1) NOT NULL ,
     FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo) 
 );
     
-CREATE TABLE curso (
+CREATE TABLE cursos (
     id_curso INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     institucion VARCHAR(100) NOT NULL,
     fecha_inicio DATE NOT NULL,
     horas INT,
     id_legajo INT (8) NOT NULL,
-    activo TINYINT(1) NOT NULL DEFAULT 1,
+	primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
+    activo TINYINT(1) NOT NULL ,
     FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo) 
 );
     
-CREATE TABLE idioma (
+CREATE TABLE idiomas (
     id_idioma INT AUTO_INCREMENT PRIMARY KEY,
     nombre ENUM('Inglés','Italiano','Portugués','Francés','Alemán','Español','Coreano','Japonés','Chino Mandarín') NOT NULL,
     nivel ENUM('Principiante (A1-A2)', 'Intermedio (B1-B2)', 'Avanzado (C1-C2)', 'Nativo') NOT NULL,
     id_legajo INT (8) NOT NULL,
-    activo TINYINT(1) NOT NULL DEFAULT 1,
+    primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
+    activo TINYINT(1) NOT NULL ,
     FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo) 
 );
 
@@ -115,7 +119,8 @@ CREATE TABLE familiar (
     estado ENUM('vivo', 'fallecido') NOT NULL,
     relacion_empleado ENUM('padres', 'hijos', 'suegros', 'sobrinos', 'conyuge'),
     id_legajo INT (8) NOT NULL,
-    activo TINYINT(1) NOT NULL DEFAULT 1,
+    primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
+    activo TINYINT(1) NOT NULL ,
     FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo) 
 );
     
@@ -126,32 +131,35 @@ CREATE TABLE antecedente_laboral (
     fecha_inicio DATE,
     fecha_fin DATE,
     id_legajo INT (8) NOT NULL,
-    activo TINYINT(1) NOT NULL DEFAULT 1,
+    primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
+    activo TINYINT(1) NOT NULL ,
     FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo) 
 );
 
-CREATE TABLE historial_legajo (
+CREATE TABLE historial_legajos (
     id_historial INT AUTO_INCREMENT PRIMARY KEY,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     accion ENUM('advertencia', 'llamada_atencion', 'suspension', 'cambio_de_funcion', 'sumario', 'traslado', 'vencimiento_contrato', 'jubilacion', 'renuncia', 'difunto', 'incapacidad', 'licencia') NOT NULL,
     detalle VARCHAR(300),
     id_legajo INT (8) NOT NULL,
-    activo TINYINT(1) NOT NULL DEFAULT 1,
+    primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
+    activo TINYINT(1) NOT NULL ,
     FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo) 
 );
 
-CREATE TABLE sumario (
+CREATE TABLE sumarios (
     id_sumario INT AUTO_INCREMENT PRIMARY KEY,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     detalle VARCHAR(300),
     id_legajo INT (8) NOT NULL,
-    activo TINYINT(1) NOT NULL DEFAULT 1,
+    primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
+    activo TINYINT(1) NOT NULL ,
     FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo) 
 );
     
 CREATE TABLE documentos (
-    id_documentos INT AUTO_INCREMENT PRIMARY KEY,
-    tipodoc ENUM('DNI', 'TITULO', 'CURSOS', 'LICENCIA', 'ACTA_DE_NACIMIENTO', 'CERTIFICADO_ESCOLARIDAD', 'CERTIFICADO_DEFUNCION', 'SUMARIO', 'RESOLUCION', 'CERTIFICADO_DE_CASAMIENTO', 'FOTO_PERFIL', 'CURRICULUM', 'OTRO') NOT NULL,
+    id_documento INT AUTO_INCREMENT PRIMARY KEY,
+    tipo_doc ENUM('DNI', 'TITULO', 'CURSOS', 'LICENCIA', 'ACTA_DE_NACIMIENTO', 'CERTIFICADO_ESCOLARIDAD', 'CERTIFICADO_DEFUNCION', 'SUMARIO', 'RESOLUCION', 'CERTIFICADO_DE_CASAMIENTO', 'FOTO_PERFIL', 'CURRICULUM', 'OTRO') NOT NULL,
     creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     descripcion TEXT,
     nombre_archivo VARCHAR(255) NOT NULL,
@@ -161,7 +169,8 @@ CREATE TABLE documentos (
     extension VARCHAR(10) NOT NULL,
     hash_archivo VARCHAR(64) NOT NULL,
     id_legajo INT (8) NOT NULL,
-    activo TINYINT(1) NOT NULL DEFAULT 1,
+    primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
+    activo TINYINT(1) NOT NULL ,
     FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo) 
 );
 
@@ -180,173 +189,147 @@ INSERT INTO categorias (nombre_categoria, descripcion) VALUES
 ('CAT 12', 'ORDENANZA - CHOFER - SIN TITULO');
 
 CREATE TABLE historico_personas (
-    id_historico INT AUTO_INCREMENT PRIMARY KEY,
-    id_persona INT,
-    nombre VARCHAR(100),
-    apellido VARCHAR(100),
-    dni VARCHAR(20),
+    id_historico_persona INT AUTO_INCREMENT PRIMARY KEY,
+    id_persona INT (8),
+    dni CHAR(8) ,
+    apellido VARCHAR(50) ,
+    nombre VARCHAR(50) ,
+    genero VARCHAR(15),
     fecha_nacimiento DATE,
-    email VARCHAR(100),
+    estado_civil VARCHAR(15),
+    cantidad_hijos INT ,
+    provincia_residencia VARCHAR(50) , 
+    ciudad_residencia VARCHAR(50) ,
+    domicilio_datos VARCHAR(300),    
+    cuil VARCHAR(13) , 
     telefono VARCHAR(20),
-    domicilio VARCHAR(200),
-    localidad VARCHAR(100),
-    provincia VARCHAR(100),
-    pais VARCHAR(50),
-    estado_civil VARCHAR(30),
-    genero VARCHAR(20),
-    fecha_archivo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    telefono_emergencia VARCHAR(20) ,
+    email VARCHAR(50),   
+	fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_accion VARCHAR(50),
     tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
 );
 
 CREATE TABLE historico_legajos (
-    id_historico INT AUTO_INCREMENT PRIMARY KEY,
-    id_legajo INT,
-    id_persona INT,
-    numero_legajo VARCHAR(50),
-    fecha_ingreso DATE,
-    fecha_egreso DATE,
-    cargo VARCHAR(100),
-    area VARCHAR(100),
-    sector VARCHAR(100),
-    estado VARCHAR(30),
-    observaciones TEXT,
-    fecha_archivo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id_historico_legajo INT AUTO_INCREMENT PRIMARY KEY,
+    id_legajo INT (8) ,
+    fecha_registro date,
+     fecha_ingreso DATE, 
+    fecha_ingreso_administracion DATE,
+    id_cargo INT,
+    id_categoria INT,
+    id_oficina INT,
+    tipo_contrato VARCHAR(20),
+    estado VARCHAR(20),    
+    id_persona int (8) ,
+	fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_accion VARCHAR(50),
     tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
 );
 
-CREATE TABLE historico_estudio (
-    id_historico INT AUTO_INCREMENT PRIMARY KEY,
-    id_estudio INT,
-    id_persona INT,
-    nivel_estudio VARCHAR(50),
-    institucion VARCHAR(150),
-    titulo VARCHAR(150),
-    fecha_inicio DATE,
-    fecha_fin DATE,
-    estado VARCHAR(30),
-    certificado VARCHAR(100),
-    fecha_archivo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE historico_titulos (
+    id_historico_titulo INT AUTO_INCREMENT PRIMARY KEY,
+    id_titulo INT ,
+    titulo VARCHAR(100),
+    nivel_estudio varchar (30),
+    institucion VARCHAR(100) ,
+    fecha_inicio DATE ,
+    fecha_fin DATE ,
+    id_legajo INT (8), 
+    fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_accion VARCHAR(50),
     tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
 );
 
-CREATE TABLE historico_curso (
-    id_historico INT AUTO_INCREMENT PRIMARY KEY,
-    id_curso INT,
-    id_persona INT,
-    nombre_curso VARCHAR(150),
-    institucion VARCHAR(150),
-    duracion_horas INT,
-    fecha_inicio DATE,
-    fecha_fin DATE,
-    certificado VARCHAR(100),
-    tipo VARCHAR(50),
-    fecha_archivo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE historico_cursos (
+    id_historico_curso INT AUTO_INCREMENT PRIMARY KEY,
+    id_curso INT ,
+    nombre VARCHAR(100) ,
+    institucion VARCHAR(100) ,
+    fecha_inicio DATE ,
+    horas INT,
+    id_legajo INT (8) ,
+     fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_accion VARCHAR(50),
     tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
 );
 
-CREATE TABLE historico_idioma (
-    id_historico INT AUTO_INCREMENT PRIMARY KEY,
-    id_idioma INT,
-    id_persona INT,
-    idioma VARCHAR(50),
-    nivel_oral ENUM('Básico', 'Intermedio', 'Avanzado', 'Nativo'),
-    nivel_escrito ENUM('Básico', 'Intermedio', 'Avanzado', 'Nativo'),
-    certificacion VARCHAR(100),
-    institucion VARCHAR(150),
-    fecha_archivo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE historico_idiomas (
+    id_historico_idioma INT AUTO_INCREMENT PRIMARY KEY,
+    id_idioma INT ,
+    nombre varchar (25),
+    nivel varchar (25),
+    id_legajo INT (8),
+    fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_accion VARCHAR(50),
     tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
 );
 
 CREATE TABLE historico_familiar (
-    id_historico INT AUTO_INCREMENT PRIMARY KEY,
-    id_familiar INT,
-    id_persona INT,
-    nombre VARCHAR(100),
-    apellido VARCHAR(100),
-    parentesco VARCHAR(50),
-    dni VARCHAR(20),
-    telefono VARCHAR(20),
-    fecha_nacimiento DATE,
-    observaciones TEXT,
-    fecha_archivo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id_historico_familiar INT AUTO_INCREMENT PRIMARY KEY,
+    id_familiar INT ,
+    nombre_familiar VARCHAR(50) ,
+    apellido_familiar VARCHAR(50) ,
+    dni_familiar CHAR(8) , 
+    fecha_nac_familiar DATE ,
+    estado varchar (20),
+    relacion_empleado varchar (20),
+    id_legajo INT (8) NOT NULL,
+     fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_accion VARCHAR(50),
     tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
 );
 
 CREATE TABLE historico_antecedente_laboral (
-    id_historico INT AUTO_INCREMENT PRIMARY KEY,
-    id_antecedente INT,
-    id_persona INT,
-    empresa VARCHAR(150),
+    id_historico_laboral INT AUTO_INCREMENT PRIMARY KEY,
+   id_antecedente INT ,
+    empresa VARCHAR(100),
     cargo VARCHAR(100),
     fecha_inicio DATE,
     fecha_fin DATE,
-    tareas TEXT,
-    telefono_contacto VARCHAR(20),
-    motivo_egreso TEXT,
-    fecha_archivo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id_legajo INT (8),  
+   fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_accion VARCHAR(50),
     tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
 );
 
-CREATE TABLE historico_historial_legajo (
-    id_historico INT AUTO_INCREMENT PRIMARY KEY,
-    id_historial INT,
-    id_legajo INT,
-    fecha_movimiento DATE,
-    tipo_movimiento VARCHAR(50),
+CREATE TABLE historico_historial_legajos (
+    id_historico_historial_legajo INT AUTO_INCREMENT PRIMARY KEY,
+    id_historial INT ,
+    fecha_registro date,
+    accion varchar (25),
+    detalle VARCHAR(300),
+    id_legajo INT (8),
+     fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    usuario_accion VARCHAR(50),
+    tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
+);
+
+CREATE TABLE historico_sumarios (
+    id_historico_sumario INT AUTO_INCREMENT PRIMARY KEY,
+    id_sumario INT ,
+    fecha_registro date,
+    id_legajo INT (8) ,    
+    fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    usuario_accion VARCHAR(50),
+    tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
+);
+
+CREATE TABLE historico_documentos (
+    id_historico_documento INT AUTO_INCREMENT PRIMARY KEY,
+    id_documento INT ,
+    tipo_doc varchar (30),
+    creado_en date,
     descripcion TEXT,
-    usuario_responsable VARCHAR(100),
-    documento_respaldo VARCHAR(200),
-    fecha_archivo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    nombre_archivo VARCHAR(255) ,
+    ruta_archivo VARCHAR(500) ,
+    tamano_archivo INT(11) ,
+    mime_type VARCHAR(100) ,
+    extension VARCHAR(10) ,
+    hash_archivo VARCHAR(64) ,
+    id_legajo INT (8),  
+    fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_accion VARCHAR(50),
     tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
 );
 
-CREATE TABLE historico_sumario (
-    id_historico INT AUTO_INCREMENT PRIMARY KEY,
-    id_sumario INT,
-    id_legajo INT,
-    numero_sumario VARCHAR(50),
-    fecha_apertura DATE,
-    fecha_cierre DATE,
-    cargos TEXT,
-    resolucion TEXT,
-    sancion VARCHAR(100),
-    estado VARCHAR(30),
-    instructor VARCHAR(100),
-    fecha_archivo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    usuario_accion VARCHAR(50),
-    tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
-);
-
-CREATE TABLE historico_documento (
-    id_historico INT AUTO_INCREMENT PRIMARY KEY,
-    id_documento INT,
-    id_persona INT,
-    tipo_documento VARCHAR(50),
-    numero_documento VARCHAR(50),
-    fecha_emision DATE,
-    fecha_vencimiento DATE,
-    archivo_path VARCHAR(500),
-    observaciones TEXT,
-    fecha_archivo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    usuario_accion VARCHAR(50),
-    tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
-);
-
-CREATE INDEX idx_hist_personas_id ON historico_personas(id_persona, fecha_archivo);
-CREATE INDEX idx_hist_legajos_id ON historico_legajos(id_legajo, fecha_archivo);
-CREATE INDEX idx_hist_estudio_persona ON historico_estudio(id_persona, fecha_archivo);
-CREATE INDEX idx_hist_curso_persona ON historico_curso(id_persona, fecha_archivo);
-CREATE INDEX idx_hist_idioma_persona ON historico_idioma(id_persona, fecha_archivo);
-CREATE INDEX idx_hist_familiar_persona ON historico_familiar(id_persona, fecha_archivo);
-CREATE INDEX idx_hist_antecedente_persona ON historico_antecedente_laboral(id_persona, fecha_archivo);
-CREATE INDEX idx_hist_historial_legajo ON historico_historial_legajo(id_legajo, fecha_archivo);
-CREATE INDEX idx_hist_sumario_legajo ON historico_sumario(id_legajo, fecha_archivo);
-CREATE INDEX idx_hist_documento_persona ON historico_documento(id_persona, fecha_archivo);
