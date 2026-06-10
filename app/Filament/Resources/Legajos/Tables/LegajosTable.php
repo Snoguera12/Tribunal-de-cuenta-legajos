@@ -28,35 +28,44 @@ class LegajosTable
                 TextColumn::make('num_legajo')
                     ->label('Número de legajo')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('persona.nombre')
                     ->label("Nombre")
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('persona.apellido')
                     ->label("Apellido")
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('persona.dni')
                     ->label("DNI")
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 IconColumn::make('estado')
-                    ->boolean(),
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('area.nombre')
                     ->label("Área")
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('cargo.nombre')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('categoria.id')
                     ->label("Categoría")
                     ->sortable()
                     ->formatStateUsing(
                         fn ($record) => $record->categoria ? "{$record->categoria->nombre} {$record->categoria->descripcion}" : 'Sin asignar'
-                    ),
+                    )
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('fecha_de_ingreso')
                     ->dateTime('d/m/Y H:i:s')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -90,13 +99,13 @@ class LegajosTable
                 SelectFilter::make('cargo_id')
                 ->label('Cargo')
                 ->options(Cargo::all()->pluck('nombre', 'id')),
-                SelectFilter::make('estado')
+                /*SelectFilter::make('estado')
                 ->options([
                     0 => 'Baja',
                     1 => 'Alta'
                 ])
                 ->default(true),
-                
+                */
                 
             ])
             ->recordActions([
@@ -115,7 +124,7 @@ class LegajosTable
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
                 ->modalCancelAction(fn ($action) => $action->color('info')),*/
-
+                
                 Action::make('estado')
                 ->label(fn (Model $record) => $record->estado ? 'Dar de Baja' : 'Dar de Alta')
                 ->icon(fn (Model $record) => $record->estado ? Heroicon::ArrowDown : Heroicon::ArrowUp)
