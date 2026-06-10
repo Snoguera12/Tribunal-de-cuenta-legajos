@@ -1,0 +1,848 @@
+USE torres_corregida1;
+
+-- STORED PROCEDURES PARA ROL RRHH - torres_corregida1
+-- ACCESO: Solo usuarios con tipo = 'rrhh'
+-- RESTRICCION: Solo puede crear usuarios de tipo empleado
+
+-- 1. TABLA: personas
+-- SP #1:  sp_rrhh_insertar_persona            - Inserta una persona nueva
+-- SP #2:  sp_rrhh_modificar_persona           - Modifica los datos de una persona
+-- SP #3:  sp_rrhh_obtener_persona             - Muestra los datos de una persona
+
+-- 2. TABLA: legajos
+-- SP #4:  sp_rrhh_insertar_legajo             - Inserta un legajo nuevo
+-- SP #5:  sp_rrhh_modificar_legajo            - Modifica los datos de un legajo
+-- SP #6:  sp_rrhh_obtener_legajo              - Muestra los datos de un legajo
+
+-- 3. TABLA: titulos
+-- SP #7:  sp_rrhh_insertar_titulo             - Inserta un título nuevo
+-- SP #8:  sp_rrhh_modificar_titulo            - Modifica los datos de un título
+-- SP #9:  sp_rrhh_obtener_titulos             - Muestra los títulos de un legajo
+
+-- 4. TABLA: cursos
+-- SP #10: sp_rrhh_insertar_curso              - Inserta un curso nuevo
+-- SP #11: sp_rrhh_modificar_curso             - Modifica los datos de un curso
+-- SP #12: sp_rrhh_obtener_cursos              - Muestra los cursos de un legajo
+
+-- 5. TABLA: idiomas
+-- SP #13: sp_rrhh_insertar_idioma             - Inserta un idioma nuevo
+-- SP #14: sp_rrhh_modificar_idioma            - Modifica los datos de un idioma
+-- SP #15: sp_rrhh_obtener_idiomas             - Muestra los idiomas de un legajo
+
+-- 6. TABLA: familiar
+-- SP #16: sp_rrhh_insertar_familiar           - Inserta un familiar nuevo
+-- SP #17: sp_rrhh_modificar_familiar          - Modifica los datos de un familiar
+-- SP #18: sp_rrhh_obtener_familiares          - Muestra los familiares de un legajo
+
+-- 7. TABLA: antecedente_laboral
+-- SP #19: sp_rrhh_insertar_antecedente        - Inserta un antecedente laboral nuevo
+-- SP #20: sp_rrhh_modificar_antecedente       - Modifica los datos de un antecedente laboral
+-- SP #21: sp_rrhh_obtener_antecedentes        - Muestra los antecedentes laborales de un legajo
+
+-- 8. TABLA: historial_legajos
+-- SP #22: sp_rrhh_insertar_historial          - Inserta un historial de legajo nuevo
+-- SP #23: sp_rrhh_modificar_historial         - Modifica los datos de un historial de legajo
+-- SP #24: sp_rrhh_obtener_historial           - Muestra el historial de un legajo
+
+-- 9. TABLA: sumarios
+-- SP #25: sp_rrhh_insertar_sumario            - Inserta un sumario nuevo
+-- SP #26: sp_rrhh_modificar_sumario           - Modifica los datos de un sumario
+-- SP #27: sp_rrhh_obtener_sumarios            - Muestra los sumarios de un legajo
+
+-- 10. TABLA: documentos
+-- SP #28: sp_rrhh_insertar_documento          - Inserta un documento nuevo
+-- SP #29: sp_rrhh_modificar_documento         - Modifica los datos de un documento
+-- SP #30: sp_rrhh_obtener_documentos          - Muestra los documentos de un legajo
+
+-- 11. TABLA: usuario
+-- SP #31: sp_rrhh_crear_usuario_automatico    - Crea usuario tipo empleado con nombre y clave automaticos
+-- SP #32: sp_rrhh_modificar_usuario           - Modifica los datos de un usuario empleado
+-- SP #33: sp_rrhh_obtener_usuario             - Muestra los datos de un usuario
+
+-- 12. FLUJO DE INGRESO
+-- SP #34: sp_rrhh_ingreso_persona_legajo      - Inserta persona y legajo y crea usuario empleado automatico
+-- SP #35: sp_rrhh_obtener_credenciales        - Devuelve credenciales y datos de contacto para notificar
+
+-- ======================================================================
+-- LIMPIEZA PREVIA
+-- ======================================================================
+DROP PROCEDURE IF EXISTS sp_rrhh_insertar_persona;
+DROP PROCEDURE IF EXISTS sp_rrhh_modificar_persona;
+DROP PROCEDURE IF EXISTS sp_rrhh_obtener_persona;
+DROP PROCEDURE IF EXISTS sp_rrhh_insertar_legajo;
+DROP PROCEDURE IF EXISTS sp_rrhh_modificar_legajo;
+DROP PROCEDURE IF EXISTS sp_rrhh_obtener_legajo;
+DROP PROCEDURE IF EXISTS sp_rrhh_insertar_titulo;
+DROP PROCEDURE IF EXISTS sp_rrhh_modificar_titulo;
+DROP PROCEDURE IF EXISTS sp_rrhh_obtener_titulos;
+DROP PROCEDURE IF EXISTS sp_rrhh_insertar_curso;
+DROP PROCEDURE IF EXISTS sp_rrhh_modificar_curso;
+DROP PROCEDURE IF EXISTS sp_rrhh_obtener_cursos;
+DROP PROCEDURE IF EXISTS sp_rrhh_insertar_idioma;
+DROP PROCEDURE IF EXISTS sp_rrhh_modificar_idioma;
+DROP PROCEDURE IF EXISTS sp_rrhh_obtener_idiomas;
+DROP PROCEDURE IF EXISTS sp_rrhh_insertar_familiar;
+DROP PROCEDURE IF EXISTS sp_rrhh_modificar_familiar;
+DROP PROCEDURE IF EXISTS sp_rrhh_obtener_familiares;
+DROP PROCEDURE IF EXISTS sp_rrhh_insertar_antecedente;
+DROP PROCEDURE IF EXISTS sp_rrhh_modificar_antecedente;
+DROP PROCEDURE IF EXISTS sp_rrhh_obtener_antecedentes;
+DROP PROCEDURE IF EXISTS sp_rrhh_insertar_historial;
+DROP PROCEDURE IF EXISTS sp_rrhh_modificar_historial;
+DROP PROCEDURE IF EXISTS sp_rrhh_obtener_historial;
+DROP PROCEDURE IF EXISTS sp_rrhh_insertar_sumario;
+DROP PROCEDURE IF EXISTS sp_rrhh_modificar_sumario;
+DROP PROCEDURE IF EXISTS sp_rrhh_obtener_sumarios;
+DROP PROCEDURE IF EXISTS sp_rrhh_insertar_documento;
+DROP PROCEDURE IF EXISTS sp_rrhh_modificar_documento;
+DROP PROCEDURE IF EXISTS sp_rrhh_obtener_documentos;
+DROP PROCEDURE IF EXISTS sp_rrhh_crear_usuario_automatico;
+DROP PROCEDURE IF EXISTS sp_rrhh_modificar_usuario;
+DROP PROCEDURE IF EXISTS sp_rrhh_obtener_usuario;
+DROP PROCEDURE IF EXISTS sp_rrhh_ingreso_persona_legajo;
+DROP PROCEDURE IF EXISTS sp_rrhh_obtener_credenciales;
+
+DELIMITER //
+
+-- ======================================================================
+-- 1. TABLA: personas
+-- ======================================================================
+
+CREATE PROCEDURE sp_rrhh_insertar_persona(
+    IN p_id_ejecutor INT,
+    IN p_dni CHAR(8),
+    IN p_apellido VARCHAR(50),
+    IN p_nombre VARCHAR(50),
+    IN p_genero ENUM('masculino','femenino','sin_determinar'),
+    IN p_fecha_nacimiento DATE,
+    IN p_estado_civil ENUM('soltero/a','viudo/a','casado/a','concubinato'),
+    IN p_cantidad_hijos INT,
+    IN p_provincia_residencia VARCHAR(50),
+    IN p_ciudad_residencia VARCHAR(50),
+    IN p_domicilio_datos VARCHAR(300),
+    IN p_cuil VARCHAR(13),
+    IN p_telefono VARCHAR(20),
+    IN p_telefono_emergencia VARCHAR(20),
+    IN p_email VARCHAR(50)
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    INSERT INTO personas (dni, apellido, nombre, genero, fecha_nacimiento, estado_civil, cantidad_hijos, provincia_residencia, ciudad_residencia, domicilio_datos, cuil, telefono, telefono_emergencia, email)
+    VALUES (p_dni, p_apellido, p_nombre, p_genero, p_fecha_nacimiento, p_estado_civil, p_cantidad_hijos, p_provincia_residencia, p_ciudad_residencia, p_domicilio_datos, p_cuil, p_telefono, p_telefono_emergencia, p_email);
+END//
+
+CREATE PROCEDURE sp_rrhh_modificar_persona(
+    IN p_id_ejecutor INT,
+    IN p_id_persona INT,
+    IN p_dni CHAR(8),
+    IN p_apellido VARCHAR(50),
+    IN p_nombre VARCHAR(50),
+    IN p_genero ENUM('masculino','femenino','sin_determinar'),
+    IN p_fecha_nacimiento DATE,
+    IN p_estado_civil ENUM('soltero/a','viudo/a','casado/a','concubinato'),
+    IN p_cantidad_hijos INT,
+    IN p_provincia_residencia VARCHAR(50),
+    IN p_ciudad_residencia VARCHAR(50),
+    IN p_domicilio_datos VARCHAR(300),
+    IN p_cuil VARCHAR(13),
+    IN p_telefono VARCHAR(20),
+    IN p_telefono_emergencia VARCHAR(20),
+    IN p_email VARCHAR(50)
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    UPDATE personas SET
+        dni = p_dni,
+        apellido = p_apellido,
+        nombre = p_nombre,
+        genero = p_genero,
+        fecha_nacimiento = p_fecha_nacimiento,
+        estado_civil = p_estado_civil,
+        cantidad_hijos = p_cantidad_hijos,
+        provincia_residencia = p_provincia_residencia,
+        ciudad_residencia = p_ciudad_residencia,
+        domicilio_datos = p_domicilio_datos,
+        cuil = p_cuil,
+        telefono = p_telefono,
+        telefono_emergencia = p_telefono_emergencia,
+        email = p_email
+    WHERE id_persona = p_id_persona;
+END//
+
+CREATE PROCEDURE sp_rrhh_obtener_persona(
+    IN p_id_persona INT
+)
+BEGIN
+    SELECT * FROM personas WHERE id_persona = p_id_persona AND activo = 1;
+END//
+
+-- ======================================================================
+-- 2. TABLA: legajos
+-- ======================================================================
+
+CREATE PROCEDURE sp_rrhh_insertar_legajo(
+    IN p_id_ejecutor INT,
+    IN p_fecha_ingreso DATE,
+    IN p_fecha_ingreso_administracion DATE,
+    IN p_id_cargo INT,
+    IN p_id_categoria INT,
+    IN p_id_oficina INT,
+    IN p_tipo_contrato ENUM('locacion','permanente','funcionario'),
+    IN p_estado ENUM('activo','de_baja','traslado','prestamo'),
+    IN p_id_persona INT
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    INSERT INTO legajos (fecha_ingreso, fecha_ingreso_administracion, id_cargo, id_categoria, id_oficina, tipo_contrato, estado, id_persona)
+    VALUES (p_fecha_ingreso, p_fecha_ingreso_administracion, p_id_cargo, p_id_categoria, p_id_oficina, p_tipo_contrato, p_estado, p_id_persona);
+END//
+
+CREATE PROCEDURE sp_rrhh_modificar_legajo(
+    IN p_id_ejecutor INT,
+    IN p_id_legajo INT,
+    IN p_fecha_ingreso DATE,
+    IN p_fecha_ingreso_administracion DATE,
+    IN p_id_cargo INT,
+    IN p_id_categoria INT,
+    IN p_id_oficina INT,
+    IN p_tipo_contrato ENUM('locacion','permanente','funcionario'),
+    IN p_estado ENUM('activo','de_baja','traslado','prestamo')
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    UPDATE legajos SET
+        fecha_ingreso = p_fecha_ingreso,
+        fecha_ingreso_administracion = p_fecha_ingreso_administracion,
+        id_cargo = p_id_cargo,
+        id_categoria = p_id_categoria,
+        id_oficina = p_id_oficina,
+        tipo_contrato = p_tipo_contrato,
+        estado = p_estado
+    WHERE id_legajo = p_id_legajo;
+END//
+
+CREATE PROCEDURE sp_rrhh_obtener_legajo(
+    IN p_id_legajo INT
+)
+BEGIN
+    SELECT l.*, p.apellido, p.nombre, p.dni,
+        c.nombre_cargo, cat.nombre_categoria, o.nombre_oficina
+    FROM legajos l
+    INNER JOIN personas p ON p.id_persona = l.id_persona
+    LEFT JOIN cargos c ON c.id_cargo = l.id_cargo
+    LEFT JOIN categorias cat ON cat.id_categoria = l.id_categoria
+    LEFT JOIN oficinas o ON o.id_oficina = l.id_oficina
+    WHERE l.id_legajo = p_id_legajo;
+END//
+
+-- ======================================================================
+-- 3. TABLA: titulos
+-- ======================================================================
+
+CREATE PROCEDURE sp_rrhh_insertar_titulo(
+    IN p_id_ejecutor INT,
+    IN p_titulo VARCHAR(100),
+    IN p_nivel_estudio ENUM('primaria','secundaria','terciario','universitario','doctorado','maestria','sin_estudios'),
+    IN p_institucion VARCHAR(100),
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE,
+    IN p_id_legajo INT
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    INSERT INTO titulos (titulo, nivel_estudio, institucion, fecha_inicio, fecha_fin, id_legajo)
+    VALUES (p_titulo, p_nivel_estudio, p_institucion, p_fecha_inicio, p_fecha_fin, p_id_legajo);
+END//
+
+CREATE PROCEDURE sp_rrhh_modificar_titulo(
+    IN p_id_ejecutor INT,
+    IN p_id_titulo INT,
+    IN p_titulo VARCHAR(100),
+    IN p_nivel_estudio ENUM('primaria','secundaria','terciario','universitario','doctorado','maestria','sin_estudios'),
+    IN p_institucion VARCHAR(100),
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    UPDATE titulos SET
+        titulo = p_titulo,
+        nivel_estudio = p_nivel_estudio,
+        institucion = p_institucion,
+        fecha_inicio = p_fecha_inicio,
+        fecha_fin = p_fecha_fin
+    WHERE id_titulo = p_id_titulo;
+END//
+
+CREATE PROCEDURE sp_rrhh_obtener_titulos(
+    IN p_id_legajo INT
+)
+BEGIN
+    SELECT * FROM titulos WHERE id_legajo = p_id_legajo AND activo = 1;
+END//
+
+-- ======================================================================
+-- 4. TABLA: cursos
+-- ======================================================================
+
+CREATE PROCEDURE sp_rrhh_insertar_curso(
+    IN p_id_ejecutor INT,
+    IN p_nombre VARCHAR(100),
+    IN p_institucion VARCHAR(100),
+    IN p_fecha_inicio DATE,
+    IN p_horas INT,
+    IN p_id_legajo INT
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    INSERT INTO cursos (nombre, institucion, fecha_inicio, horas, id_legajo)
+    VALUES (p_nombre, p_institucion, p_fecha_inicio, p_horas, p_id_legajo);
+END//
+
+CREATE PROCEDURE sp_rrhh_modificar_curso(
+    IN p_id_ejecutor INT,
+    IN p_id_curso INT,
+    IN p_nombre VARCHAR(100),
+    IN p_institucion VARCHAR(100),
+    IN p_fecha_inicio DATE,
+    IN p_horas INT
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    UPDATE cursos SET
+        nombre = p_nombre,
+        institucion = p_institucion,
+        fecha_inicio = p_fecha_inicio,
+        horas = p_horas
+    WHERE id_curso = p_id_curso;
+END//
+
+CREATE PROCEDURE sp_rrhh_obtener_cursos(
+    IN p_id_legajo INT
+)
+BEGIN
+    SELECT * FROM cursos WHERE id_legajo = p_id_legajo AND activo = 1;
+END//
+
+-- ======================================================================
+-- 5. TABLA: idiomas
+-- ======================================================================
+
+CREATE PROCEDURE sp_rrhh_insertar_idioma(
+    IN p_id_ejecutor INT,
+    IN p_nombre ENUM('Inglés','Italiano','Portugués','Francés','Alemán','Español','Coreano','Japonés','Chino Mandarín'),
+    IN p_nivel ENUM('Principiante (A1-A2)','Intermedio (B1-B2)','Avanzado (C1-C2)','Nativo'),
+    IN p_id_legajo INT
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    INSERT INTO idiomas (nombre, nivel, id_legajo)
+    VALUES (p_nombre, p_nivel, p_id_legajo);
+END//
+
+CREATE PROCEDURE sp_rrhh_modificar_idioma(
+    IN p_id_ejecutor INT,
+    IN p_id_idioma INT,
+    IN p_nombre ENUM('Inglés','Italiano','Portugués','Francés','Alemán','Español','Coreano','Japonés','Chino Mandarín'),
+    IN p_nivel ENUM('Principiante (A1-A2)','Intermedio (B1-B2)','Avanzado (C1-C2)','Nativo')
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    UPDATE idiomas SET
+        nombre = p_nombre,
+        nivel = p_nivel
+    WHERE id_idioma = p_id_idioma;
+END//
+
+CREATE PROCEDURE sp_rrhh_obtener_idiomas(
+    IN p_id_legajo INT
+)
+BEGIN
+    SELECT * FROM idiomas WHERE id_legajo = p_id_legajo AND activo = 1;
+END//
+
+-- ======================================================================
+-- 6. TABLA: familiar
+-- ======================================================================
+
+CREATE PROCEDURE sp_rrhh_insertar_familiar(
+    IN p_id_ejecutor INT,
+    IN p_nombre_familiar VARCHAR(50),
+    IN p_apellido_familiar VARCHAR(50),
+    IN p_dni_familiar CHAR(8),
+    IN p_fecha_nac_familiar DATE,
+    IN p_estado ENUM('vivo','fallecido'),
+    IN p_relacion_empleado ENUM('padres','hijos','suegros','sobrinos','conyuge'),
+    IN p_id_legajo INT
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    INSERT INTO familiar (nombre_familiar, apellido_familiar, dni_familiar, fecha_nac_familiar, estado, relacion_empleado, id_legajo)
+    VALUES (p_nombre_familiar, p_apellido_familiar, p_dni_familiar, p_fecha_nac_familiar, p_estado, p_relacion_empleado, p_id_legajo);
+END//
+
+CREATE PROCEDURE sp_rrhh_modificar_familiar(
+    IN p_id_ejecutor INT,
+    IN p_id_familiar INT,
+    IN p_nombre_familiar VARCHAR(50),
+    IN p_apellido_familiar VARCHAR(50),
+    IN p_dni_familiar CHAR(8),
+    IN p_fecha_nac_familiar DATE,
+    IN p_estado ENUM('vivo','fallecido'),
+    IN p_relacion_empleado ENUM('padres','hijos','suegros','sobrinos','conyuge')
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    UPDATE familiar SET
+        nombre_familiar = p_nombre_familiar,
+        apellido_familiar = p_apellido_familiar,
+        dni_familiar = p_dni_familiar,
+        fecha_nac_familiar = p_fecha_nac_familiar,
+        estado = p_estado,
+        relacion_empleado = p_relacion_empleado
+    WHERE id_familiar = p_id_familiar;
+END//
+
+CREATE PROCEDURE sp_rrhh_obtener_familiares(
+    IN p_id_legajo INT
+)
+BEGIN
+    SELECT * FROM familiar WHERE id_legajo = p_id_legajo AND activo = 1;
+END//
+
+-- ======================================================================
+-- 7. TABLA: antecedente_laboral
+-- ======================================================================
+
+CREATE PROCEDURE sp_rrhh_insertar_antecedente(
+    IN p_id_ejecutor INT,
+    IN p_empresa VARCHAR(100),
+    IN p_cargo VARCHAR(100),
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE,
+    IN p_id_legajo INT
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    INSERT INTO antecedente_laboral (empresa, cargo, fecha_inicio, fecha_fin, id_legajo)
+    VALUES (p_empresa, p_cargo, p_fecha_inicio, p_fecha_fin, p_id_legajo);
+END//
+
+CREATE PROCEDURE sp_rrhh_modificar_antecedente(
+    IN p_id_ejecutor INT,
+    IN p_id_antecedente INT,
+    IN p_empresa VARCHAR(100),
+    IN p_cargo VARCHAR(100),
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    UPDATE antecedente_laboral SET
+        empresa = p_empresa,
+        cargo = p_cargo,
+        fecha_inicio = p_fecha_inicio,
+        fecha_fin = p_fecha_fin
+    WHERE id_antecedente = p_id_antecedente;
+END//
+
+CREATE PROCEDURE sp_rrhh_obtener_antecedentes(
+    IN p_id_legajo INT
+)
+BEGIN
+    SELECT * FROM antecedente_laboral WHERE id_legajo = p_id_legajo AND activo = 1;
+END//
+
+-- ======================================================================
+-- 8. TABLA: historial_legajos
+-- ======================================================================
+
+CREATE PROCEDURE sp_rrhh_insertar_historial(
+    IN p_id_ejecutor INT,
+    IN p_accion ENUM('advertencia','llamada_atencion','suspension','cambio_de_funcion','sumario','traslado','vencimiento_contrato','jubilacion','renuncia','difunto','incapacidad','licencia'),
+    IN p_detalle VARCHAR(300),
+    IN p_id_legajo INT
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    INSERT INTO historial_legajos (accion, detalle, id_legajo)
+    VALUES (p_accion, p_detalle, p_id_legajo);
+END//
+
+CREATE PROCEDURE sp_rrhh_modificar_historial(
+    IN p_id_ejecutor INT,
+    IN p_id_historial INT,
+    IN p_accion ENUM('advertencia','llamada_atencion','suspension','cambio_de_funcion','sumario','traslado','vencimiento_contrato','jubilacion','renuncia','difunto','incapacidad','licencia'),
+    IN p_detalle VARCHAR(300)
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    UPDATE historial_legajos SET
+        accion = p_accion,
+        detalle = p_detalle
+    WHERE id_historial = p_id_historial;
+END//
+
+CREATE PROCEDURE sp_rrhh_obtener_historial(
+    IN p_id_legajo INT
+)
+BEGIN
+    SELECT * FROM historial_legajos WHERE id_legajo = p_id_legajo AND activo = 1 ORDER BY fecha_registro DESC;
+END//
+
+-- ======================================================================
+-- 9. TABLA: sumarios
+-- ======================================================================
+
+CREATE PROCEDURE sp_rrhh_insertar_sumario(
+    IN p_id_ejecutor INT,
+    IN p_detalle VARCHAR(300),
+    IN p_id_legajo INT
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    INSERT INTO sumarios (detalle, id_legajo)
+    VALUES (p_detalle, p_id_legajo);
+END//
+
+CREATE PROCEDURE sp_rrhh_modificar_sumario(
+    IN p_id_ejecutor INT,
+    IN p_id_sumario INT,
+    IN p_detalle VARCHAR(300)
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    UPDATE sumarios SET
+        detalle = p_detalle
+    WHERE id_sumario = p_id_sumario;
+END//
+
+CREATE PROCEDURE sp_rrhh_obtener_sumarios(
+    IN p_id_legajo INT
+)
+BEGIN
+    SELECT * FROM sumarios WHERE id_legajo = p_id_legajo AND activo = 1 ORDER BY fecha_registro DESC;
+END//
+
+-- ======================================================================
+-- 10. TABLA: documentos
+-- ======================================================================
+
+CREATE PROCEDURE sp_rrhh_insertar_documento(
+    IN p_id_ejecutor INT,
+    IN p_tipo_doc ENUM('DNI','TITULO','CURSOS','LICENCIA','ACTA_DE_NACIMIENTO','CERTIFICADO_ESCOLARIDAD','CERTIFICADO_DEFUNCION','SUMARIO','RESOLUCION','CERTIFICADO_DE_CASAMIENTO','FOTO_PERFIL','CURRICULUM','OTRO'),
+    IN p_descripcion TEXT,
+    IN p_nombre_archivo VARCHAR(255),
+    IN p_ruta_archivo VARCHAR(500),
+    IN p_tamano_archivo INT,
+    IN p_mime_type VARCHAR(100),
+    IN p_extension VARCHAR(10),
+    IN p_hash_archivo VARCHAR(64),
+    IN p_id_legajo INT
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    INSERT INTO documentos (tipo_doc, descripcion, nombre_archivo, ruta_archivo, tamano_archivo, mime_type, extension, hash_archivo, id_legajo)
+    VALUES (p_tipo_doc, p_descripcion, p_nombre_archivo, p_ruta_archivo, p_tamano_archivo, p_mime_type, p_extension, p_hash_archivo, p_id_legajo);
+END//
+
+CREATE PROCEDURE sp_rrhh_modificar_documento(
+    IN p_id_ejecutor INT,
+    IN p_id_documento INT,
+    IN p_tipo_doc ENUM('DNI','TITULO','CURSOS','LICENCIA','ACTA_DE_NACIMIENTO','CERTIFICADO_ESCOLARIDAD','CERTIFICADO_DEFUNCION','SUMARIO','RESOLUCION','CERTIFICADO_DE_CASAMIENTO','FOTO_PERFIL','CURRICULUM','OTRO'),
+    IN p_descripcion TEXT,
+    IN p_nombre_archivo VARCHAR(255),
+    IN p_ruta_archivo VARCHAR(500),
+    IN p_tamano_archivo INT,
+    IN p_mime_type VARCHAR(100),
+    IN p_extension VARCHAR(10),
+    IN p_hash_archivo VARCHAR(64)
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    UPDATE documentos SET
+        tipo_doc = p_tipo_doc,
+        descripcion = p_descripcion,
+        nombre_archivo = p_nombre_archivo,
+        ruta_archivo = p_ruta_archivo,
+        tamano_archivo = p_tamano_archivo,
+        mime_type = p_mime_type,
+        extension = p_extension,
+        hash_archivo = p_hash_archivo
+    WHERE id_documento = p_id_documento;
+END//
+
+CREATE PROCEDURE sp_rrhh_obtener_documentos(
+    IN p_id_legajo INT
+)
+BEGIN
+    SELECT * FROM documentos WHERE id_legajo = p_id_legajo AND activo = 1 ORDER BY creado_en DESC;
+END//
+
+-- ======================================================================
+-- 11. TABLA: usuario
+-- ======================================================================
+
+CREATE PROCEDURE sp_rrhh_crear_usuario_automatico(
+    IN p_id_ejecutor INT,
+    IN p_id_legajo INT,
+    OUT p_usuario_generado VARCHAR(50),
+    OUT p_pass_generada VARCHAR(255),
+    OUT p_email_persona VARCHAR(50),
+    OUT p_telefono_persona VARCHAR(20)
+)
+BEGIN
+    DECLARE v_tipo_ejecutor VARCHAR(20);
+    DECLARE v_apellido VARCHAR(50);
+    DECLARE v_email VARCHAR(50);
+    DECLARE v_telefono VARCHAR(20);
+    DECLARE v_digitos_legajo VARCHAR(8);
+    DECLARE v_pos1 INT;
+    DECLARE v_pos2 INT;
+    DECLARE v_dos_digitos CHAR(2);
+    DECLARE v_usuario_base VARCHAR(50);
+    DECLARE v_usuario_final VARCHAR(50);
+    DECLARE v_contador INT DEFAULT 0;
+    DECLARE v_existe INT DEFAULT 1;
+
+    SELECT tipo INTO v_tipo_ejecutor FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo_ejecutor != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+
+    SELECT p.apellido, p.email, p.telefono
+    INTO v_apellido, v_email, v_telefono
+    FROM personas p
+    INNER JOIN legajos l ON l.id_persona = p.id_persona
+    WHERE l.id_legajo = p_id_legajo;
+
+    SET v_digitos_legajo = LPAD(p_id_legajo, 8, '0');
+    SET v_pos1 = 1 + FLOOR(RAND() * 7);
+    SET v_pos2 = v_pos1 + 1;
+    SET v_dos_digitos = CONCAT(SUBSTRING(v_digitos_legajo, v_pos1, 1), SUBSTRING(v_digitos_legajo, v_pos2, 1));
+
+    SET v_usuario_base = LOWER(CONCAT(REPLACE(v_apellido, ' ', ''), '_', p_id_legajo));
+    SET v_usuario_final = v_usuario_base;
+
+    WHILE v_existe > 0 DO
+        SELECT COUNT(*) INTO v_existe FROM usuario WHERE usuario = v_usuario_final;
+        IF v_existe > 0 THEN
+            SET v_contador = v_contador + 1;
+            SET v_usuario_final = CONCAT(v_usuario_base, '_', v_contador);
+        END IF;
+    END WHILE;
+
+    SET p_usuario_generado = v_usuario_final;
+    SET p_pass_generada = CONCAT(UPPER(SUBSTRING(v_apellido, 1, 1)), LOWER(SUBSTRING(v_apellido, 2, 4)), v_dos_digitos, '!');
+    SET p_email_persona = v_email;
+    SET p_telefono_persona = v_telefono;
+
+    INSERT INTO usuario (usuario, pass, tipo, id_legajo, activo)
+    VALUES (p_usuario_generado, SHA2(p_pass_generada, 256), 'empleado', p_id_legajo, 1);
+END//
+
+CREATE PROCEDURE sp_rrhh_modificar_usuario(
+    IN p_id_ejecutor INT,
+    IN p_id_usuario INT,
+    IN p_activo TINYINT(1)
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    DECLARE v_tipo_destino VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    SELECT tipo INTO v_tipo_destino FROM usuario WHERE id_usuario = p_id_usuario;
+    IF v_tipo_destino != 'empleado' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El rol rrhh solo puede modificar usuarios de tipo empleado.';
+    END IF;
+    UPDATE usuario SET
+        activo = p_activo
+    WHERE id_usuario = p_id_usuario;
+END//
+
+CREATE PROCEDURE sp_rrhh_obtener_usuario(
+    IN p_id_legajo INT
+)
+BEGIN
+    SELECT id_usuario, usuario, tipo, id_legajo, primer_ingreso, activo, fecha_creacion, ultimo_login
+    FROM usuario
+    WHERE id_legajo = p_id_legajo;
+END//
+
+-- ======================================================================
+-- 12. FLUJO DE INGRESO
+-- ======================================================================
+
+CREATE PROCEDURE sp_rrhh_ingreso_persona_legajo(
+    IN p_id_ejecutor INT,
+    IN p_dni CHAR(8),
+    IN p_apellido VARCHAR(50),
+    IN p_nombre VARCHAR(50),
+    IN p_genero ENUM('masculino','femenino','sin_determinar'),
+    IN p_fecha_nacimiento DATE,
+    IN p_estado_civil ENUM('soltero/a','viudo/a','casado/a','concubinato'),
+    IN p_cantidad_hijos INT,
+    IN p_provincia_residencia VARCHAR(50),
+    IN p_ciudad_residencia VARCHAR(50),
+    IN p_domicilio_datos VARCHAR(300),
+    IN p_cuil VARCHAR(13),
+    IN p_telefono VARCHAR(20),
+    IN p_telefono_emergencia VARCHAR(20),
+    IN p_email VARCHAR(50),
+    IN p_fecha_ingreso DATE,
+    IN p_fecha_ingreso_administracion DATE,
+    IN p_id_cargo INT,
+    IN p_id_categoria INT,
+    IN p_id_oficina INT,
+    IN p_tipo_contrato ENUM('locacion','permanente','funcionario'),
+    OUT p_id_legajo_nuevo INT,
+    OUT p_usuario_generado VARCHAR(50),
+    OUT p_pass_generada VARCHAR(255),
+    OUT p_email_persona VARCHAR(50),
+    OUT p_telefono_persona VARCHAR(20)
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    DECLARE v_id_persona INT;
+
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_ejecutor AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+
+    INSERT INTO personas (dni, apellido, nombre, genero, fecha_nacimiento, estado_civil, cantidad_hijos, provincia_residencia, ciudad_residencia, domicilio_datos, cuil, telefono, telefono_emergencia, email)
+    VALUES (p_dni, p_apellido, p_nombre, p_genero, p_fecha_nacimiento, p_estado_civil, p_cantidad_hijos, p_provincia_residencia, p_ciudad_residencia, p_domicilio_datos, p_cuil, p_telefono, p_telefono_emergencia, p_email);
+
+    SET v_id_persona = LAST_INSERT_ID();
+
+    INSERT INTO legajos (fecha_ingreso, fecha_ingreso_administracion, id_cargo, id_categoria, id_oficina, tipo_contrato, estado, id_persona)
+    VALUES (p_fecha_ingreso, p_fecha_ingreso_administracion, p_id_cargo, p_id_categoria, p_id_oficina, p_tipo_contrato, 'activo', v_id_persona);
+
+    SET p_id_legajo_nuevo = LAST_INSERT_ID();
+
+    CALL sp_rrhh_crear_usuario_automatico(p_id_ejecutor, p_id_legajo_nuevo, p_usuario_generado, p_pass_generada, p_email_persona, p_telefono_persona);
+END//
+
+CREATE PROCEDURE sp_rrhh_obtener_credenciales(
+    IN p_id_legajo INT,
+    OUT p_usuario VARCHAR(50),
+    OUT p_email VARCHAR(50),
+    OUT p_telefono VARCHAR(20),
+    OUT p_nombre_completo VARCHAR(100)
+)
+BEGIN
+    SELECT u.usuario, p.email, p.telefono, CONCAT(p.nombre, ' ', p.apellido)
+    INTO p_usuario, p_email, p_telefono, p_nombre_completo
+    FROM usuario u
+    INNER JOIN legajos l ON l.id_legajo = u.id_legajo
+    INNER JOIN personas p ON p.id_persona = l.id_persona
+    WHERE u.id_legajo = p_id_legajo AND u.activo = 1;
+END//
+
+DELIMITER ;
