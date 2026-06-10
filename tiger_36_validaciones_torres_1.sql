@@ -251,11 +251,15 @@ CREATE TRIGGER trg_val_telefono_personas_insert
 BEFORE INSERT ON personas
 FOR EACH ROW
 BEGIN
-    IF CHAR_LENGTH(REGEXP_REPLACE(NEW.telefono, '[^0-9]', '')) < 7 THEN
+    DECLARE tel_digits INT;
+    DECLARE tel_em_digits INT;
+    SET tel_digits = CHAR_LENGTH(NEW.telefono) - CHAR_LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(NEW.telefono,'0',''),'1',''),'2',''),'3',''),'4',''),'5',''),'6',''),'7',''),'8',''),'9',''));
+    SET tel_em_digits = CHAR_LENGTH(NEW.telefono_emergencia) - CHAR_LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(NEW.telefono_emergencia,'0',''),'1',''),'2',''),'3',''),'4',''),'5',''),'6',''),'7',''),'8',''),'9',''));
+    IF tel_digits < 7 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'El teléfono debe tener al menos 7 dígitos numéricos.';
     END IF;
-    IF CHAR_LENGTH(REGEXP_REPLACE(NEW.telefono_emergencia, '[^0-9]', '')) < 7 THEN
+    IF tel_em_digits < 7 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'El teléfono de emergencia debe tener al menos 7 dígitos numéricos.';
     END IF;
@@ -265,11 +269,15 @@ CREATE TRIGGER trg_val_telefono_personas_update
 BEFORE UPDATE ON personas
 FOR EACH ROW
 BEGIN
-    IF CHAR_LENGTH(REGEXP_REPLACE(NEW.telefono, '[^0-9]', '')) < 7 THEN
+    DECLARE tel_digits INT;
+    DECLARE tel_em_digits INT;
+    SET tel_digits = CHAR_LENGTH(NEW.telefono) - CHAR_LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(NEW.telefono,'0',''),'1',''),'2',''),'3',''),'4',''),'5',''),'6',''),'7',''),'8',''),'9',''));
+    SET tel_em_digits = CHAR_LENGTH(NEW.telefono_emergencia) - CHAR_LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(NEW.telefono_emergencia,'0',''),'1',''),'2',''),'3',''),'4',''),'5',''),'6',''),'7',''),'8',''),'9',''));
+    IF tel_digits < 7 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'El teléfono debe tener al menos 7 dígitos numéricos.';
     END IF;
-    IF CHAR_LENGTH(REGEXP_REPLACE(NEW.telefono_emergencia, '[^0-9]', '')) < 7 THEN
+    IF tel_em_digits < 7 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'El teléfono de emergencia debe tener al menos 7 dígitos numéricos.';
     END IF;
@@ -356,9 +364,10 @@ BEFORE INSERT ON legajos
 FOR EACH ROW
 BEGIN
     DECLARE cantidad INT;
-    SELECT COUNT(*) INTO cantidad FROM legajos
-    WHERE id_persona = NEW.id_persona AND estado = 'activo';
-    IF cantidad > 0 THEN
+    SELECT COUNT(*) INTO cantidad
+    FROM legajos
+    WHERE id_persona = NEW.id_persona AND estado = 'activo' AND id_legajo != 0;
+    IF NEW.estado = 'activo' AND cantidad > 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'La persona ya tiene un legajo activo. No se permiten legajos duplicados.';
     END IF;

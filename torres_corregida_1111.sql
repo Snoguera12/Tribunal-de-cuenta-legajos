@@ -9,7 +9,6 @@ DROP TABLE IF EXISTS oficinas;
 DROP TABLE IF EXISTS personas;
 DROP TABLE IF EXISTS legajos;
 DROP TABLE IF EXISTS usuario;
-
 DROP TABLE IF EXISTS titulos;
 DROP TABLE IF EXISTS cursos;
 DROP TABLE IF EXISTS idiomas;
@@ -18,7 +17,6 @@ DROP TABLE IF EXISTS antecedente_laboral;
 DROP TABLE IF EXISTS historial_legajos;
 DROP TABLE IF EXISTS sumarios;
 DROP TABLE IF EXISTS documentos;
-
 DROP TABLE IF EXISTS historico_personas;
 DROP TABLE IF EXISTS historico_legajos;
 DROP TABLE IF EXISTS historico_titulos;
@@ -93,7 +91,7 @@ CREATE TABLE usuario (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     usuario VARCHAR(50) NOT NULL UNIQUE,
     pass VARCHAR(255) NOT NULL,
-    tipo ENUM('funcionario', 'rrhh', 'empleado') NOT NULL,
+    tipo ENUM('funcionario', 'rrhh', 'empleado', 'administrador') NOT NULL,
     id_legajo INT(8) NOT NULL UNIQUE,
     primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
     activo TINYINT(1) NOT NULL DEFAULT 1,
