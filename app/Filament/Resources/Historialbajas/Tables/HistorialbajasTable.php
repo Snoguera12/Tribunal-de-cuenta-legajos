@@ -43,7 +43,7 @@ class HistorialbajasTable
                         default => 'Desconocido',
                     }),
                 TextColumn::make('fecha_baja')
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

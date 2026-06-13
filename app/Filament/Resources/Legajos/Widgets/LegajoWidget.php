@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Widgets;
+namespace App\Filament\Resources\Legajos\Widgets;
 
 use App\Models\Legajo;
 use Filament\Widgets\StatsOverviewWidget;
@@ -10,6 +10,7 @@ class LegajoWidget extends StatsOverviewWidget
 {
     protected function getStats(): array
     {
+
         $total = Legajo::query()->count();
         $alta = Legajo::query()->where('estado', true)->count();
         $baja = Legajo::query()->where('estado', false)->count();

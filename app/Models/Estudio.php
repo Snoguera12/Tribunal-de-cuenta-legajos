@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Estudio extends Model
 {
     protected $fillable = [
+        'nombre',
         'institucion',
         'nivel_estudio',
         'activo',

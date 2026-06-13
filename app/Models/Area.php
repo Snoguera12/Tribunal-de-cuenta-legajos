@@ -8,5 +8,7 @@ class Area extends Model
 {
     protected $fillable = [
         "nombre",
+        'descripcion',
+        'fecha_creacion',
     ];
 }

@@ -30,4 +30,8 @@ class CreatePersona extends CreateRecord
         return parent::getCreateAnotherFormAction()
             ->label('Registrar y crear otro');
     }
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

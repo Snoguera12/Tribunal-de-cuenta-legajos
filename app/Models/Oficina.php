@@ -13,6 +13,6 @@ class Oficina extends Model
         'area_id',
     ];
     public function area(){
-        return $this->belongsTo(Oficina::class, 'area_id');
+        return $this->belongsTo(Area::class, 'area_id');
     }
 }

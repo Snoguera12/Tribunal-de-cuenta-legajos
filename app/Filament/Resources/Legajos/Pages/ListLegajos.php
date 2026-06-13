@@ -1,10 +1,8 @@
 <?php
 
 namespace App\Filament\Resources\Legajos\Pages;
-
 use App\Filament\Resources\Legajos\LegajoResource;
-use App\Filament\Widgets\LegajoTotal;
-use App\Filament\Widgets\LegajoWidget;
+use App\Filament\Resources\Legajos\Widgets\LegajoWidget;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;

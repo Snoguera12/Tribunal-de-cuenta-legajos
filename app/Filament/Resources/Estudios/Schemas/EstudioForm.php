@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources\Estudios\Schemas;
 
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 
 class EstudioForm
 {
@@ -15,6 +17,8 @@ class EstudioForm
     {
         return $schema
             ->components([
+                TextInput::make('nombre')
+                    ->label('Nombre del Estudio'),
                 TextInput::make('institucion')
                     ->label('Institución')
                     ->required(),
@@ -23,7 +27,6 @@ class EstudioForm
                     ->required()
                     ->searchable()
                     ->options([
-                        0 => 'Sin Estudios',
                         1 => 'Primaria',
                         2 => 'Secundaria',
                         3 => 'Terciario',
@@ -39,7 +42,6 @@ class EstudioForm
                     ->required(),
                 Toggle::make('activo')
                     ->label('Activo'),
-                
             ]);
     }
 }

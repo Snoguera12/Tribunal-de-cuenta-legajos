@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('documentos', function (Blueprint $table) {
             $table->id();
-            $table->integer('tipodoc')->nullable();
             $table->string('archivo')->nullable();
             $table->text('descripcion');
-            $table->boolean('activo');
+            $table->integer('tipodoc')->nullable();
+            $table->boolean('activo')->nullable();
             $table->dateTime("fecha_de_creacion");
             $table->dateTime("fecha_de_subida");
-            $table->foreignId("legajo_id")->constrained()->onDelete("cascade");
+            $table->foreignId("legajo_id");
             $table->timestamps();
         });
     }

@@ -18,11 +18,11 @@ class HistorialbajaResource extends Resource
 {
     protected static ?string $model = Historialbaja::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    //protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
     protected static ?string $modelLabel = "Historial de legajos";
-    protected static ?string $navigationParentItem = "Legajos";
-    protected static ?int $navigationSort = 1;
+    //protected static ?string $navigationParentItem = "Legajos";
+    protected static ?int $navigationSort = 2;
     /*public static function getNavigationBadge(): ?string{
         return Historialbaja::count();
     }*/
