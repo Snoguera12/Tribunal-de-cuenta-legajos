@@ -160,10 +160,10 @@ AFTER INSERT ON titulos
 FOR EACH ROW
 BEGIN
     INSERT INTO historico_titulos (
-        id_titulo, titulo, nivel_estudio, institucion, fecha_inicio, fecha_fin, id_legajo,
+        id_titulo, titulo, nivel_estudio, institucion, fecha_inicio, fecha_fin, id_persona,
         usuario_accion, tipo_cambio
     ) VALUES (
-        NEW.id_titulo, NEW.titulo, NEW.nivel_estudio, NEW.institucion, NEW.fecha_inicio, NEW.fecha_fin, NEW.id_legajo,
+        NEW.id_titulo, NEW.titulo, NEW.nivel_estudio, NEW.institucion, NEW.fecha_inicio, NEW.fecha_fin, NEW.id_persona,
         USER(), 'INSERT'
     );
 END//
@@ -173,10 +173,10 @@ BEFORE UPDATE ON titulos
 FOR EACH ROW
 BEGIN
     INSERT INTO historico_titulos (
-        id_titulo, titulo, nivel_estudio, institucion, fecha_inicio, fecha_fin, id_legajo,
+        id_titulo, titulo, nivel_estudio, institucion, fecha_inicio, fecha_fin, id_persona,
         usuario_accion, tipo_cambio
     ) VALUES (
-        OLD.id_titulo, OLD.titulo, OLD.nivel_estudio, OLD.institucion, OLD.fecha_inicio, OLD.fecha_fin, OLD.id_legajo,
+        OLD.id_titulo, OLD.titulo, OLD.nivel_estudio, OLD.institucion, OLD.fecha_inicio, OLD.fecha_fin, OLD.id_persona,
         USER(), 'UPDATE'
     );
 END//
@@ -190,10 +190,10 @@ AFTER INSERT ON cursos
 FOR EACH ROW
 BEGIN
     INSERT INTO historico_cursos (
-        id_curso, nombre, institucion, fecha_inicio, horas, id_legajo,
+        id_curso, nombre, institucion, fecha_inicio, horas, id_persona,
         usuario_accion, tipo_cambio
     ) VALUES (
-        NEW.id_curso, NEW.nombre, NEW.institucion, NEW.fecha_inicio, NEW.horas, NEW.id_legajo,
+        NEW.id_curso, NEW.nombre, NEW.institucion, NEW.fecha_inicio, NEW.horas, NEW.id_persona,
         USER(), 'INSERT'
     );
 END//
@@ -203,10 +203,10 @@ BEFORE UPDATE ON cursos
 FOR EACH ROW
 BEGIN
     INSERT INTO historico_cursos (
-        id_curso, nombre, institucion, fecha_inicio, horas, id_legajo,
+        id_curso, nombre, institucion, fecha_inicio, horas, id_persona,
         usuario_accion, tipo_cambio
     ) VALUES (
-        OLD.id_curso, OLD.nombre, OLD.institucion, OLD.fecha_inicio, OLD.horas, OLD.id_legajo,
+        OLD.id_curso, OLD.nombre, OLD.institucion, OLD.fecha_inicio, OLD.horas, OLD.id_persona,
         USER(), 'UPDATE'
     );
 END//
@@ -220,10 +220,10 @@ AFTER INSERT ON idiomas
 FOR EACH ROW
 BEGIN
     INSERT INTO historico_idiomas (
-        id_idioma, nombre, nivel, id_legajo,
+        id_idioma, nombre, nivel, id_persona,
         usuario_accion, tipo_cambio
     ) VALUES (
-        NEW.id_idioma, NEW.nombre, NEW.nivel, NEW.id_legajo,
+        NEW.id_idioma, NEW.nombre, NEW.nivel, NEW.id_persona,
         USER(), 'INSERT'
     );
 END//
@@ -233,10 +233,10 @@ BEFORE UPDATE ON idiomas
 FOR EACH ROW
 BEGIN
     INSERT INTO historico_idiomas (
-        id_idioma, nombre, nivel, id_legajo,
+        id_idioma, nombre, nivel, id_persona,
         usuario_accion, tipo_cambio
     ) VALUES (
-        OLD.id_idioma, OLD.nombre, OLD.nivel, OLD.id_legajo,
+        OLD.id_idioma, OLD.nombre, OLD.nivel, OLD.id_persona,
         USER(), 'UPDATE'
     );
 END//
@@ -251,11 +251,11 @@ FOR EACH ROW
 BEGIN
     INSERT INTO historico_familiar (
         id_familiar, nombre_familiar, apellido_familiar, dni_familiar,
-        fecha_nac_familiar, estado, relacion_empleado, id_legajo,
+        fecha_nac_familiar, estado, relacion_empleado, id_persona,
         usuario_accion, tipo_cambio
     ) VALUES (
         NEW.id_familiar, NEW.nombre_familiar, NEW.apellido_familiar, NEW.dni_familiar,
-        NEW.fecha_nac_familiar, NEW.estado, NEW.relacion_empleado, NEW.id_legajo,
+        NEW.fecha_nac_familiar, NEW.estado, NEW.relacion_empleado, NEW.id_persona,
         USER(), 'INSERT'
     );
 END//
@@ -266,11 +266,11 @@ FOR EACH ROW
 BEGIN
     INSERT INTO historico_familiar (
         id_familiar, nombre_familiar, apellido_familiar, dni_familiar,
-        fecha_nac_familiar, estado, relacion_empleado, id_legajo,
+        fecha_nac_familiar, estado, relacion_empleado, id_persona,
         usuario_accion, tipo_cambio
     ) VALUES (
         OLD.id_familiar, OLD.nombre_familiar, OLD.apellido_familiar, OLD.dni_familiar,
-        OLD.fecha_nac_familiar, OLD.estado, OLD.relacion_empleado, OLD.id_legajo,
+        OLD.fecha_nac_familiar, OLD.estado, OLD.relacion_empleado, OLD.id_persona,
         USER(), 'UPDATE'
     );
 END//
@@ -284,10 +284,10 @@ AFTER INSERT ON antecedente_laboral
 FOR EACH ROW
 BEGIN
     INSERT INTO historico_antecedente_laboral (
-        id_antecedente, empresa, cargo, fecha_inicio, fecha_fin, id_legajo,
+        id_antecedente, empresa, cargo, fecha_inicio, fecha_fin, id_persona,
         usuario_accion, tipo_cambio
     ) VALUES (
-        NEW.id_antecedente, NEW.empresa, NEW.cargo, NEW.fecha_inicio, NEW.fecha_fin, NEW.id_legajo,
+        NEW.id_antecedente, NEW.empresa, NEW.cargo, NEW.fecha_inicio, NEW.fecha_fin, NEW.id_persona,
         USER(), 'INSERT'
     );
 END//
@@ -297,10 +297,10 @@ BEFORE UPDATE ON antecedente_laboral
 FOR EACH ROW
 BEGIN
     INSERT INTO historico_antecedente_laboral (
-        id_antecedente, empresa, cargo, fecha_inicio, fecha_fin, id_legajo,
+        id_antecedente, empresa, cargo, fecha_inicio, fecha_fin, id_persona,
         usuario_accion, tipo_cambio
     ) VALUES (
-        OLD.id_antecedente, OLD.empresa, OLD.cargo, OLD.fecha_inicio, OLD.fecha_fin, OLD.id_legajo,
+        OLD.id_antecedente, OLD.empresa, OLD.cargo, OLD.fecha_inicio, OLD.fecha_fin, OLD.id_persona,
         USER(), 'UPDATE'
     );
 END//
@@ -375,11 +375,11 @@ FOR EACH ROW
 BEGIN
     INSERT INTO historico_documentos (
         id_documento, tipo_doc, creado_en, descripcion, nombre_archivo,
-        ruta_archivo, tamano_archivo, mime_type, extension, hash_archivo, id_legajo,
+        ruta_archivo, tamano_archivo, mime_type, extension, hash_archivo, id_persona,
         usuario_accion, tipo_cambio
     ) VALUES (
         NEW.id_documento, NEW.tipo_doc, DATE(NEW.creado_en), NEW.descripcion, NEW.nombre_archivo,
-        NEW.ruta_archivo, NEW.tamano_archivo, NEW.mime_type, NEW.extension, NEW.hash_archivo, NEW.id_legajo,
+        NEW.ruta_archivo, NEW.tamano_archivo, NEW.mime_type, NEW.extension, NEW.hash_archivo, NEW.id_persona,
         USER(), 'INSERT'
     );
 END//
@@ -390,11 +390,11 @@ FOR EACH ROW
 BEGIN
     INSERT INTO historico_documentos (
         id_documento, tipo_doc, creado_en, descripcion, nombre_archivo,
-        ruta_archivo, tamano_archivo, mime_type, extension, hash_archivo, id_legajo,
+        ruta_archivo, tamano_archivo, mime_type, extension, hash_archivo, id_persona,
         usuario_accion, tipo_cambio
     ) VALUES (
         OLD.id_documento, OLD.tipo_doc, DATE(OLD.creado_en), OLD.descripcion, OLD.nombre_archivo,
-        OLD.ruta_archivo, OLD.tamano_archivo, OLD.mime_type, OLD.extension, OLD.hash_archivo, OLD.id_legajo,
+        OLD.ruta_archivo, OLD.tamano_archivo, OLD.mime_type, OLD.extension, OLD.hash_archivo, OLD.id_persona,
         USER(), 'UPDATE'
     );
 END//
@@ -439,27 +439,27 @@ FOR EACH ROW
 BEGIN
     IF NEW.estado = 'de_baja' AND OLD.estado != 'de_baja' THEN
         UPDATE usuario SET activo = 0 WHERE id_legajo = NEW.id_legajo;
-        UPDATE titulos SET activo = 0 WHERE id_legajo = NEW.id_legajo;
-        UPDATE cursos SET activo = 0 WHERE id_legajo = NEW.id_legajo;
-        UPDATE idiomas SET activo = 0 WHERE id_legajo = NEW.id_legajo;
-        UPDATE familiar SET activo = 0 WHERE id_legajo = NEW.id_legajo;
-        UPDATE antecedente_laboral SET activo = 0 WHERE id_legajo = NEW.id_legajo;
+        UPDATE titulos SET activo = 0 WHERE id_persona = NEW.id_persona;
+        UPDATE cursos SET activo = 0 WHERE id_persona = NEW.id_persona;
+        UPDATE idiomas SET activo = 0 WHERE id_persona = NEW.id_persona;
+        UPDATE familiar SET activo = 0 WHERE id_persona = NEW.id_persona;
+        UPDATE antecedente_laboral SET activo = 0 WHERE id_persona = NEW.id_persona;
         UPDATE historial_legajos SET activo = 0 WHERE id_legajo = NEW.id_legajo;
         UPDATE sumarios SET activo = 0 WHERE id_legajo = NEW.id_legajo;
-        UPDATE documentos SET activo = 0 WHERE id_legajo = NEW.id_legajo;
+        UPDATE documentos SET activo = 0 WHERE id_persona = NEW.id_persona;
         INSERT INTO sumarios (detalle, id_legajo, activo)
         VALUES (CONCAT('Baja de legajo registrada por el sistema. Estado anterior: ', OLD.estado, '. Usuario: ', USER(), '.'), NEW.id_legajo, 0);
 
     ELSEIF NEW.estado = 'activo' AND OLD.estado = 'de_baja' THEN
         UPDATE usuario SET activo = 1 WHERE id_legajo = NEW.id_legajo;
-        UPDATE titulos SET activo = 1 WHERE id_legajo = NEW.id_legajo;
-        UPDATE cursos SET activo = 1 WHERE id_legajo = NEW.id_legajo;
-        UPDATE idiomas SET activo = 1 WHERE id_legajo = NEW.id_legajo;
-        UPDATE familiar SET activo = 1 WHERE id_legajo = NEW.id_legajo;
-        UPDATE antecedente_laboral SET activo = 1 WHERE id_legajo = NEW.id_legajo;
+        UPDATE titulos SET activo = 1 WHERE id_persona = NEW.id_persona;
+        UPDATE cursos SET activo = 1 WHERE id_persona = NEW.id_persona;
+        UPDATE idiomas SET activo = 1 WHERE id_persona = NEW.id_persona;
+        UPDATE familiar SET activo = 1 WHERE id_persona = NEW.id_persona;
+        UPDATE antecedente_laboral SET activo = 1 WHERE id_persona = NEW.id_persona;
         UPDATE historial_legajos SET activo = 1 WHERE id_legajo = NEW.id_legajo;
         UPDATE sumarios SET activo = 1 WHERE id_legajo = NEW.id_legajo;
-        UPDATE documentos SET activo = 1 WHERE id_legajo = NEW.id_legajo;
+        UPDATE documentos SET activo = 1 WHERE id_persona = NEW.id_persona;
     END IF;
 END//
 
