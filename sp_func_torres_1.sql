@@ -2,6 +2,7 @@ USE torres_corregida1;
 
 -- LISTADO COMPLETO DE STORED PROCEDURES DE CONSULTA PARA EL FUNCIONARIO
 -- OBJETIVO: Permitir al funcionario consultar todas las tablas principales e historicas sin poder modificar nada
+-- NOTA: Todos los SPs reciben IN p_id_usuario_func INT como primer parametro para validar el rol.
 
 -- 1. TABLA: personas
 -- SP #1:  sp_func_obtener_persona             - Obtiene una persona por id
@@ -94,6 +95,11 @@ USE torres_corregida1;
 -- SP #38: sp_func_legajo_completo             - Obtiene todos los datos de un legajo y su persona en una sola consulta
 -- SP #39: sp_func_buscar_persona              - Busca personas por apellido, nombre o dni
 
+-- 27. CONSULTAS ADICIONALES
+-- SP #40: sp_func_buscar_legajo               - Busca legajos por apellido, cargo, categoria u oficina
+-- SP #41: sp_func_listar_legajos_por_persona  - Lista todos los legajos de una persona
+-- SP #42: sp_func_reporte_personal_activo     - Lista todo el personal activo con datos principales
+
 -- ======================================================================
 -- LIMPIEZA PREVIA DE STORED PROCEDURES
 -- ======================================================================
@@ -136,6 +142,9 @@ DROP PROCEDURE IF EXISTS sp_func_listar_historico_documentos;
 DROP PROCEDURE IF EXISTS sp_func_listar_historico_usuario;
 DROP PROCEDURE IF EXISTS sp_func_legajo_completo;
 DROP PROCEDURE IF EXISTS sp_func_buscar_persona;
+DROP PROCEDURE IF EXISTS sp_func_buscar_legajo;
+DROP PROCEDURE IF EXISTS sp_func_listar_legajos_por_persona;
+DROP PROCEDURE IF EXISTS sp_func_reporte_personal_activo;
 
 DELIMITER //
 
@@ -144,11 +153,12 @@ DELIMITER //
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_obtener_persona(
+    IN p_id_usuario_func INT,
     IN p_id_persona INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -156,10 +166,12 @@ BEGIN
     SELECT * FROM personas WHERE id_persona = p_id_persona;
 END//
 
-CREATE PROCEDURE sp_func_listar_personas()
+CREATE PROCEDURE sp_func_listar_personas(
+    IN p_id_usuario_func INT
+)
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -172,11 +184,12 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_obtener_legajo(
+    IN p_id_usuario_func INT,
     IN p_id_legajo INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -191,10 +204,12 @@ BEGIN
     WHERE l.id_legajo = p_id_legajo;
 END//
 
-CREATE PROCEDURE sp_func_listar_legajos()
+CREATE PROCEDURE sp_func_listar_legajos(
+    IN p_id_usuario_func INT
+)
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -210,11 +225,12 @@ BEGIN
 END//
 
 CREATE PROCEDURE sp_func_listar_legajos_por_estado(
+    IN p_id_usuario_func INT,
     IN p_estado ENUM('activo','de_baja','traslado','prestamo')
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -235,11 +251,12 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_obtener_usuario(
+    IN p_id_usuario_func INT,
     IN p_id_legajo INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -249,10 +266,12 @@ BEGIN
     WHERE id_legajo = p_id_legajo;
 END//
 
-CREATE PROCEDURE sp_func_listar_usuarios()
+CREATE PROCEDURE sp_func_listar_usuarios(
+    IN p_id_usuario_func INT
+)
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -270,11 +289,12 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_obtener_titulo(
+    IN p_id_usuario_func INT,
     IN p_id_titulo INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -283,16 +303,17 @@ BEGIN
 END//
 
 CREATE PROCEDURE sp_func_listar_titulos(
-    IN p_id_legajo INT
+    IN p_id_usuario_func INT,
+    IN p_id_persona INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
     END IF;
-    SELECT * FROM titulos WHERE id_legajo = p_id_legajo ORDER BY fecha_fin DESC;
+    SELECT * FROM titulos WHERE id_persona = p_id_persona ORDER BY fecha_fin DESC;
 END//
 
 -- ======================================================================
@@ -300,11 +321,12 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_obtener_curso(
+    IN p_id_usuario_func INT,
     IN p_id_curso INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -313,16 +335,17 @@ BEGIN
 END//
 
 CREATE PROCEDURE sp_func_listar_cursos(
-    IN p_id_legajo INT
+    IN p_id_usuario_func INT,
+    IN p_id_persona INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
     END IF;
-    SELECT * FROM cursos WHERE id_legajo = p_id_legajo ORDER BY fecha_inicio DESC;
+    SELECT * FROM cursos WHERE id_persona = p_id_persona ORDER BY fecha_inicio DESC;
 END//
 
 -- ======================================================================
@@ -330,11 +353,12 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_obtener_idioma(
+    IN p_id_usuario_func INT,
     IN p_id_idioma INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -343,16 +367,17 @@ BEGIN
 END//
 
 CREATE PROCEDURE sp_func_listar_idiomas(
-    IN p_id_legajo INT
+    IN p_id_usuario_func INT,
+    IN p_id_persona INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
     END IF;
-    SELECT * FROM idiomas WHERE id_legajo = p_id_legajo ORDER BY nombre;
+    SELECT * FROM idiomas WHERE id_persona = p_id_persona ORDER BY nombre;
 END//
 
 -- ======================================================================
@@ -360,11 +385,12 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_obtener_familiar(
+    IN p_id_usuario_func INT,
     IN p_id_familiar INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -373,16 +399,17 @@ BEGIN
 END//
 
 CREATE PROCEDURE sp_func_listar_familiares(
-    IN p_id_legajo INT
+    IN p_id_usuario_func INT,
+    IN p_id_persona INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
     END IF;
-    SELECT * FROM familiar WHERE id_legajo = p_id_legajo ORDER BY relacion_empleado, apellido_familiar;
+    SELECT * FROM familiar WHERE id_persona = p_id_persona ORDER BY relacion_empleado, apellido_familiar;
 END//
 
 -- ======================================================================
@@ -390,11 +417,12 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_obtener_antecedente(
+    IN p_id_usuario_func INT,
     IN p_id_antecedente INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -403,16 +431,17 @@ BEGIN
 END//
 
 CREATE PROCEDURE sp_func_listar_antecedentes(
-    IN p_id_legajo INT
+    IN p_id_usuario_func INT,
+    IN p_id_persona INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
     END IF;
-    SELECT * FROM antecedente_laboral WHERE id_legajo = p_id_legajo ORDER BY fecha_inicio DESC;
+    SELECT * FROM antecedente_laboral WHERE id_persona = p_id_persona ORDER BY fecha_inicio DESC;
 END//
 
 -- ======================================================================
@@ -420,11 +449,12 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_obtener_historial(
+    IN p_id_usuario_func INT,
     IN p_id_historial INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -433,11 +463,12 @@ BEGIN
 END//
 
 CREATE PROCEDURE sp_func_listar_historial(
+    IN p_id_usuario_func INT,
     IN p_id_legajo INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -450,11 +481,12 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_obtener_sumario(
+    IN p_id_usuario_func INT,
     IN p_id_sumario INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -463,11 +495,12 @@ BEGIN
 END//
 
 CREATE PROCEDURE sp_func_listar_sumarios(
+    IN p_id_usuario_func INT,
     IN p_id_legajo INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -480,11 +513,12 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_obtener_documento(
+    IN p_id_usuario_func INT,
     IN p_id_documento INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -493,26 +527,29 @@ BEGIN
 END//
 
 CREATE PROCEDURE sp_func_listar_documentos(
-    IN p_id_legajo INT
+    IN p_id_usuario_func INT,
+    IN p_id_persona INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
     END IF;
-    SELECT * FROM documentos WHERE id_legajo = p_id_legajo ORDER BY creado_en DESC;
+    SELECT * FROM documentos WHERE id_persona = p_id_persona ORDER BY creado_en DESC;
 END//
 
 -- ======================================================================
 -- 12. TABLA: categorias
 -- ======================================================================
 
-CREATE PROCEDURE sp_func_listar_categorias()
+CREATE PROCEDURE sp_func_listar_categorias(
+    IN p_id_usuario_func INT
+)
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -524,10 +561,12 @@ END//
 -- 13. TABLA: cargos
 -- ======================================================================
 
-CREATE PROCEDURE sp_func_listar_cargos()
+CREATE PROCEDURE sp_func_listar_cargos(
+    IN p_id_usuario_func INT
+)
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -539,10 +578,12 @@ END//
 -- 14. TABLA: oficinas
 -- ======================================================================
 
-CREATE PROCEDURE sp_func_listar_oficinas()
+CREATE PROCEDURE sp_func_listar_oficinas(
+    IN p_id_usuario_func INT
+)
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -555,11 +596,12 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_listar_historico_personas(
+    IN p_id_usuario_func INT,
     IN p_id_persona INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -572,11 +614,12 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_listar_historico_legajos(
+    IN p_id_usuario_func INT,
     IN p_id_legajo INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -589,16 +632,17 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_listar_historico_titulos(
-    IN p_id_legajo INT
+    IN p_id_usuario_func INT,
+    IN p_id_persona INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
     END IF;
-    SELECT * FROM historico_titulos WHERE id_legajo = p_id_legajo ORDER BY fecha_accion DESC;
+    SELECT * FROM historico_titulos WHERE id_persona = p_id_persona ORDER BY fecha_accion DESC;
 END//
 
 -- ======================================================================
@@ -606,16 +650,17 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_listar_historico_cursos(
-    IN p_id_legajo INT
+    IN p_id_usuario_func INT,
+    IN p_id_persona INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
     END IF;
-    SELECT * FROM historico_cursos WHERE id_legajo = p_id_legajo ORDER BY fecha_accion DESC;
+    SELECT * FROM historico_cursos WHERE id_persona = p_id_persona ORDER BY fecha_accion DESC;
 END//
 
 -- ======================================================================
@@ -623,16 +668,17 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_listar_historico_idiomas(
-    IN p_id_legajo INT
+    IN p_id_usuario_func INT,
+    IN p_id_persona INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
     END IF;
-    SELECT * FROM historico_idiomas WHERE id_legajo = p_id_legajo ORDER BY fecha_accion DESC;
+    SELECT * FROM historico_idiomas WHERE id_persona = p_id_persona ORDER BY fecha_accion DESC;
 END//
 
 -- ======================================================================
@@ -640,16 +686,17 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_listar_historico_familiar(
-    IN p_id_legajo INT
+    IN p_id_usuario_func INT,
+    IN p_id_persona INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
     END IF;
-    SELECT * FROM historico_familiar WHERE id_legajo = p_id_legajo ORDER BY fecha_accion DESC;
+    SELECT * FROM historico_familiar WHERE id_persona = p_id_persona ORDER BY fecha_accion DESC;
 END//
 
 -- ======================================================================
@@ -657,16 +704,17 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_listar_historico_antecedente(
-    IN p_id_legajo INT
+    IN p_id_usuario_func INT,
+    IN p_id_persona INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
     END IF;
-    SELECT * FROM historico_antecedente_laboral WHERE id_legajo = p_id_legajo ORDER BY fecha_accion DESC;
+    SELECT * FROM historico_antecedente_laboral WHERE id_persona = p_id_persona ORDER BY fecha_accion DESC;
 END//
 
 -- ======================================================================
@@ -674,11 +722,12 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_listar_historico_historial(
+    IN p_id_usuario_func INT,
     IN p_id_legajo INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -691,11 +740,12 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_listar_historico_sumarios(
+    IN p_id_usuario_func INT,
     IN p_id_legajo INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -708,16 +758,17 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_listar_historico_documentos(
-    IN p_id_legajo INT
+    IN p_id_usuario_func INT,
+    IN p_id_persona INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
     END IF;
-    SELECT * FROM historico_documentos WHERE id_legajo = p_id_legajo ORDER BY fecha_accion DESC;
+    SELECT * FROM historico_documentos WHERE id_persona = p_id_persona ORDER BY fecha_accion DESC;
 END//
 
 -- ======================================================================
@@ -725,11 +776,12 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_listar_historico_usuario(
+    IN p_id_usuario_func INT,
     IN p_id_legajo INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -742,15 +794,18 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_func_legajo_completo(
+    IN p_id_usuario_func INT,
     IN p_id_legajo INT
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    DECLARE v_id_persona INT;
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
     END IF;
+    SELECT id_persona INTO v_id_persona FROM legajos WHERE id_legajo = p_id_legajo;
     SELECT l.*, p.apellido, p.nombre, p.dni, p.cuil, p.genero, p.fecha_nacimiento,
         p.estado_civil, p.cantidad_hijos, p.provincia_residencia, p.ciudad_residencia,
         p.domicilio_datos, p.telefono, p.telefono_emergencia, p.email,
@@ -761,24 +816,25 @@ BEGIN
     LEFT JOIN categorias cat ON cat.id_categoria = l.id_categoria
     LEFT JOIN oficinas o ON o.id_oficina = l.id_oficina
     WHERE l.id_legajo = p_id_legajo;
-    SELECT * FROM titulos WHERE id_legajo = p_id_legajo AND activo = 1 ORDER BY fecha_fin DESC;
-    SELECT * FROM cursos WHERE id_legajo = p_id_legajo AND activo = 1 ORDER BY fecha_inicio DESC;
-    SELECT * FROM idiomas WHERE id_legajo = p_id_legajo AND activo = 1 ORDER BY nombre;
-    SELECT * FROM familiar WHERE id_legajo = p_id_legajo AND activo = 1 ORDER BY relacion_empleado;
-    SELECT * FROM antecedente_laboral WHERE id_legajo = p_id_legajo AND activo = 1 ORDER BY fecha_inicio DESC;
+    SELECT * FROM titulos WHERE id_persona = v_id_persona AND activo = 1 ORDER BY fecha_fin DESC;
+    SELECT * FROM cursos WHERE id_persona = v_id_persona AND activo = 1 ORDER BY fecha_inicio DESC;
+    SELECT * FROM idiomas WHERE id_persona = v_id_persona AND activo = 1 ORDER BY nombre;
+    SELECT * FROM familiar WHERE id_persona = v_id_persona AND activo = 1 ORDER BY relacion_empleado;
+    SELECT * FROM antecedente_laboral WHERE id_persona = v_id_persona AND activo = 1 ORDER BY fecha_inicio DESC;
     SELECT * FROM historial_legajos WHERE id_legajo = p_id_legajo AND activo = 1 ORDER BY fecha_registro DESC;
     SELECT * FROM sumarios WHERE id_legajo = p_id_legajo AND activo = 1 ORDER BY fecha_registro DESC;
-    SELECT * FROM documentos WHERE id_legajo = p_id_legajo AND activo = 1 ORDER BY creado_en DESC;
+    SELECT * FROM documentos WHERE id_persona = v_id_persona AND activo = 1 ORDER BY creado_en DESC;
     SELECT id_usuario, usuario, tipo, primer_ingreso, activo, fecha_creacion, ultimo_login
     FROM usuario WHERE id_legajo = p_id_legajo;
 END//
 
 CREATE PROCEDURE sp_func_buscar_persona(
+    IN p_id_usuario_func INT,
     IN p_busqueda VARCHAR(100)
 )
 BEGIN
     DECLARE v_tipo VARCHAR(20);
-    SET v_tipo = (SELECT tipo FROM usuario WHERE id_usuario = @id_usuario_sesion AND activo = 1);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
     IF v_tipo != 'funcionario' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
@@ -794,6 +850,83 @@ BEGIN
         OR p.nombre LIKE CONCAT('%', p_busqueda, '%')
         OR p.dni LIKE CONCAT('%', p_busqueda, '%')
         OR p.cuil LIKE CONCAT('%', p_busqueda, '%')
+    ORDER BY p.apellido, p.nombre;
+END//
+
+-- ======================================================================
+-- 27. CONSULTAS ADICIONALES
+-- ======================================================================
+
+CREATE PROCEDURE sp_func_buscar_legajo(
+    IN p_id_usuario_func INT,
+    IN p_busqueda VARCHAR(100),
+    IN p_id_cargo INT,
+    IN p_id_categoria INT,
+    IN p_id_oficina INT
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
+    IF v_tipo != 'funcionario' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
+    END IF;
+    SELECT l.*, p.apellido, p.nombre, p.dni,
+        c.nombre_cargo, cat.nombre_categoria, o.nombre_oficina
+    FROM legajos l
+    INNER JOIN personas p ON p.id_persona = l.id_persona
+    LEFT JOIN cargos c ON c.id_cargo = l.id_cargo
+    LEFT JOIN categorias cat ON cat.id_categoria = l.id_categoria
+    LEFT JOIN oficinas o ON o.id_oficina = l.id_oficina
+    WHERE (p_busqueda IS NULL OR p.apellido LIKE CONCAT('%', p_busqueda, '%')
+        OR p.nombre LIKE CONCAT('%', p_busqueda, '%')
+        OR p.dni LIKE CONCAT('%', p_busqueda, '%'))
+        AND (p_id_cargo IS NULL OR l.id_cargo = p_id_cargo)
+        AND (p_id_categoria IS NULL OR l.id_categoria = p_id_categoria)
+        AND (p_id_oficina IS NULL OR l.id_oficina = p_id_oficina)
+    ORDER BY p.apellido, p.nombre;
+END//
+
+CREATE PROCEDURE sp_func_listar_legajos_por_persona(
+    IN p_id_usuario_func INT,
+    IN p_id_persona INT
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
+    IF v_tipo != 'funcionario' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
+    END IF;
+    SELECT l.*, c.nombre_cargo, cat.nombre_categoria, o.nombre_oficina
+    FROM legajos l
+    LEFT JOIN cargos c ON c.id_cargo = l.id_cargo
+    LEFT JOIN categorias cat ON cat.id_categoria = l.id_categoria
+    LEFT JOIN oficinas o ON o.id_oficina = l.id_oficina
+    WHERE l.id_persona = p_id_persona
+    ORDER BY l.fecha_registro DESC;
+END//
+
+CREATE PROCEDURE sp_func_reporte_personal_activo(
+    IN p_id_usuario_func INT
+)
+BEGIN
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_func AND activo = 1;
+    IF v_tipo != 'funcionario' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo funcionarios pueden usar este procedimiento.';
+    END IF;
+    SELECT l.id_legajo, l.tipo_contrato, l.fecha_ingreso,
+        p.apellido, p.nombre, p.dni, p.cuil,
+        p.telefono, p.email,
+        c.nombre_cargo, cat.nombre_categoria, o.nombre_oficina
+    FROM legajos l
+    INNER JOIN personas p ON p.id_persona = l.id_persona
+    LEFT JOIN cargos c ON c.id_cargo = l.id_cargo
+    LEFT JOIN categorias cat ON cat.id_categoria = l.id_categoria
+    LEFT JOIN oficinas o ON o.id_oficina = l.id_oficina
+    WHERE l.estado = 'activo'
     ORDER BY p.apellido, p.nombre;
 END//
 

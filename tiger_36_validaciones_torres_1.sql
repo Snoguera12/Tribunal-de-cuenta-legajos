@@ -366,7 +366,7 @@ BEGIN
     DECLARE cantidad INT;
     SELECT COUNT(*) INTO cantidad
     FROM legajos
-    WHERE id_persona = NEW.id_persona AND estado = 'activo' AND id_legajo != 0;
+    WHERE id_persona = NEW.id_persona AND estado = 'activo';
     IF NEW.estado = 'activo' AND cantidad > 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'La persona ya tiene un legajo activo. No se permiten legajos duplicados.';
@@ -453,7 +453,7 @@ BEFORE INSERT ON titulos
 FOR EACH ROW
 BEGIN
     DECLARE estado_legajo VARCHAR(20);
-    SELECT estado INTO estado_legajo FROM legajos WHERE id_legajo = NEW.id_legajo;
+    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona;
     IF estado_legajo = 'de_baja' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No se puede agregar un título a un legajo dado de baja.';
@@ -466,7 +466,7 @@ FOR EACH ROW
 BEGIN
     DECLARE cantidad INT;
     SELECT COUNT(*) INTO cantidad FROM titulos
-    WHERE id_legajo = NEW.id_legajo
+    WHERE id_persona = NEW.id_persona
     AND titulo = NEW.titulo
     AND institucion = NEW.institucion
     AND fecha_inicio = NEW.fecha_inicio
@@ -506,7 +506,7 @@ BEFORE INSERT ON cursos
 FOR EACH ROW
 BEGIN
     DECLARE estado_legajo VARCHAR(20);
-    SELECT estado INTO estado_legajo FROM legajos WHERE id_legajo = NEW.id_legajo;
+    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona;
     IF estado_legajo = 'de_baja' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No se puede agregar un curso a un legajo dado de baja.';
@@ -543,7 +543,7 @@ FOR EACH ROW
 BEGIN
     DECLARE cantidad INT;
     SELECT COUNT(*) INTO cantidad FROM idiomas
-    WHERE id_legajo = NEW.id_legajo AND nombre = NEW.nombre;
+    WHERE id_persona = NEW.id_persona AND nombre = NEW.nombre;
     IF cantidad > 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Ya existe ese idioma registrado para este legajo.';
@@ -555,7 +555,7 @@ BEFORE INSERT ON idiomas
 FOR EACH ROW
 BEGIN
     DECLARE estado_legajo VARCHAR(20);
-    SELECT estado INTO estado_legajo FROM legajos WHERE id_legajo = NEW.id_legajo;
+    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona;
     IF estado_legajo = 'de_baja' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No se puede agregar un idioma a un legajo dado de baja.';
@@ -573,8 +573,7 @@ BEGIN
     DECLARE dni_empleado CHAR(8);
     SELECT p.dni INTO dni_empleado
     FROM personas p
-    INNER JOIN legajos l ON l.id_persona = p.id_persona
-    WHERE l.id_legajo = NEW.id_legajo;
+    WHERE p.id_persona = NEW.id_persona;
     IF NEW.dni_familiar = dni_empleado THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'El DNI del familiar no puede ser igual al DNI del empleado.';
@@ -588,8 +587,7 @@ BEGIN
     DECLARE dni_empleado CHAR(8);
     SELECT p.dni INTO dni_empleado
     FROM personas p
-    INNER JOIN legajos l ON l.id_persona = p.id_persona
-    WHERE l.id_legajo = NEW.id_legajo;
+    WHERE p.id_persona = NEW.id_persona;
     IF NEW.dni_familiar = dni_empleado THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'El DNI del familiar no puede ser igual al DNI del empleado.';
@@ -642,7 +640,7 @@ FOR EACH ROW
 BEGIN
     DECLARE cantidad INT;
     SELECT COUNT(*) INTO cantidad FROM familiar
-    WHERE id_legajo = NEW.id_legajo AND relacion_empleado = 'conyuge' AND activo = 1;
+    WHERE id_persona = NEW.id_persona AND relacion_empleado = 'conyuge' AND activo = 1;
     IF NEW.relacion_empleado = 'conyuge' AND cantidad > 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Ya existe un cónyuge activo registrado para este legajo.';
@@ -655,7 +653,7 @@ FOR EACH ROW
 BEGIN
     DECLARE cantidad INT;
     SELECT COUNT(*) INTO cantidad FROM familiar
-    WHERE id_legajo = NEW.id_legajo AND relacion_empleado = 'conyuge' AND activo = 1 AND id_familiar != NEW.id_familiar;
+    WHERE id_persona = NEW.id_persona AND relacion_empleado = 'conyuge' AND activo = 1 AND id_familiar != NEW.id_familiar;
     IF NEW.relacion_empleado = 'conyuge' AND cantidad > 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Ya existe un cónyuge activo registrado para este legajo.';
@@ -669,8 +667,7 @@ BEGIN
     DECLARE fecha_nac_empleado DATE;
     SELECT p.fecha_nacimiento INTO fecha_nac_empleado
     FROM personas p
-    INNER JOIN legajos l ON l.id_persona = p.id_persona
-    WHERE l.id_legajo = NEW.id_legajo;
+    WHERE p.id_persona = NEW.id_persona;
     IF NEW.relacion_empleado = 'hijos' AND NEW.fecha_nac_familiar <= fecha_nac_empleado THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Un hijo debe ser menor que el empleado.';
@@ -688,8 +685,7 @@ BEGIN
     DECLARE fecha_nac_empleado DATE;
     SELECT p.fecha_nacimiento INTO fecha_nac_empleado
     FROM personas p
-    INNER JOIN legajos l ON l.id_persona = p.id_persona
-    WHERE l.id_legajo = NEW.id_legajo;
+    WHERE p.id_persona = NEW.id_persona;
     IF NEW.relacion_empleado = 'hijos' AND NEW.fecha_nac_familiar <= fecha_nac_empleado THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Un hijo debe ser menor que el empleado.';
@@ -705,7 +701,7 @@ BEFORE INSERT ON familiar
 FOR EACH ROW
 BEGIN
     DECLARE estado_legajo VARCHAR(20);
-    SELECT estado INTO estado_legajo FROM legajos WHERE id_legajo = NEW.id_legajo;
+    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona;
     IF estado_legajo = 'de_baja' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No se puede agregar un familiar a un legajo dado de baja.';
@@ -745,7 +741,7 @@ BEFORE INSERT ON antecedente_laboral
 FOR EACH ROW
 BEGIN
     DECLARE estado_legajo VARCHAR(20);
-    SELECT estado INTO estado_legajo FROM legajos WHERE id_legajo = NEW.id_legajo;
+    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona;
     IF estado_legajo = 'de_baja' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No se puede agregar un antecedente laboral a un legajo dado de baja.';
@@ -761,7 +757,7 @@ BEFORE INSERT ON documentos
 FOR EACH ROW
 BEGIN
     DECLARE estado_legajo VARCHAR(20);
-    SELECT estado INTO estado_legajo FROM legajos WHERE id_legajo = NEW.id_legajo;
+    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona;
     IF estado_legajo = 'de_baja' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No se puede agregar un documento a un legajo dado de baja.';
@@ -774,7 +770,7 @@ FOR EACH ROW
 BEGIN
     DECLARE cantidad INT;
     SELECT COUNT(*) INTO cantidad FROM documentos
-    WHERE id_legajo = NEW.id_legajo AND hash_archivo = NEW.hash_archivo;
+    WHERE id_persona = NEW.id_persona AND hash_archivo = NEW.hash_archivo;
     IF cantidad > 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Ya existe un documento con el mismo contenido cargado para este legajo.';
@@ -787,7 +783,7 @@ FOR EACH ROW
 BEGIN
     DECLARE cantidad INT;
     SELECT COUNT(*) INTO cantidad FROM documentos
-    WHERE id_legajo = NEW.id_legajo AND tipo_doc = 'FOTO_PERFIL' AND activo = 1;
+    WHERE id_persona = NEW.id_persona AND tipo_doc = 'FOTO_PERFIL' AND activo = 1;
     IF NEW.tipo_doc = 'FOTO_PERFIL' AND cantidad > 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Ya existe una foto de perfil activa para este legajo.';
@@ -800,7 +796,7 @@ FOR EACH ROW
 BEGIN
     DECLARE cantidad INT;
     SELECT COUNT(*) INTO cantidad FROM documentos
-    WHERE id_legajo = NEW.id_legajo AND tipo_doc = 'FOTO_PERFIL' AND activo = 1 AND id_documento != NEW.id_documento;
+    WHERE id_persona = NEW.id_persona AND tipo_doc = 'FOTO_PERFIL' AND activo = 1 AND id_documento != NEW.id_documento;
     IF NEW.tipo_doc = 'FOTO_PERFIL' AND NEW.activo = 1 AND cantidad > 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Ya existe una foto de perfil activa para este legajo.';
