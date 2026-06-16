@@ -74,6 +74,8 @@ GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_listar_legajos TO 'rol_adm
 GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_listar_legajos_por_estado TO 'rol_administrador';
 GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_obtener_usuario TO 'rol_administrador';
 GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_listar_usuarios TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_insertar_usuario TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_modificar_usuario TO 'rol_administrador';
 GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_obtener_titulo TO 'rol_administrador';
 GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_listar_titulos TO 'rol_administrador';
 GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_obtener_curso TO 'rol_administrador';
@@ -106,6 +108,31 @@ GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_listar_historico_documento
 GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_listar_historico_usuario TO 'rol_administrador';
 GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_legajo_completo TO 'rol_administrador';
 GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_buscar_persona TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_listar_legajos_por_persona TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_listar_auditoria_completa TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_buscar_por_cargo_categoria_oficina TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_listar_usuarios_por_tipo TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_reporte_bajas TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_insertar_categoria TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_modificar_categoria TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_insertar_cargo TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_modificar_cargo TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_insertar_oficina TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_modificar_oficina TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_admin_reporte_general TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.vista_personal_activo TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.vista_personal_baja TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.vista_legajos_completo TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.vista_titulos_activos TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.vista_cursos_activos TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.vista_idiomas_activos TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.vista_familiares_activos TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.vista_documentos_activos TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.vista_sumarios_activos TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.vista_historial_activo TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.vista_usuarios_activos TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.vista_reporte_estadisticas TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_auth_cambiar_pass TO 'rol_administrador';
 
 -- ======================================================================
 -- PERMISOS: rol_funcionario
@@ -177,6 +204,21 @@ GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_func_listar_historico_documentos
 GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_func_listar_historico_usuario TO 'rol_funcionario';
 GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_func_legajo_completo TO 'rol_funcionario';
 GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_func_buscar_persona TO 'rol_funcionario';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_func_buscar_legajo TO 'rol_funcionario';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_func_listar_legajos_por_persona TO 'rol_funcionario';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_func_reporte_personal_activo TO 'rol_funcionario';
+GRANT SELECT ON torres_corregida1.vista_personal_activo TO 'rol_funcionario';
+GRANT SELECT ON torres_corregida1.vista_personal_baja TO 'rol_funcionario';
+GRANT SELECT ON torres_corregida1.vista_legajos_completo TO 'rol_funcionario';
+GRANT SELECT ON torres_corregida1.vista_titulos_activos TO 'rol_funcionario';
+GRANT SELECT ON torres_corregida1.vista_cursos_activos TO 'rol_funcionario';
+GRANT SELECT ON torres_corregida1.vista_idiomas_activos TO 'rol_funcionario';
+GRANT SELECT ON torres_corregida1.vista_familiares_activos TO 'rol_funcionario';
+GRANT SELECT ON torres_corregida1.vista_documentos_activos TO 'rol_funcionario';
+GRANT SELECT ON torres_corregida1.vista_sumarios_activos TO 'rol_funcionario';
+GRANT SELECT ON torres_corregida1.vista_historial_activo TO 'rol_funcionario';
+GRANT SELECT ON torres_corregida1.vista_usuarios_activos TO 'rol_funcionario';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_auth_cambiar_pass TO 'rol_funcionario';
 
 -- ======================================================================
 -- PERMISOS: rol_rrhh
@@ -211,39 +253,60 @@ GRANT SELECT ON torres_corregida1.historico_historial_legajos TO 'rol_rrhh';
 GRANT SELECT ON torres_corregida1.historico_sumarios TO 'rol_rrhh';
 GRANT SELECT ON torres_corregida1.historico_documentos TO 'rol_rrhh';
 GRANT SELECT ON torres_corregida1.historico_usuario TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_insertar_persona TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_modificar_persona TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_persona TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_insertar_legajo TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_modificar_legajo TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_legajo TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_insertar_titulo TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_modificar_titulo TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_titulos TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_insertar_curso TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_modificar_curso TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_cursos TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_insertar_idioma TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_modificar_idioma TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_idiomas TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_insertar_familiar TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_modificar_familiar TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_familiares TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_insertar_antecedente TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_modificar_antecedente TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_antecedentes TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_insertar_historial TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_modificar_historial TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_historial TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_insertar_sumario TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_modificar_sumario TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_sumarios TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_insertar_documento TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_modificar_documento TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_documentos TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_insertar_usuario TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_modificar_usuario TO 'rol_rrhh';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_usuario TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_insertar_persona TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_modificar_persona TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_obtener_persona TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_insertar_legajo TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_modificar_legajo TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_obtener_legajo TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_insertar_titulo TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_modificar_titulo TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_obtener_titulos TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_insertar_curso TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_modificar_curso TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_obtener_cursos TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_insertar_idioma TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_modificar_idioma TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_obtener_idiomas TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_insertar_familiar TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_modificar_familiar TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_obtener_familiares TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_insertar_antecedente TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_modificar_antecedente TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_obtener_antecedentes TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_insertar_historial TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_modificar_historial TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_obtener_historial TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_insertar_sumario TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_modificar_sumario TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_obtener_sumarios TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_insertar_documento TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_modificar_documento TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_obtener_documentos TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_insertar_usuario TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_modificar_usuario TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_obtener_usuario TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_listar_personas TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_listar_legajos TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_listar_legajos_por_estado TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_buscar_persona TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_legajo_completo TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_listar_historico_legajo TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_listar_documentos_por_tipo TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_alta_completa TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_rrhh_dar_baja_legajo TO 'rol_rrhh';
+GRANT SELECT ON torres_corregida1.vista_personal_activo TO 'rol_rrhh';
+GRANT SELECT ON torres_corregida1.vista_personal_baja TO 'rol_rrhh';
+GRANT SELECT ON torres_corregida1.vista_legajos_completo TO 'rol_rrhh';
+GRANT SELECT ON torres_corregida1.vista_titulos_activos TO 'rol_rrhh';
+GRANT SELECT ON torres_corregida1.vista_cursos_activos TO 'rol_rrhh';
+GRANT SELECT ON torres_corregida1.vista_idiomas_activos TO 'rol_rrhh';
+GRANT SELECT ON torres_corregida1.vista_familiares_activos TO 'rol_rrhh';
+GRANT SELECT ON torres_corregida1.vista_documentos_activos TO 'rol_rrhh';
+GRANT SELECT ON torres_corregida1.vista_sumarios_activos TO 'rol_rrhh';
+GRANT SELECT ON torres_corregida1.vista_historial_activo TO 'rol_rrhh';
+GRANT SELECT ON torres_corregida1.vista_usuarios_activos TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_auth_cambiar_pass TO 'rol_rrhh';
 
 -- ======================================================================
 -- PERMISOS: rol_empleado
@@ -251,17 +314,21 @@ GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_usuario TO 'rol_rrhh';
 -- Sin acceso directo a ninguna tabla
 -- Sin acceso a tablas historicas
 -- ======================================================================
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_persona TO 'rol_empleado';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_legajo TO 'rol_empleado';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_titulos TO 'rol_empleado';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_cursos TO 'rol_empleado';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_idiomas TO 'rol_empleado';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_familiares TO 'rol_empleado';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_antecedentes TO 'rol_empleado';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_historial TO 'rol_empleado';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_sumarios TO 'rol_empleado';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_documentos TO 'rol_empleado';
-GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_obtener_usuario TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_empl_obtener_persona TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_empl_obtener_legajo TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_empl_obtener_titulos TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_empl_obtener_cursos TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_empl_obtener_idiomas TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_empl_obtener_familiares TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_empl_obtener_antecedentes TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_empl_obtener_historial TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_empl_obtener_sumarios TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_empl_obtener_documentos TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_empl_obtener_usuario TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_empl_legajo_completo TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_empl_buscar_documento_por_tipo TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_empl_obtener_datos_contacto TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_auth_cambiar_pass TO 'rol_empleado';
 
 -- ======================================================================
 -- CREACION DE USUARIOS DE BASE DE DATOS Y ASIGNACION DE ROLES
@@ -283,5 +350,70 @@ SET DEFAULT ROLE 'rol_administrador' TO 'usr_administrador'@'localhost';
 SET DEFAULT ROLE 'rol_funcionario' TO 'usr_funcionario'@'localhost';
 SET DEFAULT ROLE 'rol_rrhh' TO 'usr_rrhh'@'localhost';
 SET DEFAULT ROLE 'rol_empleado' TO 'usr_empleado'@'localhost';
+
+-- ======================================================================
+-- PERMISOS DE SEGURIDAD Y BACKUP
+-- ======================================================================
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_login TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_login TO 'rol_funcionario';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_login TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_login TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_desbloquear_usuario TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_solicitar_recuperacion TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_solicitar_recuperacion TO 'rol_funcionario';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_solicitar_recuperacion TO 'rol_rrhh';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_solicitar_recuperacion TO 'rol_empleado';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_atender_recuperacion TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_listar_solicitudes TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_registrar_log TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_listar_log TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_registrar_evento TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_listar_eventos TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_registrar_incidente TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_listar_incidentes TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_atender_incidente TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_seg_listar_usuarios_bloqueados TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_backup_generar_diario TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_backup_generar_semanal TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_backup_listar TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_backup_limpiar_diarios TO 'rol_administrador';
+GRANT EXECUTE ON PROCEDURE torres_corregida1.sp_backup_limpiar_semanales TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.log_sistema TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.intentos_login TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.solicitudes_recuperacion TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.eventos TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.incidentes TO 'rol_administrador';
+GRANT SELECT ON torres_corregida1.backup_log TO 'rol_administrador';
+
+-- ======================================================================
+-- PERMISOS DML SOBRE TABLAS DE SEGURIDAD PARA TODOS LOS ROLES
+-- Necesarios para que sp_seg_login, sp_auth_cambiar_pass y
+-- sp_seg_solicitar_recuperacion puedan insertar/actualizar logs y eventos
+-- independientemente del usuario que ejecuta el SP.
+-- ======================================================================
+GRANT INSERT ON torres_corregida1.log_sistema TO 'rol_administrador';
+GRANT INSERT ON torres_corregida1.log_sistema TO 'rol_funcionario';
+GRANT INSERT ON torres_corregida1.log_sistema TO 'rol_rrhh';
+GRANT INSERT ON torres_corregida1.log_sistema TO 'rol_empleado';
+
+GRANT SELECT, INSERT, UPDATE ON torres_corregida1.intentos_login TO 'rol_administrador';
+GRANT SELECT, INSERT, UPDATE ON torres_corregida1.intentos_login TO 'rol_funcionario';
+GRANT SELECT, INSERT, UPDATE ON torres_corregida1.intentos_login TO 'rol_rrhh';
+GRANT SELECT, INSERT, UPDATE ON torres_corregida1.intentos_login TO 'rol_empleado';
+
+GRANT INSERT ON torres_corregida1.eventos TO 'rol_administrador';
+GRANT INSERT ON torres_corregida1.eventos TO 'rol_funcionario';
+GRANT INSERT ON torres_corregida1.eventos TO 'rol_rrhh';
+GRANT INSERT ON torres_corregida1.eventos TO 'rol_empleado';
+
+GRANT INSERT ON torres_corregida1.incidentes TO 'rol_administrador';
+GRANT INSERT ON torres_corregida1.incidentes TO 'rol_funcionario';
+GRANT INSERT ON torres_corregida1.incidentes TO 'rol_rrhh';
+GRANT INSERT ON torres_corregida1.incidentes TO 'rol_empleado';
+
+GRANT SELECT, INSERT ON torres_corregida1.solicitudes_recuperacion TO 'rol_administrador';
+GRANT SELECT, INSERT ON torres_corregida1.solicitudes_recuperacion TO 'rol_funcionario';
+GRANT SELECT, INSERT ON torres_corregida1.solicitudes_recuperacion TO 'rol_rrhh';
+GRANT SELECT, INSERT ON torres_corregida1.solicitudes_recuperacion TO 'rol_empleado';
 
 FLUSH PRIVILEGES;

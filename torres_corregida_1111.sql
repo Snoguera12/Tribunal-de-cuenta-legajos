@@ -1,5 +1,5 @@
 DROP DATABASE IF EXISTS torres_corregida1;
-CREATE DATABASE IF NOT EXISTS torres_corregida1;
+CREATE DATABASE IF NOT EXISTS torres_corregida1 CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci;
 USE torres_corregida1;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -28,6 +28,12 @@ DROP TABLE IF EXISTS historico_historial_legajos;
 DROP TABLE IF EXISTS historico_sumarios;
 DROP TABLE IF EXISTS historico_documentos;
 DROP TABLE IF EXISTS historico_usuario;
+DROP TABLE IF EXISTS log_sistema;
+DROP TABLE IF EXISTS intentos_login;
+DROP TABLE IF EXISTS solicitudes_recuperacion;
+DROP TABLE IF EXISTS eventos;
+DROP TABLE IF EXISTS incidentes;
+DROP TABLE IF EXISTS backup_log;
 
 CREATE TABLE categorias (
     id_categoria INT AUTO_INCREMENT PRIMARY KEY,
@@ -65,9 +71,7 @@ CREATE TABLE personas (
     cuil VARCHAR(13) UNIQUE NOT NULL,
     telefono VARCHAR(20) NOT NULL,
     telefono_emergencia VARCHAR(20) NOT NULL,
-    email VARCHAR(50),
-    primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
-    activo TINYINT(1) NOT NULL DEFAULT 1
+    email VARCHAR(50)
 );
 
 CREATE TABLE legajos (
@@ -107,10 +111,10 @@ CREATE TABLE titulos (
     institucion VARCHAR(100) NOT NULL,
     fecha_inicio DATE NOT NULL,
     fecha_fin DATE NOT NULL,
-    id_legajo INT (8) NOT NULL,
+    id_persona INT (8) NOT NULL,
     primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
     activo TINYINT(1) NOT NULL DEFAULT 1,
-    FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo)
+    FOREIGN KEY (id_persona) REFERENCES personas(id_persona)
 );
 
 CREATE TABLE cursos (
@@ -119,20 +123,20 @@ CREATE TABLE cursos (
     institucion VARCHAR(100) NOT NULL,
     fecha_inicio DATE NOT NULL,
     horas INT,
-    id_legajo INT (8) NOT NULL,
+    id_persona INT (8) NOT NULL,
     primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
     activo TINYINT(1) NOT NULL DEFAULT 1,
-    FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo)
+    FOREIGN KEY (id_persona) REFERENCES personas(id_persona)
 );
 
 CREATE TABLE idiomas (
     id_idioma INT AUTO_INCREMENT PRIMARY KEY,
     nombre ENUM('Inglés','Italiano','Portugués','Francés','Alemán','Español','Coreano','Japonés','Chino Mandarín') NOT NULL,
     nivel ENUM('Principiante (A1-A2)', 'Intermedio (B1-B2)', 'Avanzado (C1-C2)', 'Nativo') NOT NULL,
-    id_legajo INT (8) NOT NULL,
+    id_persona INT (8) NOT NULL,
     primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
     activo TINYINT(1) NOT NULL DEFAULT 1,
-    FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo)
+    FOREIGN KEY (id_persona) REFERENCES personas(id_persona)
 );
 
 CREATE TABLE familiar (
@@ -143,10 +147,10 @@ CREATE TABLE familiar (
     fecha_nac_familiar DATE NOT NULL,
     estado ENUM('vivo', 'fallecido') NOT NULL,
     relacion_empleado ENUM('padres', 'hijos', 'suegros', 'sobrinos', 'conyuge'),
-    id_legajo INT (8) NOT NULL,
+    id_persona INT (8) NOT NULL,
     primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
     activo TINYINT(1) NOT NULL DEFAULT 1,
-    FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo)
+    FOREIGN KEY (id_persona) REFERENCES personas(id_persona)
 );
 
 CREATE TABLE antecedente_laboral (
@@ -155,10 +159,10 @@ CREATE TABLE antecedente_laboral (
     cargo VARCHAR(100),
     fecha_inicio DATE,
     fecha_fin DATE,
-    id_legajo INT (8) NOT NULL,
+    id_persona INT (8) NOT NULL,
     primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
     activo TINYINT(1) NOT NULL DEFAULT 1,
-    FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo)
+    FOREIGN KEY (id_persona) REFERENCES personas(id_persona)
 );
 
 CREATE TABLE historial_legajos (
@@ -193,10 +197,10 @@ CREATE TABLE documentos (
     mime_type VARCHAR(100) NOT NULL,
     extension VARCHAR(10) NOT NULL,
     hash_archivo VARCHAR(64) NOT NULL,
-    id_legajo INT (8) NOT NULL,
+    id_persona INT (8) NOT NULL,
     primer_ingreso TINYINT(1) NOT NULL DEFAULT 1,
     activo TINYINT(1) NOT NULL DEFAULT 1,
-    FOREIGN KEY (id_legajo) REFERENCES legajos(id_legajo)
+    FOREIGN KEY (id_persona) REFERENCES personas(id_persona)
 );
 
 CREATE TABLE historico_personas (
@@ -246,7 +250,7 @@ CREATE TABLE historico_titulos (
     institucion VARCHAR(100) ,
     fecha_inicio DATE ,
     fecha_fin DATE ,
-    id_legajo INT (8),
+    id_persona INT (8),
     fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_accion VARCHAR(50),
     tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
@@ -259,7 +263,7 @@ CREATE TABLE historico_cursos (
     institucion VARCHAR(100) ,
     fecha_inicio DATE ,
     horas INT,
-    id_legajo INT (8) ,
+    id_persona INT (8) ,
     fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_accion VARCHAR(50),
     tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
@@ -270,7 +274,7 @@ CREATE TABLE historico_idiomas (
     id_idioma INT ,
     nombre varchar (25),
     nivel varchar (25),
-    id_legajo INT (8),
+    id_persona INT (8),
     fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_accion VARCHAR(50),
     tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
@@ -285,7 +289,7 @@ CREATE TABLE historico_familiar (
     fecha_nac_familiar DATE ,
     estado varchar (20),
     relacion_empleado varchar (20),
-    id_legajo INT (8),
+    id_persona INT (8),
     fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_accion VARCHAR(50),
     tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
@@ -298,7 +302,7 @@ CREATE TABLE historico_antecedente_laboral (
     cargo VARCHAR(100),
     fecha_inicio DATE,
     fecha_fin DATE,
-    id_legajo INT (8),
+    id_persona INT (8),
     fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_accion VARCHAR(50),
     tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
@@ -339,7 +343,7 @@ CREATE TABLE historico_documentos (
     mime_type VARCHAR(100) ,
     extension VARCHAR(10) ,
     hash_archivo VARCHAR(64) ,
-    id_legajo INT (8),
+    id_persona INT (8),
     fecha_accion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_accion VARCHAR(50),
     tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
@@ -361,6 +365,89 @@ CREATE TABLE historico_usuario (
     tipo_cambio ENUM('INSERT', 'UPDATE', 'DELETE')
 );
 
+CREATE TABLE log_sistema (
+    id_log INT AUTO_INCREMENT PRIMARY KEY,
+    fecha_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id_usuario INT,
+    usuario_nombre VARCHAR(50),
+    tipo_usuario VARCHAR(20),
+    ip VARCHAR(45),
+    accion VARCHAR(100) NOT NULL,
+    tabla_afectada VARCHAR(50),
+    id_registro INT,
+    detalle TEXT,
+    resultado ENUM('exitoso', 'fallido', 'bloqueado') NOT NULL DEFAULT 'exitoso',
+    duracion_ms INT
+);
+
+CREATE TABLE intentos_login (
+    id_intento INT AUTO_INCREMENT PRIMARY KEY,
+    usuario VARCHAR(50) NOT NULL,
+    ip VARCHAR(45),
+    fecha_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    resultado ENUM('exitoso', 'fallido') NOT NULL,
+    intentos_fallidos INT NOT NULL DEFAULT 0,
+    bloqueado TINYINT(1) NOT NULL DEFAULT 0,
+    fecha_bloqueo DATETIME,
+    fecha_desbloqueo DATETIME
+);
+
+CREATE TABLE solicitudes_recuperacion (
+    id_solicitud INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    usuario VARCHAR(50) NOT NULL,
+    fecha_solicitud DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    estado ENUM('pendiente', 'atendida', 'rechazada') NOT NULL DEFAULT 'pendiente',
+    id_admin_atiende INT,
+    fecha_atencion DATETIME,
+    detalle VARCHAR(300),
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
+);
+
+CREATE TABLE eventos (
+    id_evento INT AUTO_INCREMENT PRIMARY KEY,
+    fecha_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    tipo_evento ENUM('login', 'logout', 'cambio_pass', 'creacion_usuario', 'baja_legajo',
+        'reactivacion_legajo', 'modificacion_datos', 'backup', 'recuperacion_pass',
+        'bloqueo_usuario', 'desbloqueo_usuario', 'acceso_denegado', 'otro') NOT NULL,
+    id_usuario INT,
+    usuario_nombre VARCHAR(50),
+    tipo_usuario VARCHAR(20),
+    ip VARCHAR(45),
+    tabla_afectada VARCHAR(50),
+    id_registro INT,
+    detalle TEXT,
+    resultado ENUM('exitoso', 'fallido', 'bloqueado') NOT NULL DEFAULT 'exitoso'
+);
+
+CREATE TABLE incidentes (
+    id_incidente INT AUTO_INCREMENT PRIMARY KEY,
+    fecha_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    tipo_incidente ENUM('acceso_no_autorizado', 'multiples_intentos_fallidos', 'usuario_bloqueado',
+        'cambio_pass_forzado', 'backup_fallido', 'error_sistema', 'dato_invalido',
+        'intento_modificacion_admin', 'otro') NOT NULL,
+    nivel_severidad ENUM('bajo', 'medio', 'alto', 'critico') NOT NULL DEFAULT 'medio',
+    id_usuario INT,
+    usuario_nombre VARCHAR(50),
+    ip VARCHAR(45),
+    descripcion TEXT NOT NULL,
+    estado ENUM('abierto', 'en_revision', 'resuelto', 'cerrado') NOT NULL DEFAULT 'abierto',
+    id_admin_atiende INT,
+    fecha_resolucion DATETIME,
+    resolucion TEXT
+);
+
+CREATE TABLE backup_log (
+    id_backup INT AUTO_INCREMENT PRIMARY KEY,
+    fecha_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    tipo ENUM('diario', 'semanal') NOT NULL,
+    nombre_archivo VARCHAR(255) NOT NULL,
+    ruta_archivo VARCHAR(500) NOT NULL,
+    tamano_kb INT,
+    resultado ENUM('exitoso', 'fallido') NOT NULL DEFAULT 'exitoso',
+    detalle TEXT
+);
+
 INSERT INTO categorias (nombre_categoria, descripcion) VALUES
 ('CAT 1', 'SECRETARIO GENERAL - CONTADOR FISCAL'),
 ('CAT 2', 'JEFE DE RENDICION'),
@@ -374,5 +461,36 @@ INSERT INTO categorias (nombre_categoria, descripcion) VALUES
 ('CAT 10', 'ADMINISTRATIVO C - REVISOR C'),
 ('CAT 11', 'MAYORDOMO'),
 ('CAT 12', 'ORDENANZA - CHOFER - SIN TITULO');
+
+-- ======================================================================
+-- DATOS INICIALES: USUARIO ADMINISTRADOR DEL SISTEMA
+-- ======================================================================
+-- Usuario: admin_torres / Clave: Admin12345!
+-- Debe cambiarse la clave en el primer ingreso (primer_ingreso = 1)
+INSERT INTO personas (
+    dni, apellido, nombre, genero, fecha_nacimiento, estado_civil, cantidad_hijos,
+    provincia_residencia, ciudad_residencia, domicilio_datos, cuil, telefono,
+    telefono_emergencia, email
+) VALUES (
+    '00000000', 'ADMINISTRADOR', 'SISTEMA', 'sin_determinar', '1985-01-01', 'soltero/a', 0,
+    'SANTIAGO DEL ESTERO', 'SANTIAGO DEL ESTERO', 'SIN DATOS', '20-00000000-0', '0000000000',
+    '0000000000', 'admin@torres.gob.ar'
+);
+
+INSERT INTO legajos (
+    fecha_ingreso, fecha_ingreso_administracion, id_cargo, id_categoria, id_oficina,
+    tipo_contrato, estado, id_persona
+) VALUES (
+    '2020-01-01', '2020-01-01', NULL, 1, NULL,
+    'funcionario', 'activo', (SELECT id_persona FROM personas WHERE dni = '00000000')
+);
+
+INSERT INTO usuario (
+    usuario, pass, tipo, id_legajo, primer_ingreso, activo
+) VALUES (
+    'admin_torres', SHA2('Admin12345!', 256), 'administrador',
+    (SELECT id_legajo FROM legajos WHERE id_persona = (SELECT id_persona FROM personas WHERE dni = '00000000')),
+    1, 1
+);
 
 SET FOREIGN_KEY_CHECKS = 1;
