@@ -20,19 +20,21 @@ class PersonasTable
         return $table
             ->columns([
                 TextColumn::make('nombre')
-                    ->sortable()
-                    ->searchable(),
+                    ->label('Nombre')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('apellido')
-                    ->sortable()
-                    ->searchable(),
+                    ->label('Apellido')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('dni')
-                    ->sortable()
                     ->label("DNI")
                     ->searchable(),
+                    //->sortable(),
                 TextColumn::make('cuil')
-                    ->sortable()
                     ->label("CUIL")
                     ->searchable(),
+                    //->sortable(),
                 TextColumn::make('email')
                     ->label('Email address')
                     ->searchable(),
@@ -43,7 +45,8 @@ class PersonasTable
                     1 => 'Masculino',
                     2 => 'Otro',
                     default => 'Desconocido',
-                }),
+                })
+                ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('estado_civil')
                     ->label('Estado Civil')
                     ->formatStateUsing(fn (int $state): string => match ($state) {
@@ -51,15 +54,22 @@ class PersonasTable
                     1 => 'Casado/a',
                     2 => 'Viúdo/a',
                     default => 'Desconocido',
-                }),
+                })
+                ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('fecha_de_nacimiento')
                     ->date('d/m/Y')
                     ->sortable(),
                 TextColumn::make('domicilio'),
                 TextColumn::make('telefono')
-                    ->label("Teléfono"),
+                    ->label("Teléfono")
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('telefono_emergencia')
-                    ->label("Teléfono de emergencia"),
+                    ->label("Teléfono de emergencia")
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                /*
                 TextColumn::make('created_at')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable()
@@ -68,6 +78,7 @@ class PersonasTable
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                */
             ])
             ->filters([
                 Filter::make('fecha_de_nacimiento')

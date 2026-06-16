@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'rol',
     ];
 
     /**
@@ -45,5 +46,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function isGenerico(){
+        return $this->rol == 0;
+    }
+    public function isFuncionario(){
+        return $this->rol == 1;
+    }
+    public function isRRHH(){
+        return $this->rol == 2;
+    }
+    public function isEmpleado(){
+        return $this->rol == 3;
+    }
+    public function isAdmin(){
+        return $this->rol == 4;
     }
 }

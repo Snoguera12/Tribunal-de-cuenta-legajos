@@ -45,6 +45,7 @@ class HistorialbajasTable
                 TextColumn::make('fecha_baja')
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
+                /*
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -53,6 +54,7 @@ class HistorialbajasTable
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                */
             ])
             ->filters([
                 //
