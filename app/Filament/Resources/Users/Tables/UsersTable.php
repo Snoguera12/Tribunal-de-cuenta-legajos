@@ -31,10 +31,9 @@ class UsersTable
                 TextColumn::make('rol')
                     ->label('Rol')
                     ->formatStateUsing(fn (int $state): string => match ($state) {
-                    0 => 'Genérico',
-                    1 => 'Funcionario',
-                    2 => 'RRHH', 
-                    3 => 'Empleado',
+                    1 => 'Empleado',
+                    2 => 'Funcionario',
+                    3 => 'RRHH', 
                     4 => 'Administrador',
                     default => 'Desconocido',
                 }),  // 'Genérico', 'Funcionario', 'RRHH', 'Empleado', 'Administrador'

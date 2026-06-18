@@ -29,12 +29,11 @@ class UserForm
                 Select::make('rol')
                     ->label('Rol del Usuario')
                     ->options([
-                        //0 => 'Genérico',
-                        1 => 'Funcionario',
-                        2 => 'RRHH (Recursos Humanos.)',
-                        3 => 'Empleado',
+                        1 => 'Empleado',
+                        2 => 'Funcionario',
+                        3 => 'RRHH (Recursos Humanos.)',
                         4 => 'Administrador',
-                    ]) // 'Genérico', 'Funcionario', 'RRHH', 'Empleado', 'Administrador'
+                    ]) // 'Empleado', 'Funcionario', 'RRHH', 'Administrador'
                     ->required(),
             ]);
     }

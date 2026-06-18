@@ -24,8 +24,8 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::factory()->create([
-            'name' => 'Funcionario',
-            'email' => 'funcionario@gmail.com',
+            'name' => 'Empleado',
+            'email' => 'empleado@gmail.com',
             'password' => Hash::make('123456'),
             'rol' => 1,
             'email_verified_at' => now(),
@@ -38,8 +38,8 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
         User::factory()->create([
-            'name' => 'Empleado',
-            'email' => 'empleado@gmail.com',
+            'name' => 'Funcionario',
+            'email' => 'funcionario@gmail.com',
             'password' => Hash::make('123456'),
             'rol' => 3,
             'email_verified_at' => now(),
