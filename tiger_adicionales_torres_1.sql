@@ -1,46 +1,44 @@
 USE torres_corregida1;
 
 -- LISTADO COMPLETO DE TRIGGERS ADICIONALES PARA torres_corregida1
--- OBJETIVO: Complementar la auditoria, sincronizacion automatica y seguridad del sistema
+-- OBJETIVO: Complementar la sincronizacion automatica y seguridad del sistema
+-- NOTA: trg_actualizar_ultimo_login y trg_log_cambio_pass fueron eliminados
+-- porque trg_historico_usuario_update (tiger_23) ya registra TODOS los cambios en historico_usuario.
 
 -- 1. TABLA: usuario
--- TRIGGER #1:  trg_actualizar_ultimo_login          - Registra en historico cuando cambia ultimo_login
--- TRIGGER #2:  trg_primer_ingreso_usuario           - Actualiza primer_ingreso a 0 en el primer UPDATE activo
--- TRIGGER #3:  trg_log_cambio_pass                  - Registra en historico cuando cambia la contrasena
--- TRIGGER #4:  trg_bloqueo_admin_unico_update       - Bloquea desactivar el ultimo administrador activo
--- TRIGGER #5:  trg_bloqueo_admin_unico_delete       - Bloquea eliminar el ultimo administrador activo
+-- TRIGGER #1: trg_primer_ingreso_usuario           - Actualiza primer_ingreso a 0 en el primer UPDATE activo
+-- TRIGGER #2: trg_bloqueo_admin_unico_update       - Bloquea desactivar el ultimo administrador activo
+-- TRIGGER #3: trg_bloqueo_admin_unico_delete       - Bloquea eliminar el ultimo administrador activo
 
 -- 2. TABLA: titulos
--- TRIGGER #6:  trg_primer_ingreso_titulos           - Actualiza primer_ingreso a 0 en el primer UPDATE
+-- TRIGGER #4: trg_primer_ingreso_titulos           - Actualiza primer_ingreso a 0 en el primer UPDATE
 
 -- 3. TABLA: cursos
--- TRIGGER #7:  trg_primer_ingreso_cursos            - Actualiza primer_ingreso a 0 en el primer UPDATE
+-- TRIGGER #5: trg_primer_ingreso_cursos            - Actualiza primer_ingreso a 0 en el primer UPDATE
 
 -- 4. TABLA: idiomas
--- TRIGGER #8:  trg_primer_ingreso_idiomas           - Actualiza primer_ingreso a 0 en el primer UPDATE
+-- TRIGGER #6: trg_primer_ingreso_idiomas           - Actualiza primer_ingreso a 0 en el primer UPDATE
 
 -- 5. TABLA: familiar
--- TRIGGER #9:  trg_primer_ingreso_familiar          - Actualiza primer_ingreso a 0 en el primer UPDATE
--- TRIGGER #10: trg_sync_cantidad_hijos_insert       - Actualiza cantidad_hijos en personas al agregar un hijo
--- TRIGGER #11: trg_sync_cantidad_hijos_delete       - Actualiza cantidad_hijos en personas al eliminar un hijo
--- TRIGGER #12: trg_sync_estado_civil_conyuge        - Actualiza estado_civil a viudo/a cuando fallece el conyuge
+-- TRIGGER #7:  trg_primer_ingreso_familiar          - Actualiza primer_ingreso a 0 en el primer UPDATE
+-- TRIGGER #8:  trg_sync_cantidad_hijos_insert       - Actualiza cantidad_hijos en personas al agregar un hijo
+-- TRIGGER #9:  trg_sync_cantidad_hijos_delete       - Actualiza cantidad_hijos en personas al eliminar un hijo
+-- TRIGGER #10: trg_sync_estado_civil_conyuge        - Actualiza estado_civil a viudo/a cuando fallece el conyuge
 
 -- 6. TABLA: antecedente_laboral
--- TRIGGER #13: trg_primer_ingreso_antecedente       - Actualiza primer_ingreso a 0 en el primer UPDATE
+-- TRIGGER #11: trg_primer_ingreso_antecedente       - Actualiza primer_ingreso a 0 en el primer UPDATE
 
 -- 7. TABLA: documentos
--- TRIGGER #14: trg_primer_ingreso_documentos        - Actualiza primer_ingreso a 0 en el primer UPDATE
+-- TRIGGER #12: trg_primer_ingreso_documentos        - Actualiza primer_ingreso a 0 en el primer UPDATE
 
 -- 8. TABLA: historial_legajos
--- TRIGGER #15: trg_validar_historial_sumario        - Verifica que exista sumario real antes de registrar accion sumario
--- TRIGGER #16: trg_validar_estado_legajo_historial  - Verifica que el legajo este activo antes de registrar baja definitiva
+-- TRIGGER #13: trg_validar_historial_sumario        - Verifica que exista sumario real antes de registrar accion sumario
+-- TRIGGER #14: trg_validar_estado_legajo_historial  - Verifica que el legajo este activo antes de registrar baja definitiva
 
 -- ======================================================================
 -- LIMPIEZA PREVIA DE DISPARADORES
 -- ======================================================================
-DROP TRIGGER IF EXISTS trg_actualizar_ultimo_login;
 DROP TRIGGER IF EXISTS trg_primer_ingreso_usuario;
-DROP TRIGGER IF EXISTS trg_log_cambio_pass;
 DROP TRIGGER IF EXISTS trg_bloqueo_admin_unico_update;
 DROP TRIGGER IF EXISTS trg_bloqueo_admin_unico_delete;
 DROP TRIGGER IF EXISTS trg_primer_ingreso_titulos;
@@ -61,42 +59,12 @@ DELIMITER //
 -- 1. TABLA: usuario
 -- ======================================================================
 
-CREATE TRIGGER trg_actualizar_ultimo_login
-AFTER UPDATE ON usuario
-FOR EACH ROW
-BEGIN
-    IF NEW.ultimo_login != OLD.ultimo_login OR (NEW.ultimo_login IS NOT NULL AND OLD.ultimo_login IS NULL) THEN
-        INSERT INTO historico_usuario (
-            id_usuario, usuario, pass, tipo, id_legajo, primer_ingreso, activo,
-            fecha_creacion, ultimo_login, usuario_accion, tipo_cambio
-        ) VALUES (
-            NEW.id_usuario, NEW.usuario, NEW.pass, NEW.tipo, NEW.id_legajo, NEW.primer_ingreso, NEW.activo,
-            DATE(NEW.fecha_creacion), NEW.ultimo_login, USER(), 'UPDATE'
-        );
-    END IF;
-END//
-
 CREATE TRIGGER trg_primer_ingreso_usuario
 AFTER UPDATE ON usuario
 FOR EACH ROW
 BEGIN
     IF OLD.primer_ingreso = 1 AND NEW.activo = 1 AND NEW.ultimo_login IS NOT NULL THEN
         UPDATE usuario SET primer_ingreso = 0 WHERE id_usuario = NEW.id_usuario;
-    END IF;
-END//
-
-CREATE TRIGGER trg_log_cambio_pass
-BEFORE UPDATE ON usuario
-FOR EACH ROW
-BEGIN
-    IF NEW.pass != OLD.pass THEN
-        INSERT INTO historico_usuario (
-            id_usuario, usuario, pass, tipo, id_legajo, primer_ingreso, activo,
-            fecha_creacion, ultimo_login, usuario_accion, tipo_cambio
-        ) VALUES (
-            OLD.id_usuario, OLD.usuario, NULL, OLD.tipo, OLD.id_legajo, OLD.primer_ingreso, OLD.activo,
-            DATE(OLD.fecha_creacion), OLD.ultimo_login, USER(), 'UPDATE'
-        );
     END IF;
 END//
 

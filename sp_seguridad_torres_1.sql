@@ -584,7 +584,12 @@ BEGIN
     FROM usuario u
     INNER JOIN legajos l ON l.id_legajo = u.id_legajo
     INNER JOIN personas p ON p.id_persona = l.id_persona
-    LEFT JOIN intentos_login i ON i.usuario = u.usuario AND i.bloqueado = 1
+    INNER JOIN (
+        SELECT usuario, MAX(intentos_fallidos) AS intentos_fallidos, MAX(fecha_bloqueo) AS fecha_bloqueo
+        FROM intentos_login
+        WHERE bloqueado = 1
+        GROUP BY usuario
+    ) i ON i.usuario = u.usuario
     WHERE u.activo = 0
     ORDER BY i.fecha_bloqueo DESC;
 END//

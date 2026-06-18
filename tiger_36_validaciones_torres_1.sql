@@ -453,7 +453,7 @@ BEFORE INSERT ON titulos
 FOR EACH ROW
 BEGIN
     DECLARE estado_legajo VARCHAR(20);
-    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona;
+    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona ORDER BY id_legajo DESC LIMIT 1;
     IF estado_legajo = 'de_baja' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No se puede agregar un título a un legajo dado de baja.';
@@ -506,7 +506,7 @@ BEFORE INSERT ON cursos
 FOR EACH ROW
 BEGIN
     DECLARE estado_legajo VARCHAR(20);
-    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona;
+    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona ORDER BY id_legajo DESC LIMIT 1;
     IF estado_legajo = 'de_baja' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No se puede agregar un curso a un legajo dado de baja.';
@@ -555,7 +555,7 @@ BEFORE INSERT ON idiomas
 FOR EACH ROW
 BEGIN
     DECLARE estado_legajo VARCHAR(20);
-    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona;
+    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona ORDER BY id_legajo DESC LIMIT 1;
     IF estado_legajo = 'de_baja' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No se puede agregar un idioma a un legajo dado de baja.';
@@ -701,7 +701,7 @@ BEFORE INSERT ON familiar
 FOR EACH ROW
 BEGIN
     DECLARE estado_legajo VARCHAR(20);
-    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona;
+    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona ORDER BY id_legajo DESC LIMIT 1;
     IF estado_legajo = 'de_baja' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No se puede agregar un familiar a un legajo dado de baja.';
@@ -741,7 +741,7 @@ BEFORE INSERT ON antecedente_laboral
 FOR EACH ROW
 BEGIN
     DECLARE estado_legajo VARCHAR(20);
-    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona;
+    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona ORDER BY id_legajo DESC LIMIT 1;
     IF estado_legajo = 'de_baja' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No se puede agregar un antecedente laboral a un legajo dado de baja.';
@@ -757,7 +757,7 @@ BEFORE INSERT ON documentos
 FOR EACH ROW
 BEGIN
     DECLARE estado_legajo VARCHAR(20);
-    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona;
+    SELECT estado INTO estado_legajo FROM legajos WHERE id_persona = NEW.id_persona ORDER BY id_legajo DESC LIMIT 1;
     IF estado_legajo = 'de_baja' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No se puede agregar un documento a un legajo dado de baja.';

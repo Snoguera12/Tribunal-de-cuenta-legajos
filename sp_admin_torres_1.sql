@@ -168,7 +168,7 @@ END//
 
 CREATE PROCEDURE sp_admin_listar_personas()
 BEGIN
-    SELECT * FROM personas ORDER BY apellido, nombre;
+    CALL sp_base_listar_personas();
 END//
 
 -- ======================================================================
@@ -191,29 +191,14 @@ END//
 
 CREATE PROCEDURE sp_admin_listar_legajos()
 BEGIN
-    SELECT l.*, p.apellido, p.nombre, p.dni,
-        c.nombre_cargo, cat.nombre_categoria, o.nombre_oficina
-    FROM legajos l
-    INNER JOIN personas p ON p.id_persona = l.id_persona
-    LEFT JOIN cargos c ON c.id_cargo = l.id_cargo
-    LEFT JOIN categorias cat ON cat.id_categoria = l.id_categoria
-    LEFT JOIN oficinas o ON o.id_oficina = l.id_oficina
-    ORDER BY p.apellido, p.nombre;
+    CALL sp_base_listar_legajos();
 END//
 
 CREATE PROCEDURE sp_admin_listar_legajos_por_estado(
     IN p_estado ENUM('activo','de_baja','traslado','prestamo')
 )
 BEGIN
-    SELECT l.*, p.apellido, p.nombre, p.dni,
-        c.nombre_cargo, cat.nombre_categoria, o.nombre_oficina
-    FROM legajos l
-    INNER JOIN personas p ON p.id_persona = l.id_persona
-    LEFT JOIN cargos c ON c.id_cargo = l.id_cargo
-    LEFT JOIN categorias cat ON cat.id_categoria = l.id_categoria
-    LEFT JOIN oficinas o ON o.id_oficina = l.id_oficina
-    WHERE l.estado = p_estado
-    ORDER BY p.apellido, p.nombre;
+    CALL sp_base_listar_legajos_por_estado(p_estado);
 END//
 
 -- ======================================================================
@@ -330,7 +315,7 @@ CREATE PROCEDURE sp_admin_listar_titulos(
     IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM titulos WHERE id_persona = p_id_persona ORDER BY fecha_fin DESC;
+    CALL sp_base_listar_titulos(p_id_persona);
 END//
 
 -- ======================================================================
@@ -348,7 +333,7 @@ CREATE PROCEDURE sp_admin_listar_cursos(
     IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM cursos WHERE id_persona = p_id_persona ORDER BY fecha_inicio DESC;
+    CALL sp_base_listar_cursos(p_id_persona);
 END//
 
 -- ======================================================================
@@ -366,7 +351,7 @@ CREATE PROCEDURE sp_admin_listar_idiomas(
     IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM idiomas WHERE id_persona = p_id_persona ORDER BY nombre;
+    CALL sp_base_listar_idiomas(p_id_persona);
 END//
 
 -- ======================================================================
@@ -384,7 +369,7 @@ CREATE PROCEDURE sp_admin_listar_familiares(
     IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM familiar WHERE id_persona = p_id_persona ORDER BY relacion_empleado, apellido_familiar;
+    CALL sp_base_listar_familiares(p_id_persona);
 END//
 
 -- ======================================================================
@@ -402,7 +387,7 @@ CREATE PROCEDURE sp_admin_listar_antecedentes(
     IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM antecedente_laboral WHERE id_persona = p_id_persona ORDER BY fecha_inicio DESC;
+    CALL sp_base_listar_antecedentes(p_id_persona);
 END//
 
 -- ======================================================================
@@ -420,7 +405,7 @@ CREATE PROCEDURE sp_admin_listar_historial(
     IN p_id_legajo INT
 )
 BEGIN
-    SELECT * FROM historial_legajos WHERE id_legajo = p_id_legajo ORDER BY fecha_registro DESC;
+    CALL sp_base_listar_historial(p_id_legajo);
 END//
 
 -- ======================================================================
@@ -438,7 +423,7 @@ CREATE PROCEDURE sp_admin_listar_sumarios(
     IN p_id_legajo INT
 )
 BEGIN
-    SELECT * FROM sumarios WHERE id_legajo = p_id_legajo ORDER BY fecha_registro DESC;
+    CALL sp_base_listar_sumarios(p_id_legajo);
 END//
 
 -- ======================================================================
@@ -456,7 +441,7 @@ CREATE PROCEDURE sp_admin_listar_documentos(
     IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM documentos WHERE id_persona = p_id_persona ORDER BY creado_en DESC;
+    CALL sp_base_listar_documentos(p_id_persona);
 END//
 
 -- ======================================================================
@@ -465,7 +450,7 @@ END//
 
 CREATE PROCEDURE sp_admin_listar_categorias()
 BEGIN
-    SELECT * FROM categorias ORDER BY nombre_categoria;
+    CALL sp_base_listar_categorias();
 END//
 
 -- ======================================================================
@@ -474,7 +459,7 @@ END//
 
 CREATE PROCEDURE sp_admin_listar_cargos()
 BEGIN
-    SELECT * FROM cargos ORDER BY nombre_cargo;
+    CALL sp_base_listar_cargos();
 END//
 
 -- ======================================================================
@@ -483,7 +468,7 @@ END//
 
 CREATE PROCEDURE sp_admin_listar_oficinas()
 BEGIN
-    SELECT * FROM oficinas ORDER BY nombre_oficina;
+    CALL sp_base_listar_oficinas();
 END//
 
 -- ======================================================================
@@ -494,7 +479,7 @@ CREATE PROCEDURE sp_admin_listar_historico_personas(
     IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM historico_personas WHERE id_persona = p_id_persona ORDER BY fecha_accion DESC;
+    CALL sp_base_listar_historico_personas(p_id_persona);
 END//
 
 -- ======================================================================
@@ -502,10 +487,10 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_admin_listar_historico_legajos(
-    IN p_id_legajo INT
+    IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM historico_legajos WHERE id_legajo = p_id_legajo ORDER BY fecha_accion DESC;
+    CALL sp_base_listar_historico_legajos(p_id_persona);
 END//
 
 -- ======================================================================
@@ -516,7 +501,7 @@ CREATE PROCEDURE sp_admin_listar_historico_titulos(
     IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM historico_titulos WHERE id_persona = p_id_persona ORDER BY fecha_accion DESC;
+    CALL sp_base_listar_historico_titulos(p_id_persona);
 END//
 
 -- ======================================================================
@@ -527,7 +512,7 @@ CREATE PROCEDURE sp_admin_listar_historico_cursos(
     IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM historico_cursos WHERE id_persona = p_id_persona ORDER BY fecha_accion DESC;
+    CALL sp_base_listar_historico_cursos(p_id_persona);
 END//
 
 -- ======================================================================
@@ -538,7 +523,7 @@ CREATE PROCEDURE sp_admin_listar_historico_idiomas(
     IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM historico_idiomas WHERE id_persona = p_id_persona ORDER BY fecha_accion DESC;
+    CALL sp_base_listar_historico_idiomas(p_id_persona);
 END//
 
 -- ======================================================================
@@ -549,7 +534,7 @@ CREATE PROCEDURE sp_admin_listar_historico_familiar(
     IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM historico_familiar WHERE id_persona = p_id_persona ORDER BY fecha_accion DESC;
+    CALL sp_base_listar_historico_familiar(p_id_persona);
 END//
 
 -- ======================================================================
@@ -560,7 +545,7 @@ CREATE PROCEDURE sp_admin_listar_historico_antecedente(
     IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM historico_antecedente_laboral WHERE id_persona = p_id_persona ORDER BY fecha_accion DESC;
+    CALL sp_base_listar_historico_antecedente(p_id_persona);
 END//
 
 -- ======================================================================
@@ -568,10 +553,10 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_admin_listar_historico_historial(
-    IN p_id_legajo INT
+    IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM historico_historial_legajos WHERE id_legajo = p_id_legajo ORDER BY fecha_accion DESC;
+    CALL sp_base_listar_historico_historial(p_id_persona);
 END//
 
 -- ======================================================================
@@ -579,10 +564,10 @@ END//
 -- ======================================================================
 
 CREATE PROCEDURE sp_admin_listar_historico_sumarios(
-    IN p_id_legajo INT
+    IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM historico_sumarios WHERE id_legajo = p_id_legajo ORDER BY fecha_accion DESC;
+    CALL sp_base_listar_historico_sumarios(p_id_persona);
 END//
 
 -- ======================================================================
@@ -593,7 +578,7 @@ CREATE PROCEDURE sp_admin_listar_historico_documentos(
     IN p_id_persona INT
 )
 BEGIN
-    SELECT * FROM historico_documentos WHERE id_persona = p_id_persona ORDER BY fecha_accion DESC;
+    CALL sp_base_listar_historico_documentos(p_id_persona);
 END//
 
 -- ======================================================================
@@ -604,7 +589,7 @@ CREATE PROCEDURE sp_admin_listar_historico_usuario(
     IN p_id_legajo INT
 )
 BEGIN
-    SELECT * FROM historico_usuario WHERE id_legajo = p_id_legajo ORDER BY fecha_accion DESC;
+    CALL sp_base_listar_historico_usuario(p_id_legajo);
 END//
 
 -- ======================================================================
@@ -615,47 +600,14 @@ CREATE PROCEDURE sp_admin_legajo_completo(
     IN p_id_legajo INT
 )
 BEGIN
-    DECLARE v_id_persona INT;
-    SELECT id_persona INTO v_id_persona FROM legajos WHERE id_legajo = p_id_legajo;
-    SELECT l.*, p.apellido, p.nombre, p.dni, p.cuil, p.genero, p.fecha_nacimiento,
-        p.estado_civil, p.cantidad_hijos, p.provincia_residencia, p.ciudad_residencia,
-        p.domicilio_datos, p.telefono, p.telefono_emergencia, p.email,
-        c.nombre_cargo, cat.nombre_categoria, o.nombre_oficina
-    FROM legajos l
-    INNER JOIN personas p ON p.id_persona = l.id_persona
-    LEFT JOIN cargos c ON c.id_cargo = l.id_cargo
-    LEFT JOIN categorias cat ON cat.id_categoria = l.id_categoria
-    LEFT JOIN oficinas o ON o.id_oficina = l.id_oficina
-    WHERE l.id_legajo = p_id_legajo;
-
-    SELECT * FROM titulos WHERE id_persona = v_id_persona AND activo = 1 ORDER BY fecha_fin DESC;
-    SELECT * FROM cursos WHERE id_persona = v_id_persona AND activo = 1 ORDER BY fecha_inicio DESC;
-    SELECT * FROM idiomas WHERE id_persona = v_id_persona AND activo = 1 ORDER BY nombre;
-    SELECT * FROM familiar WHERE id_persona = v_id_persona AND activo = 1 ORDER BY relacion_empleado;
-    SELECT * FROM antecedente_laboral WHERE id_persona = v_id_persona AND activo = 1 ORDER BY fecha_inicio DESC;
-    SELECT * FROM historial_legajos WHERE id_legajo = p_id_legajo AND activo = 1 ORDER BY fecha_registro DESC;
-    SELECT * FROM sumarios WHERE id_legajo = p_id_legajo AND activo = 1 ORDER BY fecha_registro DESC;
-    SELECT * FROM documentos WHERE id_persona = v_id_persona AND activo = 1 ORDER BY creado_en DESC;
-    SELECT id_usuario, usuario, tipo, primer_ingreso, activo, fecha_creacion, ultimo_login
-    FROM usuario WHERE id_legajo = p_id_legajo;
+    CALL sp_base_legajo_completo(p_id_legajo);
 END//
 
 CREATE PROCEDURE sp_admin_buscar_persona(
     IN p_busqueda VARCHAR(100)
 )
 BEGIN
-    SELECT p.*, l.id_legajo, l.estado,
-        c.nombre_cargo, cat.nombre_categoria, o.nombre_oficina
-    FROM personas p
-    LEFT JOIN legajos l ON l.id_persona = p.id_persona
-    LEFT JOIN cargos c ON c.id_cargo = l.id_cargo
-    LEFT JOIN categorias cat ON cat.id_categoria = l.id_categoria
-    LEFT JOIN oficinas o ON o.id_oficina = l.id_oficina
-    WHERE p.apellido LIKE CONCAT('%', p_busqueda, '%')
-        OR p.nombre LIKE CONCAT('%', p_busqueda, '%')
-        OR p.dni LIKE CONCAT('%', p_busqueda, '%')
-        OR p.cuil LIKE CONCAT('%', p_busqueda, '%')
-    ORDER BY p.apellido, p.nombre;
+    CALL sp_base_buscar_persona(p_busqueda);
 END//
 
 -- ======================================================================
@@ -666,13 +618,7 @@ CREATE PROCEDURE sp_admin_listar_legajos_por_persona(
     IN p_id_persona INT
 )
 BEGIN
-    SELECT l.*, c.nombre_cargo, cat.nombre_categoria, o.nombre_oficina
-    FROM legajos l
-    LEFT JOIN cargos c ON c.id_cargo = l.id_cargo
-    LEFT JOIN categorias cat ON cat.id_categoria = l.id_categoria
-    LEFT JOIN oficinas o ON o.id_oficina = l.id_oficina
-    WHERE l.id_persona = p_id_persona
-    ORDER BY l.fecha_registro DESC;
+    CALL sp_base_listar_legajos_por_persona(p_id_persona);
 END//
 
 CREATE PROCEDURE sp_admin_listar_auditoria_completa(
@@ -743,8 +689,11 @@ BEGIN
     LEFT JOIN cargos c ON c.id_cargo = l.id_cargo
     LEFT JOIN categorias cat ON cat.id_categoria = l.id_categoria
     LEFT JOIN oficinas o ON o.id_oficina = l.id_oficina
-    LEFT JOIN sumarios s ON s.id_legajo = l.id_legajo
-        AND s.detalle LIKE 'Baja de legajo%'
+    LEFT JOIN sumarios s ON s.id_sumario = (
+        SELECT id_sumario FROM sumarios
+        WHERE id_legajo = l.id_legajo AND detalle LIKE 'Baja de legajo%'
+        ORDER BY fecha_registro DESC LIMIT 1
+    )
     WHERE l.estado = 'de_baja'
     ORDER BY s.fecha_registro DESC;
 END//

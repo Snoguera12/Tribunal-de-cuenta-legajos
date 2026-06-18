@@ -36,7 +36,9 @@ BEGIN
     SELECT pass, activo, usuario, tipo INTO v_pass_guardada, v_activo, v_usuario, v_tipo
     FROM usuario WHERE id_usuario = p_id_usuario;
 
-    IF v_activo = 0 THEN
+    IF v_pass_guardada IS NULL THEN
+        SET p_resultado = 'USUARIO_NO_EXISTE';
+    ELSEIF v_activo = 0 THEN
         SET p_resultado = 'USUARIO_INACTIVO';
     ELSEIF v_pass_guardada != SHA2(p_pass_actual, 256) THEN
         SET p_resultado = 'CONTRASENA_ACTUAL_INCORRECTA';

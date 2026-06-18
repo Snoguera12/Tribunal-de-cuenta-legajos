@@ -789,41 +789,50 @@ BEGIN
     ORDER BY p.apellido, p.nombre;
 END//
 
-CREATE PROCEDURE sp_rrhh_listar_legajos()
+CREATE PROCEDURE sp_rrhh_listar_legajos(
+    IN p_id_usuario_rrhh INT
+)
 BEGIN
-    SELECT l.*, p.apellido, p.nombre, p.dni,
-        c.nombre_cargo, cat.nombre_categoria, o.nombre_oficina
-    FROM legajos l
-    INNER JOIN personas p ON p.id_persona = l.id_persona
-    LEFT JOIN cargos c ON c.id_cargo = l.id_cargo
-    LEFT JOIN categorias cat ON cat.id_categoria = l.id_categoria
-    LEFT JOIN oficinas o ON o.id_oficina = l.id_oficina
-    ORDER BY p.apellido, p.nombre;
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_rrhh AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Acceso denegado.';
+    END IF;
+    CALL sp_base_listar_legajos();
 END//
 
 CREATE PROCEDURE sp_rrhh_listar_legajos_por_estado(
+    IN p_id_usuario_rrhh INT,
     IN p_estado ENUM('activo','de_baja','traslado','prestamo')
 )
 BEGIN
-    SELECT l.*, p.apellido, p.nombre, p.dni,
-        c.nombre_cargo, cat.nombre_categoria, o.nombre_oficina
-    FROM legajos l
-    INNER JOIN personas p ON p.id_persona = l.id_persona
-    LEFT JOIN cargos c ON c.id_cargo = l.id_cargo
-    LEFT JOIN categorias cat ON cat.id_categoria = l.id_categoria
-    LEFT JOIN oficinas o ON o.id_oficina = l.id_oficina
-    WHERE l.estado = p_estado
-    ORDER BY p.apellido, p.nombre;
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_rrhh AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Acceso denegado.';
+    END IF;
+    CALL sp_base_listar_legajos_por_estado(p_estado);
 END//
 
 CREATE PROCEDURE sp_rrhh_buscar_persona(
+    IN p_id_usuario_rrhh INT,
     IN p_busqueda VARCHAR(100)
 )
 BEGIN
-    SELECT p.*, l.id_legajo, l.estado,
+    DECLARE v_tipo VARCHAR(20);
+    SELECT tipo INTO v_tipo FROM usuario WHERE id_usuario = p_id_usuario_rrhh AND activo = 1;
+    IF v_tipo != 'rrhh' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Acceso denegado. Solo usuarios rrhh pueden usar este procedimiento.';
+    END IF;
+    SELECT DISTINCT p.*, l.id_legajo, l.estado,
         c.nombre_cargo, cat.nombre_categoria, o.nombre_oficina
     FROM personas p
-    LEFT JOIN legajos l ON l.id_persona = p.id_persona
+    LEFT JOIN legajos l ON l.id_legajo = (
+        SELECT id_legajo FROM legajos
+        WHERE id_persona = p.id_persona
+        ORDER BY id_legajo DESC LIMIT 1
+    )
     LEFT JOIN cargos c ON c.id_cargo = l.id_cargo
     LEFT JOIN categorias cat ON cat.id_categoria = l.id_categoria
     LEFT JOIN oficinas o ON o.id_oficina = l.id_oficina
@@ -838,28 +847,10 @@ CREATE PROCEDURE sp_rrhh_legajo_completo(
     IN p_id_legajo INT
 )
 BEGIN
-    DECLARE v_id_persona INT;
-    SELECT id_persona INTO v_id_persona FROM legajos WHERE id_legajo = p_id_legajo;
-    SELECT l.*, p.apellido, p.nombre, p.dni, p.cuil, p.genero, p.fecha_nacimiento,
-        p.estado_civil, p.cantidad_hijos, p.provincia_residencia, p.ciudad_residencia,
-        p.domicilio_datos, p.telefono, p.telefono_emergencia, p.email,
-        c.nombre_cargo, cat.nombre_categoria, o.nombre_oficina
-    FROM legajos l
-    INNER JOIN personas p ON p.id_persona = l.id_persona
-    LEFT JOIN cargos c ON c.id_cargo = l.id_cargo
-    LEFT JOIN categorias cat ON cat.id_categoria = l.id_categoria
-    LEFT JOIN oficinas o ON o.id_oficina = l.id_oficina
-    WHERE l.id_legajo = p_id_legajo;
-    SELECT * FROM titulos WHERE id_persona = v_id_persona AND activo = 1 ORDER BY fecha_fin DESC;
-    SELECT * FROM cursos WHERE id_persona = v_id_persona AND activo = 1 ORDER BY fecha_inicio DESC;
-    SELECT * FROM idiomas WHERE id_persona = v_id_persona AND activo = 1 ORDER BY nombre;
-    SELECT * FROM familiar WHERE id_persona = v_id_persona AND activo = 1 ORDER BY relacion_empleado;
-    SELECT * FROM antecedente_laboral WHERE id_persona = v_id_persona AND activo = 1 ORDER BY fecha_inicio DESC;
-    SELECT * FROM historial_legajos WHERE id_legajo = p_id_legajo AND activo = 1 ORDER BY fecha_registro DESC;
-    SELECT * FROM sumarios WHERE id_legajo = p_id_legajo AND activo = 1 ORDER BY fecha_registro DESC;
-    SELECT * FROM documentos WHERE id_persona = v_id_persona AND activo = 1 ORDER BY creado_en DESC;
-    SELECT id_usuario, usuario, tipo, primer_ingreso, activo, fecha_creacion, ultimo_login
-    FROM usuario WHERE id_legajo = p_id_legajo;
+    DECLARE v_tipo VARCHAR(20);
+    SELECT u.tipo INTO v_tipo FROM usuario u WHERE u.id_legajo = p_id_legajo LIMIT 1;
+    CALL sp_base_legajo_completo(p_id_legajo);
+    SELECT * FROM historico_legajos WHERE id_legajo = p_id_legajo ORDER BY fecha_accion DESC;
 END//
 
 CREATE PROCEDURE sp_rrhh_listar_historico_legajo(

@@ -9,7 +9,6 @@ USE torres_corregida1;
 DROP INDEX IF EXISTS idx_personas_dni ON personas;
 DROP INDEX IF EXISTS idx_personas_cuil ON personas;
 DROP INDEX IF EXISTS idx_personas_apellido_nombre ON personas;
-DROP INDEX IF EXISTS idx_personas_activo ON personas;
 DROP INDEX IF EXISTS idx_legajos_id_persona ON legajos;
 DROP INDEX IF EXISTS idx_legajos_estado ON legajos;
 DROP INDEX IF EXISTS idx_legajos_id_cargo ON legajos;
@@ -52,7 +51,6 @@ DROP INDEX IF EXISTS idx_hist_usuario_id_legajo ON historico_usuario;
 CREATE INDEX idx_personas_dni ON personas (dni);
 CREATE INDEX idx_personas_cuil ON personas (cuil);
 CREATE INDEX idx_personas_apellido_nombre ON personas (apellido, nombre);
-CREATE INDEX idx_personas_activo ON personas (activo);
 
 -- ======================================================================
 -- INDICES: legajos
