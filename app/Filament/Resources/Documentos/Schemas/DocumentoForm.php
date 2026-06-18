@@ -22,7 +22,10 @@ class DocumentoForm
                     ->label('Número de legajo')
                     ->required()
                     ->searchable()
-                    ->options(Legajo::selectRaw('id, num_legajo')->pluck('num_legajo', 'id'))
+                    //Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')->selectRaw("legajos.id, CONCAT(personas.nombre, ' ', personas.apellido) as nombre_completo")->pluck('nombre_completo', 'id')
+                    //->options(Legajo::selectRaw('id, num_legajo')->pluck('num_legajo', 'id'))
+                    //Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')->selectRaw("legajos.id, CONCAT(personas.nombre, ' ', personas.apellido, ' (Legajo: ', legajos.num_legajo, ' - DNI: ', personas.dni, ')') as nombre_completo")->pluck('nombre_completo', 'id');
+                    ->options(Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')->selectRaw("legajos.id, CONCAT('Legajo: ', ' ',legajos.num_legajo, ' (', personas.nombre, ' ', personas.apellido, ' - DNI: ', personas.dni, ')') as nombre_completo")->pluck('nombre_completo', 'id'))
                     ->validationMessages([
                         'required' => 'Requiere asociar a un Legajo.',
                     ])
@@ -42,10 +45,24 @@ class DocumentoForm
                     ->label('Descripción')
                     ->required()
                     ->columnSpanFull(),
-                TextInput::make('tipodoc')
+                Select::make('tipodoc')
                     ->label('Tipo de Documento.')
                     ->required()
-                    ->numeric(),
+                    ->options([
+                        0 => 'DNI',
+                        1 => 'Título',
+                        2 => 'Cursos',
+                        3 => 'Liciancia',
+                        4 => 'Acta de Nacimiento',
+                        5 => 'Certificado de Escolaridad',
+                        6 => 'Certificado Defunción',
+                        7 => 'Certificado de Casamiento',
+                        8 => 'Sumario',
+                        9 => 'Resolución',
+                        10 => 'Foto de Perfil',
+                        11 => 'Curriculum',
+                        12 => 'Otro',
+                    ]),
                 Toggle::make('activo'),
                 DateTimePicker::make('fecha_de_creacion')
                     ->label('Fecha de Creación.')

@@ -25,12 +25,15 @@ class OficinasTable
                     ->label('Descripción')
                     ->wrap() // Hace que el texto salte de línea si es largo
                     ->lineClamp(2), // (Opcional) Recorta el texto a 2 líneas y añade "..."
-                TextColumn::make('fecha_creacion')
+                /*TextColumn::make('fecha_creacion')
                     ->dateTime('d/m/Y H:i:s')
                     ->label('Fecha de creación')
                     ->wrap() // Hace que el texto salte de línea si es largo
-                    ->lineClamp(2), // (Opcional) Recorta el texto a 2 líneas y añade "..."
-                
+                    ->lineClamp(2), // (Opcional) Recorta el texto a 2 líneas y añade "..."*/
+                TextColumn::make('created_at')
+                    ->label('Fecha de Creación')
+                    ->dateTime('d/m/Y H:i:s')
+
             ])
             ->filters([
                 //

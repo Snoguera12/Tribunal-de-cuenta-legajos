@@ -15,10 +15,10 @@ class EstudiosTable
     {
         return $table
             ->columns([
-                TextColumn::make('nombre')
+                /*TextColumn::make('nombre')
                     ->label('Nombre del Estudio')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable(),*/
                 TextColumn::make('institucion')
                     ->label('Institución')
                     ->sortable()

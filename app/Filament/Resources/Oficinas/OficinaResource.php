@@ -19,7 +19,7 @@ class OficinaResource extends Resource
     protected static ?string $model = Oficina::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-    protected static string|\UnitEnum|null $navigationGroup = "Departamentos";
+    protected static string|\UnitEnum|null $navigationGroup = "Institución";
     protected static ?string $modelLabel = "Oficinas";
     protected static ?int $navigationSort = 20;
     public static function form(Schema $schema): Schema

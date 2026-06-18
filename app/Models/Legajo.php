@@ -18,6 +18,7 @@ class Legajo extends Model
         "categoria_id",
         "cargo_id",
         "area_id",
+        "titulo_id",
     ];
 
     public function persona(){
@@ -31,5 +32,12 @@ class Legajo extends Model
     }
     public function area(){
         return $this->belongsTo(Area::class, 'area_id');
+    }
+    public function titulo(){
+        return $this->belongsTo(Titulo::class, 'titulo_id');
+    }
+    public function documentos()
+    {
+        return $this->hasMany(Documento::class);
     }
 }

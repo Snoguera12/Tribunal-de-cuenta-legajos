@@ -9,7 +9,7 @@ class Oficina extends Model
     protected $fillable = [
         'nombre',
         'descripcion',
-        'fecha_creacion',
+        //'fecha_creacion',
         'area_id',
     ];
     public function area(){

@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Filament\Widgets;
+namespace App\Filament\Resources\Personas\Widgets;
 
 use App\Models\Persona;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-class PruebaWidget extends StatsOverviewWidget
+class PersonaTotalWidget extends StatsOverviewWidget
 {
     protected function getStats(): array
     {
         return [
-            /*Stat::make('Personas Registradas', Persona::count())
-            ->description("Número total de las Personas de este año.")
+            Stat::make('Personas Registradas', Persona::count())
+            //->description("Personas Registradas.")
             ->chart(
                 Persona::selectRaw("strftime('%m', created_at) as month, COUNT(*) as count")
                     ->whereYear("created_at", now()->year)
@@ -22,7 +22,7 @@ class PruebaWidget extends StatsOverviewWidget
                     ->toArray()
             )
             ->descriptionColor("success")
-            ->color("success")*/
+            ->color("primary")
         ];
     }
 }

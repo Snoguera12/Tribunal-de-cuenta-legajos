@@ -35,6 +35,78 @@ class PersonaForm
                     ]),
                 TextInput::make('dni')
                     ->label("DNI")
+                    ->unique(ignoreRecord: true) // Evita errores al editar el mismo registro
+                    ->required()
+                    ->maxLength(8)
+                    ->live(onBlur: true) 
+                    ->rules(['required', 'regex:/^[0-9]{7,8}$/'])
+                    ->validationMessages([
+                        "required" => "Requiere introducir el DNI.",
+                        "unique" => "Ya se registró el DNI.",
+                        "regex" => "El DNI debe contener entre 7 y 8 dígitos.",
+                    ])
+                    ->extraInputAttributes([
+                        'type' => 'text',
+                        'inputmode' => 'numeric',
+                        'oninvalid' => "this.setCustomValidity('Por favor, introducir el DNI.')",
+                        'oninput' => "this.setCustomValidity('')",
+                    ])
+                    ->dehydrateStateUsing(fn (string|null $state) => $state ? (int) preg_replace('/\D/', '', $state) : null)
+                    // Se ejecuta al perder el foco si el CUIL está vacío
+                    ->afterStateUpdated(function (string|null $state, Set $set, Get $get) {
+                        if (blank($state) || filled($get('cuil'))) {
+                            return;
+                        }
+
+                        // El DNI físico se rellena con ceros a la izquierda hasta tener 8 dígitos para armar el CUIL estándar
+                        $dniPad = str_pad(preg_replace('/\D/', '', $state), 8, '0', STR_PAD_LEFT);
+                        
+                        // Prefijo genérico 20 y sufijo 2 (El usuario podrá corregirlo si es mujer/empresa)
+                        $prefijo = '20';
+                        $sufijo = '2';
+
+                        $set('cuil', $prefijo . $dniPad . $sufijo);
+                    }),
+
+                TextInput::make('cuil')
+                    ->label("CUIL")
+                    ->required()
+                    ->unique(ignoreRecord: true)
+                    ->maxLength(11)
+                    // Pasamos un Closure a rules() para que Filament nos inyecte la instancia de Get correctamente
+                    ->rules(fn (Get $get): array => [
+                        'regex:/^\d{11}$/', // Formato numérico puro de 11 dígitos
+                        function (string $attribute, $value, $fail) use ($get) {
+                            $dni = preg_replace('/\D/', '', (string) $get('dni'));
+                            $cuilNumericoPuro = preg_replace('/\D/', '', (string) $value);
+
+                            if (blank($dni) || strlen($cuilNumericoPuro) !== 11) {
+                                return;
+                            }
+
+                            // El DNI dentro del CUIL siempre ocupa 8 dígitos (de la posición 2 a la 9)
+                            $dniEnCuil = substr($cuilNumericoPuro, 2, 8);
+                            $dniConCeros = str_pad($dni, 8, '0', STR_PAD_LEFT);
+
+                            if ($dniEnCuil !== $dniConCeros) {
+                                $fail("El número de documento intermedio ({$dniEnCuil}) no coincide con el DNI ingresado ({$dni}).");
+                            }
+                        },
+                    ])
+                    ->validationMessages([
+                        "required" => "Requiere introducir el CUIL.",
+                        "unique" => "Ya se registró el CUIL.",
+                        "regex" => "El CUIL debe contener exactamente 11 números sin guiones.",
+                    ])
+                    ->extraInputAttributes([
+                        'type' => 'text',
+                        'inputmode' => 'numeric',
+                    ])
+                    ->dehydrateStateUsing(fn (string|null $state) => $state ? (int) preg_replace('/\D/', '', $state) : null),
+
+
+                /*TextInput::make('dni')
+                    ->label("DNI")
                     ->unique()
                     ->maxLength(9)
                     ->rules(['required','regex:/^[0-9]{1,9}$/',])
@@ -77,7 +149,6 @@ class PersonaForm
                     ]),
                 TextInput::make('cuil')
                     ->label("CUIL")
-                    //->numeric()
                     ->required()
                     ->unique()
                     ->maxLength(12)
@@ -89,7 +160,7 @@ class PersonaForm
                                 $cuilNumericoPuro = preg_replace('/[^0-9]/', '', (string) $value);
 
 
-                                if ($dni && strlen($cuilNumericoPuro) === 12) {
+                                if ($dni && strlen($cuilNumericoPuro) === 11) {
                                     $dniEnCuil = substr($cuilNumericoPuro, 2, 9);
 
 
@@ -99,14 +170,14 @@ class PersonaForm
                                 
                                     }
                                     if ($dniEnCuil !== $dni) {
-                                    $fail("El número de documento intermedio ({$dniEnCuil}) no coincide con el DNI ingresado ({$dni}).");
+                                        $fail("El número de documento intermedio ({$dniEnCuil}) no coincide con el DNI ingresado ({$dni}).");
                                     }
                                 }
                             },
                         ];
                     })
                     ->validationMessages([
-                        //"required" => "Requiere introducir el CUIL.",
+                        "required" => "Requiere introducir el CUIL.",
                         "unique" => "Ya se registró el CUIL."
                     ])
                     ->dehydrateStateUsing(fn (string|null $state) => $state ? (int) preg_replace('/\D/', '', $state) : null)
@@ -114,7 +185,7 @@ class PersonaForm
                         "required" => "Requiere introducir el CUIL.",
                         "unique" => "Ya se registró el CUIL.",
                         //"regex" => "El formato del CUIL debe ser 00-00000000-0.",
-                    ]),
+                    ]),*/
                 TextInput::make('email')
                     ->label('Correo Electróico')
                     ->email()

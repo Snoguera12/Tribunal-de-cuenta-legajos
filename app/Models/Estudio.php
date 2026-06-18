@@ -18,4 +18,8 @@ class Estudio extends Model
     public function persona(){
         return $this->belongsTo(Persona::class, 'persona_id');
     }
+    public function titulos()
+    {
+        return $this->hasMany(Titulo::class);
+    }
 }

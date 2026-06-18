@@ -18,6 +18,9 @@ class AreasTable
                     ->label('Nombre del Área')
                     ->sortable()
                     ->searchable(),
+                TextColumn::make('created_at')
+                    ->label('Fecha de Creación')
+                    ->dateTime('d/m/Y H:i:s')
             ])
             ->filters([
                 //

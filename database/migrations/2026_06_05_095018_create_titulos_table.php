@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre', 100);
             $table->foreignId('estudio_id')->constrained()->onDelete("cascade");
-            $table->foreignId('legajo_id')->constrained()->onDelete("cascade");
+            //$table->foreignId('legajo_id')->constrained()->onDelete("cascade");
             $table->timestamps();
         });
     }

@@ -11,4 +11,9 @@ class Area extends Model
         'descripcion',
         'fecha_creacion',
     ];
+
+    public function oficinas()
+    {
+        return $this->hasMany(Oficina::class);
+    }
 }

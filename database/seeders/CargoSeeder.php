@@ -13,19 +13,24 @@ class CargoSeeder extends Seeder
      */
     public function run(): void
     {
-        Cargo::create(['nombre' => 'Archivo']);
+        Cargo::create(['nombre' => 'Administrativo']);
         Cargo::create(['nombre' => 'Auditoria']);
-        Cargo::create(['nombre' => 'Comision de estudios 1']);
-        Cargo::create(['nombre' => 'Comision de estudios 2']);
-        Cargo::create(['nombre' => 'Computos']);
-        Cargo::create(['nombre' => 'Fiscal General 1']);
-        Cargo::create(['nombre' => 'Fiscal General 2']);
-        Cargo::create(['nombre' => 'Habilitación']);
-        Cargo::create(['nombre' => 'Mesa de entradas']);
-        Cargo::create(['nombre' => 'Municipios']);
-        Cargo::create(['nombre' => 'Personal']);
-        Cargo::create(['nombre' => 'Rendición de cuentas']);
+        Cargo::create(['nombre' => 'Comisión de Gobierno']);
+        Cargo::create(['nombre' => 'Consejero/a de Cuentas']);
+        Cargo::create(['nombre' => 'Coordinador Ejecutivo']);
+        Cargo::create(['nombre' => 'Fiscal Jefe/a']);
+        Cargo::create(['nombre' => 'Gabinete Técnico']);
+        Cargo::create(['nombre' => 'Informático']);
+        Cargo::create(['nombre' => 'Interventor']);
+        Cargo::create(['nombre' => 'Oficial Mayor de Estudios']);
+        Cargo::create(['nombre' => 'Oficial Principal de Despacho']);
+        Cargo::create(['nombre' => 'Operador']);
+        Cargo::create(['nombre' => 'Ordenanza']);
+        Cargo::create(['nombre' => 'Presidente/a']);
+        Cargo::create(['nombre' => 'Relator Mayor Coordinador']);
+        Cargo::create(['nombre' => 'Sección de Fiscalización']);
         Cargo::create(['nombre' => 'Secretaria General']);
-        Cargo::create(['nombre' => 'Servicios Generales']);
+        Cargo::create(['nombre' => 'Servicio Jurídico del Estado']);
+        Cargo::create(['nombre' => 'Vocero']);
     }
 }

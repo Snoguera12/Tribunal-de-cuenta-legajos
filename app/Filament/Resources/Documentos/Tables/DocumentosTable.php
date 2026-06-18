@@ -8,6 +8,7 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Storage;
 
 class DocumentosTable
 {
@@ -20,22 +21,45 @@ class DocumentosTable
                     ->sortable(),
                 /*TextColumn::make('archivo')
                     ->searchable(),*/
+                TextColumn::make('archivo')
+                ->label('Documento')
+                ->formatStateUsing(fn () => 'Abrir Archivo')
+                ->url(fn (string $state): string => Storage::url($state))
+                ->openUrlInNewTab(),
                 TextColumn::make('tipodoc')
-                    ->label('Tipo de Docimento')
+                    ->label('Tipo de Documento')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->openUrlInNewTab()
+                    ->formatStateUsing(fn (int $state): string => match ($state) {
+                    0 => 'DNI',
+                    1 => 'Título',
+                    2 => 'Cursos',
+                    3 => 'Liciancia',
+                    4 => 'Acta de Nacimiento',
+                    5 => 'Certificado de Escolaridad',
+                    6 => 'Certificado Defunción',
+                    7 => 'Certificado de Casamiento',
+                    8 => 'Sumario',
+                    9 => 'Resolución',
+                    10 => 'Foto de Perfil',
+                    11 => 'Curriculum',
+                    12 => 'Otro',
+                    default => 'Desconocido',
+                }),
                 IconColumn::make('activo')
                     ->boolean(),
                 TextColumn::make('fecha_de_creacion')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable(),
-                TextColumn::make('fecha_de_subida')
+                /*TextColumn::make('fecha_de_subida')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable(),*/
+                TextColumn::make('created_at')
+                    ->label('Fecha de Subida')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    //->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()

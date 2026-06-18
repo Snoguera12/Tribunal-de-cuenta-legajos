@@ -12,7 +12,7 @@ class Documento extends Model
         'tipodoc',
         'activo',
         'fecha_de_creacion',
-        'fecha_de_subida',
+        //'fecha_de_subida',
         'legajo_id',
     ];
 

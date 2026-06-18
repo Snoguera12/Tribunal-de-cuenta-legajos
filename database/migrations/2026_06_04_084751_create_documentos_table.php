@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('tipodoc')->nullable();
             $table->boolean('activo')->nullable();
             $table->dateTime("fecha_de_creacion");
-            $table->dateTime("fecha_de_subida");
+            //$table->dateTime("fecha_de_subida");
             $table->foreignId("legajo_id");
             $table->timestamps();
         });

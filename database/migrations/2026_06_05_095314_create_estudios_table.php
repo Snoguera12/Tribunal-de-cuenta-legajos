@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('estudios', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 100)->nullable();
+            //$table->string('nombre', 100)->nullable();
             $table->string('institucion', 100)->nullable();
             $table->integer('nivel_estudio');
             $table->boolean('activo')->nullable();

@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Titulos\Schemas;
 
 use App\Models\Estudio;
-use App\Models\Legajo;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -18,10 +17,10 @@ class TituloForm
                     ->label('Nombre del Título')
                     ->required()
                     ->validationMessages([
-                        "required" => "Requiere introducir el Nombre del Área.",
+                        "required" => "Requiere introducir el Nombre del Título.",
                     ])
                     ->extraInputAttributes([
-                        'oninvalid' => "this.setCustomValidity('Requiere introducir el Nombre del Área.')",
+                        'oninvalid' => "this.setCustomValidity('Requiere introducir el Nombre del Título.')",
                         'oninput' => "this.setCustomValidity('')",
                     ]),
                 Select::make("estudio_id")
@@ -29,11 +28,11 @@ class TituloForm
                     ->searchable()
                     ->required()
                     ->options(Estudio::selectRaw("id, institucion")->pluck('institucion', 'id')),
-                Select::make("legajo_id")
+                /*Select::make("legajo_id")
                     ->label("Legajo")
                     ->searchable()
                     ->required()
-                    ->options(Legajo::selectRaw("id, num_legajo")->pluck('num_legajo', 'id'))
+                    ->options(Legajo::selectRaw("id, num_legajo")->pluck('num_legajo', 'id'))*/
             ]);
     }
 }
