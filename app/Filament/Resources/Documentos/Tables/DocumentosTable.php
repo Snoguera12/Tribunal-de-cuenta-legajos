@@ -18,14 +18,14 @@ class DocumentosTable
             ->columns([
                 TextColumn::make('legajo.num_legajo')
                     ->label("Número de legajo")
-                    ->sortable(),
-                /*TextColumn::make('archivo')
-                    ->searchable(),*/
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('archivo')
                 ->label('Documento')
-                ->formatStateUsing(fn () => 'Abrir Archivo')
+                //->formatStateUsing(fn () => 'Abrir Archivo')
                 ->url(fn (string $state): string => Storage::url($state))
-                ->openUrlInNewTab(),
+                ->openUrlInNewTab()
+                ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('tipodoc')
                     ->label('Tipo de Documento')
                     ->numeric()
@@ -46,24 +46,18 @@ class DocumentosTable
                     11 => 'Curriculum',
                     12 => 'Otro',
                     default => 'Desconocido',
-                }),
-                IconColumn::make('activo')
-                    ->boolean(),
+                })
+                ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('fecha_de_creacion')
+                    ->label('Fecha de Creación')
                     ->dateTime('d/m/Y H:i:s')
-                    ->sortable(),
-                /*TextColumn::make('fecha_de_subida')
-                    ->dateTime('d/m/Y H:i:s')
-                    ->sortable(),*/
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('created_at')
                     ->label('Fecha de Subida')
                     ->dateTime('d/m/Y H:i:s')
-                    ->sortable(),
-                    //->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
                 //

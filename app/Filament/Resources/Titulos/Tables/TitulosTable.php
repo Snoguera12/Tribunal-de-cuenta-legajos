@@ -2,12 +2,9 @@
 
 namespace App\Filament\Resources\Titulos\Tables;
 
-use App\Models\Estudio;
-use App\Models\Legajo;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -17,6 +14,21 @@ class TitulosTable
     {
         return $table
             ->columns([
+                TextColumn::make('persona.nombre')
+                    ->label('Nombre')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make('persona.apellido')
+                    ->label('Apellido')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make('persona.dni')
+                    ->label('DNI')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('nombre')
                     ->label('Nombre del Título')
                     ->sortable()
@@ -30,6 +42,12 @@ class TitulosTable
                     ->label('Fecha de Creación')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                /*TextColumn::make('updated_at')
+                    ->label('Fecha de Actualización')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),*/
             ])
             ->filters([
                 //

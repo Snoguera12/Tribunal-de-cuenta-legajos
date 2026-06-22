@@ -22,22 +22,27 @@ class PersonasTable
                 TextColumn::make('nombre')
                     ->label('Nombre')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('apellido')
                     ->label('Apellido')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('dni')
                     ->label("DNI")
-                    ->searchable(),
-                    //->sortable(),
+                    ->searchable()
+                    //->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('cuil')
                     ->label("CUIL")
-                    ->searchable(),
-                    //->sortable(),
+                    ->searchable()
+                    //->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('email')
                     ->label('Email address')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('genero')
                     ->label('Género')
                     ->formatStateUsing(fn (int $state): string => match ($state) {
@@ -69,16 +74,17 @@ class PersonasTable
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                /*
                 TextColumn::make('created_at')
+                    ->label('Fecha de Creación')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                /*TextColumn::make('updated_at')
+                    ->label('Fecha de Actualización')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                */
+                    ->toggleable(isToggledHiddenByDefault: true),*/
+                
             ])
             ->filters([
                 Filter::make('fecha_de_nacimiento')

@@ -20,7 +20,6 @@ return new class extends Migration
             $table->foreignId("categoria_id")->constrained()->onDelete("cascade");
             $table->foreignId("cargo_id")->constrained()->onDelete("cascade");
             $table->foreignId("area_id")->constrained()->onDelete("cascade");
-            $table->foreignId("titulo_id")->constrained()->onDelete("cascade");
             $table->timestamps();
         });
     }

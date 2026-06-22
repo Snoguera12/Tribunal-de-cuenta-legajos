@@ -17,11 +17,13 @@ class UsersTable
                 TextColumn::make('name')
                     ->label("Nombre de Usuario")
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('email')
                     ->label('Correo Electrónico')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('email_verified_at')
                     ->label('Correo Verificado')
                     ->dateTime('d/m/Y H:i:s')
@@ -36,12 +38,15 @@ class UsersTable
                     3 => 'RRHH', 
                     4 => 'Administrador',
                     default => 'Desconocido',
-                }),  // 'Genérico', 'Funcionario', 'RRHH', 'Empleado', 'Administrador'
+                }) // 'Empleado', 'Funcionario', 'RRHH', 'Administrador'
+                ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('created_at')
                     ->dateTime('d/m/Y H:i:s')
+                    ->label('Fecha de Creación')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label('Fecha de Actualización')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

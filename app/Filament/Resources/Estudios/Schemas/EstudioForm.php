@@ -54,14 +54,8 @@ class EstudioForm
                                         5 => 'Doctorado',
                                         6 => 'Maestría'
                                     ]),
-                                DatePicker::make('fecha_inicio')
-                                    ->label('Fecha de Inicialización')
-                                    ->required(),
                                 DatePicker::make('fecha_fin')
-                                    ->label('Fecha de Finalización')
-                                    ->required(),
-                                Toggle::make('activo')
-                                    ->label('Activo'),
+                                    ->label('Fecha de Finalización'),
                             ]),
                         Tabs\Tab::make('titulo')
                             ->label('Títulos')

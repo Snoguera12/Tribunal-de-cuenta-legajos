@@ -20,7 +20,8 @@ class EstudioResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     protected static string|\UnitEnum|null $navigationGroup = "Agentes";
-    protected static ?string $modelLabel = "Estudio";
+    protected static ?string $modelLabel = 'Institución';
+    protected static ?string $pluralModelLabel = 'Instituciones';
     protected static ?int $navigationSort = 10;
     public static function form(Schema $schema): Schema
     {

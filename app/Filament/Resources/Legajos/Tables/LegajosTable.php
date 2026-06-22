@@ -67,10 +67,12 @@ class LegajosTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('created_at')
+                    ->label("Fecha de Creación")
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                ->label("Fecha de Actualizado")
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -99,14 +101,12 @@ class LegajosTable
                 SelectFilter::make('cargo_id')
                 ->label('Cargo')
                 ->options(Cargo::all()->pluck('nombre', 'id')),
-                /*SelectFilter::make('estado')
+                SelectFilter::make('estado')
                 ->options([
                     0 => 'Baja',
                     1 => 'Alta'
                 ])
                 ->default(true),
-                */
-                
             ])
             ->recordActions([
                 /* Action::make('menaje_razon')

@@ -17,23 +17,26 @@ class OficinasTable
                 TextColumn::make('nombre')
                     ->label('Nombre de la Oficina')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('area.nombre')
                     ->label("Área")
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('descripcion')
                     ->label('Descripción')
                     ->wrap() // Hace que el texto salte de línea si es largo
-                    ->lineClamp(2), // (Opcional) Recorta el texto a 2 líneas y añade "..."
-                /*TextColumn::make('fecha_creacion')
-                    ->dateTime('d/m/Y H:i:s')
-                    ->label('Fecha de creación')
-                    ->wrap() // Hace que el texto salte de línea si es largo
-                    ->lineClamp(2), // (Opcional) Recorta el texto a 2 líneas y añade "..."*/
+                    ->lineClamp(2) // (Opcional) Recorta el texto a 2 líneas y añade "..."
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('created_at')
                     ->label('Fecha de Creación')
                     ->dateTime('d/m/Y H:i:s')
-
+                    ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make('updated_at')
+                    ->label('Fecha de Actualización')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
