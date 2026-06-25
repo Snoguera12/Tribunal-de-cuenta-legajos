@@ -48,16 +48,13 @@ class User extends Authenticatable
         ];
     }
 
-    public function isGenerico(){
-        return $this->rol == 0;
-    }
-    public function isFuncionario(){
+    public function isEmpleado(){
         return $this->rol == 1;
     }
-    public function isRRHH(){
+    public function isFuncionario(){
         return $this->rol == 2;
     }
-    public function isEmpleado(){
+    public function isRRHH(){
         return $this->rol == 3;
     }
     public function isAdmin(){

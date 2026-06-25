@@ -7,5 +7,5 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateHistorialbaja extends CreateRecord
 {
-    //protected static string $resource = HistorialbajaResource::class;
+    protected static string $resource = HistorialbajaResource::class;
 }

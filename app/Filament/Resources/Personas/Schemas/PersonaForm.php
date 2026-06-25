@@ -224,6 +224,7 @@ class PersonaForm
                         'oninput' => "this.setCustomValidity('')",
                     ]),
                 DatePicker::make('fecha_de_nacimiento')
+                ->label('Fecha de Nacimiento')
                 ->maxDate(now()->subYears(18)->toDateString()) // Máximo hace 18 años
                 ->rules(['date', 'before_or_equal:' . now()->subYears(18)->toDateString()])
                 ->helperText('La persona tiene que ser mayor de edad.')

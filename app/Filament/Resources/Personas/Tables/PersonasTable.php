@@ -46,29 +46,33 @@ class PersonasTable
                 TextColumn::make('genero')
                     ->label('Género')
                     ->formatStateUsing(fn (int $state): string => match ($state) {
-                    0 => 'Femenino',
-                    1 => 'Masculino',
-                    2 => 'Otro',
-                    default => 'Desconocido',
-                })
-                ->toggleable(isToggledHiddenByDefault: true),
+                        0 => 'Femenino',
+                        1 => 'Masculino',
+                        2 => 'Otro',
+                        default => 'Desconocido',
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('estado_civil')
                     ->label('Estado Civil')
                     ->formatStateUsing(fn (int $state): string => match ($state) {
-                    0 => 'Soltero/a',
-                    1 => 'Casado/a',
-                    2 => 'Viúdo/a',
-                    default => 'Desconocido',
-                })
-                ->toggleable(isToggledHiddenByDefault: true),
+                        0 => 'Soltero/a',
+                        1 => 'Casado/a',
+                        2 => 'Viúdo/a',
+                        default => 'Desconocido',
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('fecha_de_nacimiento')
+                    ->label('Nacimiento')
                     ->date('d/m/Y')
-                    ->sortable(),
-                TextColumn::make('domicilio'),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make('domicilio')
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('telefono')
                     ->label("Teléfono")
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('telefono_emergencia')
                     ->label("Teléfono de emergencia")
                     ->searchable()
@@ -86,6 +90,7 @@ class PersonasTable
                     ->toggleable(isToggledHiddenByDefault: true),*/
                 
             ])
+            
             ->filters([
                 Filter::make('fecha_de_nacimiento')
                 ->form([
@@ -136,9 +141,9 @@ class PersonasTable
                 EditAction::make(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
+                /*BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                ]),
+                ]),*/
             ]);
     }
 }

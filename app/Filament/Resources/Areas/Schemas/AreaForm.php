@@ -34,6 +34,7 @@ class AreaForm
                             ->label('Oficinas')
                             ->schema([
                                 Repeater::make('oficina')
+                                ->addActionLabel('Añadir una Oficina')
                                 ->relationship('oficinas')
                                 ->schema([
                                     TextInput::make('nombre')

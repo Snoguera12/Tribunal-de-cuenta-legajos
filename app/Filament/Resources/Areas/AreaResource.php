@@ -19,7 +19,7 @@ class AreaResource extends Resource
     protected static ?string $model = Area::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-    protected static string|\UnitEnum|null $navigationGroup = "Institución";
+    protected static string|\UnitEnum|null $navigationGroup = "Departamento";
     protected static ?string $modelLabel = "Áreas";
     protected static ?int $navigationSort = 1;
 

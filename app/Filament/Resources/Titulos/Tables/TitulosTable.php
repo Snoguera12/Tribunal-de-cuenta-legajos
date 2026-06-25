@@ -56,9 +56,9 @@ class TitulosTable
                 EditAction::make(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
+                /*BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                ]),
+                ]),*/
             ]);
     }
 }

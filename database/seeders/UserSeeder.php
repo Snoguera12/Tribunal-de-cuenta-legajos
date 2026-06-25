@@ -31,15 +31,15 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
         User::factory()->create([
-            'name' => 'RRHH',
-            'email' => 'rrhh@gmail.com',
+            'name' => 'Funcionario',
+            'email' => 'funcionario@gmail.com',
             'password' => Hash::make('123456'),
             'rol' => 2,
             'email_verified_at' => now(),
         ]);
         User::factory()->create([
-            'name' => 'Funcionario',
-            'email' => 'funcionario@gmail.com',
+            'name' => 'RRHH',
+            'email' => 'rrhh@gmail.com',
             'password' => Hash::make('123456'),
             'rol' => 3,
             'email_verified_at' => now(),

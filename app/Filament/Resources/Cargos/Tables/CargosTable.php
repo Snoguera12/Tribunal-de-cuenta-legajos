@@ -15,10 +15,9 @@ class CargosTable
         return $table
             ->columns([
                 TextColumn::make('nombre')
-                    ->label('Nombre')
+                    ->label('Nombre del Cargo')
                     ->searchable()
                     ->sortable()
-                    ->dateTime('d/m/Y H:i:s')
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('created_at')
                     ->label('Fecha de Creación')
@@ -26,7 +25,7 @@ class CargosTable
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('updated_at')
                     ->label('Fecha de Actualización')
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -37,9 +36,9 @@ class CargosTable
                 EditAction::make(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
+                /*BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                ]),
+                ]),*/
             ]);
     }
 }

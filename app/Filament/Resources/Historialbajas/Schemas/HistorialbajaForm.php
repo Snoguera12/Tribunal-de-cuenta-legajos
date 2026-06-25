@@ -26,7 +26,7 @@ class HistorialbajaForm
                         'oninput' => "this.setCustomValidity('')",
                     ]),*/
                 Select::make('motivo')
-                    ->label('Número de legajo')
+                    ->label('Motivo de Legajo')
                     ->searchable()
                     ->required()
                     ->options([
