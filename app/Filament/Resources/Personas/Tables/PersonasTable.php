@@ -138,6 +138,7 @@ class PersonasTable
                 ->label('Registrar Persona'),
             ])*/
             ->recordActions([
+ViewAction::make(),
                 EditAction::make(),
             ])
             ->toolbarActions([
