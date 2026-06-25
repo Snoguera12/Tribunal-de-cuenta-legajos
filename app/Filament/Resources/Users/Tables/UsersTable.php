@@ -14,6 +14,21 @@ class UsersTable
     {
         return $table
             ->columns([
+                TextColumn::make('persona.nombre')
+                    ->label("Nombre")
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('persona.apellido')
+                    ->label("Apellido")
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('persona.dni')
+                    ->label("DNI")
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('name')
                     ->label("Nombre de Usuario")
                     ->searchable()

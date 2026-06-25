@@ -29,6 +29,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'rol' => 1,
             'email_verified_at' => now(),
+            'persona_id' => NULL,
         ]);
         User::factory()->create([
             'name' => 'Funcionario',
@@ -36,6 +37,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'rol' => 2,
             'email_verified_at' => now(),
+            'persona_id' => NULL,
         ]);
         User::factory()->create([
             'name' => 'RRHH',
@@ -43,6 +45,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'rol' => 3,
             'email_verified_at' => now(),
+            'persona_id' => NULL,
         ]);
         User::factory()->create([
             'name' => 'Administador',
@@ -50,6 +53,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'rol' => 4,
             'email_verified_at' => now(),
+            'persona_id' => NULL,
         ]);
     }
 }

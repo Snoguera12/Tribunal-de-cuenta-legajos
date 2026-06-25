@@ -23,8 +23,11 @@ class User extends Authenticatable
         'email',
         'password',
         'rol',
+        'persona_id',
     ];
-
+    public function persona(){
+        return $this->belongsTo(Persona::class, 'persona_id');
+    }
     /**
      * The attributes that should be hidden for serialization.
      *

@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use App\Models\Persona;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Hash;
 
 class UserForm
 {
@@ -14,7 +16,7 @@ class UserForm
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->label('Nombre')
+                    ->label('Nombre de Usuario')
                     ->required(),
                 TextInput::make('email')
                     ->label('Correo Electrónico')
@@ -24,8 +26,20 @@ class UserForm
                     ->label('Correo Verificado'),
                 TextInput::make('password')
                     ->label('Contraseña')
+                    
                     ->password()
-                    ->required(),
+                    ->required(fn (string $context): bool => $context === 'create')
+                    // Si el campo está vacío al guardar, no lo incluye en el Query de actualización
+                    ->dehydrated(fn (?string $state) => filled($state))
+
+                    // Encripta la contraseña automáticamente antes de guardarla (si se modificó)
+                    ->mutateDehydratedStateUsing(fn (string $state) => Hash::make($state))
+                    ->helperText(function (string $context) {
+                        if ($context === 'edit') {
+                            return 'Deje este campo en blanco si no desea cambiar la contraseña.';
+                        }
+                        return null; // No muestra nada al crear
+                    }),
                 Select::make('rol')
                     ->label('Rol del Usuario')
                     ->options([
@@ -35,6 +49,12 @@ class UserForm
                         4 => 'Administrador',
                     ]) // 'Empleado', 'Funcionario', 'RRHH', 'Administrador'
                     ->required(),
+                Select::make("persona_id")
+                        ->label("Persona")
+                        ->searchable()
+                        ->nullable()
+                        ->placeholder("Ninguna persona")
+                        ->options(Persona::selectRaw("id, nombre || ' ' || apellido || ' (DNI: ' || dni || ')' AS nombre_completo")->pluck('nombre_completo', 'id')),
             ]);
     }
 }

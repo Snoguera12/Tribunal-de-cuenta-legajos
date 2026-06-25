@@ -19,4 +19,13 @@ class Persona extends Model
         "telefono",
         "telefono_emergencia",
     ];
+
+    public function legajos()
+    {
+        return $this->hasMany(Legajo::class);
+    }
+    public function estudios()
+    {
+        return $this->hasMany(Estudio::class);
+    }
 }
