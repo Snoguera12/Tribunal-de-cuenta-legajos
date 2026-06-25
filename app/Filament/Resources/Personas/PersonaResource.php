@@ -5,7 +5,9 @@ namespace App\Filament\Resources\Personas;
 use App\Filament\Resources\Personas\Pages\CreatePersona;
 use App\Filament\Resources\Personas\Pages\EditPersona;
 use App\Filament\Resources\Personas\Pages\ListPersonas;
+use App\Filament\Resources\Personas\Pages\ViewPersona;
 use App\Filament\Resources\Personas\Schemas\PersonaForm;
+use App\Filament\Resources\Personas\Schemas\PersonaInfolist;
 use App\Filament\Resources\Personas\Tables\PersonasTable;
 use App\Models\Persona;
 use BackedEnum;
@@ -34,6 +36,11 @@ class PersonaResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return PersonaForm::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return PersonaInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table

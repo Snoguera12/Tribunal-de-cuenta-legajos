@@ -6,6 +6,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -40,7 +41,7 @@ class PersonasTable
                     //->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('email')
-                    ->label('Email address')
+                    ->label('Correo Electrónico')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('genero')
@@ -138,13 +139,13 @@ class PersonasTable
                 ->label('Registrar Persona'),
             ])*/
             ->recordActions([
-ViewAction::make(),
+                ViewAction::make(),
                 EditAction::make(),
             ])
             ->toolbarActions([
-                /*BulkActionGroup::make([
+                BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                ]),*/
+                ]),
             ]);
     }
 }

@@ -3,19 +3,20 @@
 namespace App\Filament\Resources\Personas\Pages;
 
 use App\Filament\Resources\Personas\PersonaResource;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ViewAction;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\EditAction;
+use Filament\Resources\Pages\ViewRecord;
 
-class EditPersona extends EditRecord
+class ViewPersona extends ViewRecord
 {
     protected static string $resource = PersonaResource::class;
-
+    public function getTitle(): string
+    {
+        return 'Perfil';
+    }
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make(),
-            DeleteAction::make(),
+            EditAction::make()
         ];
     }
 }
