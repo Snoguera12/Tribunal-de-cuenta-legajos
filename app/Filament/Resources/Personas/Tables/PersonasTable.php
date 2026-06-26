@@ -33,12 +33,10 @@ class PersonasTable
                 TextColumn::make('dni')
                     ->label("DNI")
                     ->searchable()
-                    //->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('cuil')
                     ->label("CUIL")
                     ->searchable()
-                    //->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('email')
                     ->label('Correo Electrónico')

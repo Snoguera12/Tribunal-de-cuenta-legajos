@@ -10,8 +10,6 @@ class Estudio extends Model
         'nombre',
         'institucion',
         'nivel_estudio',
-        'activo',
-        'fecha_inicio',
         'fecha_fin',
         'persona_id',
     ];

@@ -28,4 +28,16 @@ class Persona extends Model
     {
         return $this->hasMany(Estudio::class);
     }
+    
+    public function estudioPrioritario()
+    {
+        return $this->hasOne(Estudio::class)
+            ->orderByRaw("CASE 
+                WHEN nivel_estudio = 'Universitario' THEN 1
+                WHEN nivel_estudio = 'Terciario' THEN 2
+                WHEN nivel_estudio = 'Secundario' THEN 3
+                WHEN nivel_estudio = 'Primario' THEN 4
+                ELSE 5 
+            END")->latestOfMany(); // Garantiza que devuelva un solo registro compatible con Section::relationship
+    }
 }

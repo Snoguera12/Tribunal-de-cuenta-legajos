@@ -16,6 +16,7 @@ class PersonaForm
         return $schema
             ->components([
                 TextInput::make('nombre')
+                    ->label('Nombre')
                     ->required()
                     ->validationMessages([
                         "required" => "Requiere introducir el Nombre.",
@@ -25,6 +26,7 @@ class PersonaForm
                         'oninput' => "this.setCustomValidity('')",
                     ]),
                 TextInput::make('apellido')
+                    ->label('Apellido')
                     ->required()
                     ->validationMessages([
                         "required" => "Requiere introducir el Apellido.",
@@ -103,89 +105,6 @@ class PersonaForm
                         'inputmode' => 'numeric',
                     ])
                     ->dehydrateStateUsing(fn (string|null $state) => $state ? (int) preg_replace('/\D/', '', $state) : null),
-
-
-                /*TextInput::make('dni')
-                    ->label("DNI")
-                    ->unique()
-                    ->maxLength(9)
-                    ->rules(['required','regex:/^[0-9]{1,9}$/',])
-                    ->required()
-                    ->live(onBlur: true) 
-                    // Ejecuta la función lógica cada vez que el DNI cambia
-                    ->afterStateUpdated(function (string|null $state, Set $set, Get $get) {
-                        // Si el DNI está vacío o ya hay un CUIL cargado manualmente, no hacemos nada
-                        if (blank($state) || filled($get('cuil'))) {
-                            return;
-                        }
-
-                        // Definimos prefijo y sufijo por defecto (ej: 20 y 2)
-                        $prefijo = 20;
-                        $sufijo = 2;
-
-                        // Concatenamos para armar el CUIL automático: 20 + DNI + 2
-                        $cuilAutomatico = $prefijo . $state . $sufijo;
-                        // Asignamos el valor al campo CUIL
-                        $set('cuil', $cuilAutomatico);
-                    })
-                    ->validationMessages([
-                    "required" => "Requiere introducir el DNI.",
-                    "unique" => "Ya se registró el DNI.",
-                    "regex" => "El DNI debe contener 8 dígitos.",
-                    ])
-                    ->dehydrateStateUsing(fn (string|null $state) => $state ? (int) preg_replace('/\D/', '', $state) : null)
-                    ->validationMessages([
-                        "required" => "Requiere introducir el DNI.",
-                        "unique" => "Ya se registró el DNI."
-                    ])
-                    ->extraInputAttributes([
-                    'type' => 'text',
-                    'inputmode' => 'numeric',
-                    'maxlength' => 9,
-                    ])
-                    ->extraInputAttributes([
-                        'oninvalid' => "this.setCustomValidity('Por favor, introducir el DNI.')",
-                        'oninput' => "this.setCustomValidity('')",
-                    ]),
-                TextInput::make('cuil')
-                    ->label("CUIL")
-                    ->required()
-                    ->unique()
-                    ->maxLength(12)
-                    ->rules(function (callable $get) {
-                        return [
-                            'regex:/^\d{2}\d{9}\d$/',
-                            function (string $attribute, $value, $fail) use ($get) {
-                                $dni = preg_replace('/[^0-9]/', '', (string) $get('dni'));
-                                $cuilNumericoPuro = preg_replace('/[^0-9]/', '', (string) $value);
-
-
-                                if ($dni && strlen($cuilNumericoPuro) === 11) {
-                                    $dniEnCuil = substr($cuilNumericoPuro, 2, 9);
-
-
-                                    if ($dniEnCuil !== $dni) {
-                                        $fail("El número de documento intermedio ({$dniEnCuil}) no coincide con el DNI ingresado ({$dni}).");
-                                    
-                                
-                                    }
-                                    if ($dniEnCuil !== $dni) {
-                                        $fail("El número de documento intermedio ({$dniEnCuil}) no coincide con el DNI ingresado ({$dni}).");
-                                    }
-                                }
-                            },
-                        ];
-                    })
-                    ->validationMessages([
-                        "required" => "Requiere introducir el CUIL.",
-                        "unique" => "Ya se registró el CUIL."
-                    ])
-                    ->dehydrateStateUsing(fn (string|null $state) => $state ? (int) preg_replace('/\D/', '', $state) : null)
-                    ->validationMessages([
-                        "required" => "Requiere introducir el CUIL.",
-                        "unique" => "Ya se registró el CUIL.",
-                        //"regex" => "El formato del CUIL debe ser 00-00000000-0.",
-                    ]),*/
                 TextInput::make('email')
                     ->label('Correo Electróico')
                     ->email()
