@@ -2,11 +2,17 @@
 
 namespace App\Filament\Resources\Personas\Schemas;
 
+use App\Models\Legajo;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class PersonaInfolist
 {
@@ -18,7 +24,7 @@ class PersonaInfolist
                     ->columns(2)
                     ->columnSpanFull()
                     ->tabs([
-                        Tabs\Tab::make('Tab 1')
+                        Tab::make('Tab 1')
                             ->label('Persona')
                             ->schema([
                                 Section::make('Datos Personales')
@@ -37,24 +43,10 @@ class PersonaInfolist
                                             ->placeholder('-'),
                                         TextEntry::make('genero')
                                             ->label('Género')
-                                            ->numeric()
-                                            ->placeholder('-')
-                                            ->formatStateUsing(fn (int $state): string => match ($state) {
-                                                0 => 'Femenino',
-                                                1 => 'Masculino',
-                                                2 => 'Otro',
-                                                default => 'Desconocido',
-                                            }),
+                                            ->placeholder('-'),
                                         TextEntry::make('estado_civil')
                                             ->label('Estado Civil')
-                                            ->numeric()
-                                            ->placeholder('-')
-                                            ->formatStateUsing(fn (int $state): string => match ($state) {
-                                                0 => 'Soltero/a',
-                                                1 => 'Casado/a',
-                                                2 => 'Viúdo/a',
-                                                default => 'Desconocido',
-                                            }),
+                                            ->placeholder('-'),
                                         TextEntry::make('fecha_de_nacimiento')
                                             ->date('d/m/Y'),
                                         TextEntry::make('domicilio')
@@ -91,62 +83,89 @@ class PersonaInfolist
                                             ->date('d/m/Y'),
                                     ])->columns(3),
                             ]),
-                        Tabs\Tab::make('Tab 2')
-                            ->label('Papeles')
-                            ->schema([
-                                Section::make('Legajos de la Persona')
-                                ->schema([
-                                    RepeatableEntry::make('legajos')
-                                    ->placeholder('-')
-                                    ->columns(3)
-                                    ->schema([
-                                        TextEntry::make('num_legajo')
-                                            ->label('Número de legajo')
-                                            ->placeholder('-'),
-                                        TextEntry::make('fecha_de_ingreso')
-                                            ->label('Fecha de Ingreso')
-                                            ->placeholder('-'),
-                                        TextEntry::make('estado')
-                                            ->label('Estado')
-                                            ->placeholder('-'),
-                                    ]),
-                                ])
-                            ]),
-                    ]),
-                
-
-                /*Section::make('Estudios de la persona')
-                    ->schema([
-                        RepeatableEntry::make('estudios')
-                        ->placeholder('-')
-                        ->columns(3)
-                        ->grid(1)
+                        Tab::make('Tab 2')
+                        ->label('Papeles')
+                        ->columnSpanFull()
                         ->schema([
-                            TextEntry::make('institucion')
-                                ->label('Institución')
-                                ->placeholder('-'),
-                            TextEntry::make('nivel_estudio')
-                                ->label('Nivel de Estudio')
-                                ->placeholder('-')
-                                ->formatStateUsing(fn (int $state): string => match ($state) {
-                                        1 => 'Primaria',
-                                        2 => 'Secundaria',
-                                        3 => 'Terciario',
-                                        4 => 'Universitario',
-                                        5 => 'Doctorado',
-                                        6 => 'Maestría',
-                                        default => 'Desconocido',
-                                    }
-                                ),
-                            TextEntry::make('fecha_fin')
-                                ->label('Fecha de Finalización')
-                                ->placeholder('-')
-                                ->date('d/m/Y'),
+                            Section::make('Legajos de la Persona')
+                            ->columnSpanFull()
+                            ->schema([
+                                RepeatableEntry::make('legajos')
+                                ->hiddenLabel()
+                                ->placeholder('Sin legajo')
+                                ->columns(1)
+                                ->schema([
+                                    Grid::make(2)
+                                    ->schema([
+                                        Grid::make(3)
+                                            ->columnSpan(1)
+                                            ->schema([
+                                                TextEntry::make('num_legajo')
+                                                    ->label('Número de legajo')
+                                                    ->placeholder('-'),
+                                                TextEntry::make('fecha_de_ingreso')
+                                                    ->label('Fecha de Ingreso')
+                                                    ->placeholder('-'),
+                                                TextEntry::make('estado')
+                                                    ->label('Estado')
+                                                    ->icon(fn (Legajo $record) => $record->isAlta() ? Heroicon::CheckCircle : Heroicon::XCircle)
+                                                    ->color(fn (Legajo $record) => $record->isAlta() ? 'success' : 'danger')
+                                                    ->iconColor(fn (Legajo $record) => $record->isAlta() ? 'success' : 'danger')
+                                                    ->placeholder('-'),
+                                                TextEntry::make('area.nombre')
+                                                    ->label('Área')
+                                                    ->placeholder('-'),
+                                                TextEntry::make('categoria.nombre')
+                                                    ->label('Categoría')
+                                                    ->placeholder('-'),
+                                                TextEntry::make('cargo.nombre')
+                                                    ->label('Cargo')
+                                                    ->placeholder('-'),
+                                            ]),
+                                            Section::make('Documentos Adjuntos')
+                                                ->columnSpan(1)
+                                                ->extraAttributes([
+                                                    'style' => 'max-height: 300px; overflow-y: auto;', 
+                                                ])
+                                                ->schema([
+                                                    RepeatableEntry::make('documentos')
+                                                        ->label('Archivos Adjuntos')
+                                                        ->hiddenLabel()
+                                                        ->placeholder('Sin documentos')
+                                                        ->contained(false) // Quita el recuadro gris individual por documento
+                                                        ->grid(1)
+                                                        ->extraAttributes([
+                                                            // Clases de Tailwind para aplicar un borde gris sutil, fondo blanco y separación inferior
+                                                            'class' => '[&>div]:border [&>div]:border-gray-200 [&>div]:bg-white [&>div]:shadow-sm [&>div]:mb-3 last:[&>div]:mb-0'
+                                                        ])
+                                                        ->schema([
+                                                            Grid::make(2)
+                                                                ->columns(2)
+                                                                ->schema([
+                                                                    TextEntry::make('tipodoc')
+                                                                        ->label('Tipo'),
+                                                                    
+                                                                    TextEntry::make('fecha_de_creacion')
+                                                                        ->label('Fecha de Creación')
+                                                                        ->dateTime('d/m/Y H:i:m'),
+                                                                ]),
+                                                            TextEntry::make('archivo')
+                                                                ->hiddenLabel()
+                                                                ->bulleted()
+                                                                ->icon('heroicon-o-document-arrow-down')
+                                                                ->color('primary')
+                                                                ->url(fn ($record) => $record->archivo ? Storage::url($record->archivo) : null)
+                                                                ->openUrlInNewTab(),
+
+                                                        ]),
+                                                ])
+                                    ]),
+                                    
+                                    
+                                ]),
+                            ])
                         ]),
-                    ])*/
-                    
-                    
-                    
+                    ]),
             ]);
     }
 }

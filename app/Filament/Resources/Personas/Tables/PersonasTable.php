@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Personas\Tables;
 
+use App\Enums\GeneroEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteBulkAction;
@@ -44,21 +45,9 @@ class PersonasTable
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('genero')
                     ->label('Género')
-                    ->formatStateUsing(fn (int $state): string => match ($state) {
-                        0 => 'Femenino',
-                        1 => 'Masculino',
-                        2 => 'Otro',
-                        default => 'Desconocido',
-                    })
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('estado_civil')
                     ->label('Estado Civil')
-                    ->formatStateUsing(fn (int $state): string => match ($state) {
-                        0 => 'Soltero/a',
-                        1 => 'Casado/a',
-                        2 => 'Viúdo/a',
-                        default => 'Desconocido',
-                    })
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('fecha_de_nacimiento')
                     ->label('Nacimiento')
@@ -77,11 +66,11 @@ class PersonasTable
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('created_at')
+                /*TextColumn::make('created_at')
                     ->label('Fecha de Creación')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true),*/
                 /*TextColumn::make('updated_at')
                     ->label('Fecha de Actualización')
                     ->dateTime('d/m/Y H:i:s')
@@ -126,11 +115,7 @@ class PersonasTable
                 }),*/
                 SelectFilter::make('genero')
                 ->label("Género")
-                ->options([
-                    0 => 'Femenino',
-                    1 => 'Masculino',
-                    2 => 'Otro',
-                ])
+                ->options(GeneroEnum::class)
             ])
             /*->headerActions([
             CreateAction::make()

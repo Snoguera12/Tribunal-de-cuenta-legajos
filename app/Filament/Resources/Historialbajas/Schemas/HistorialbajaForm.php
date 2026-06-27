@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Historialbajas\Schemas;
 
+use App\Enums\MotivoBajaEnum;
 use App\Models\Legajo;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
@@ -29,15 +30,7 @@ class HistorialbajaForm
                     ->label('Motivo de Legajo')
                     ->searchable()
                     ->required()
-                    ->options([
-                        0 => 'Renuncia',
-                        1 => 'Despido',
-                        2 => 'Vencimiento de Contrato',
-                        3 => 'Jubilación',
-                        4 => 'Fallecimiento',
-                        5 => 'Incapacidad',
-                        6 => 'Traslado'
-                    ])
+                    ->options([MotivoBajaEnum::class])
                     ->validationMessages([
                         "required" => "Requiere asociar un legajo.",
                     ])->extraInputAttributes([

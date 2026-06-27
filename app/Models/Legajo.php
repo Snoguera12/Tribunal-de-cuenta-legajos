@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoLegajoEnum;
 use Illuminate\Database\Eloquent\Model;
 
 class Legajo extends Model
@@ -9,7 +10,9 @@ class Legajo extends Model
     protected $attributes = [
         "estado" => true,
     ];
-
+    protected $casts = [
+        'estado' => EstadoLegajoEnum::class,
+    ];
     protected $fillable = [
         "num_legajo",
         "fecha_de_ingreso",
@@ -19,7 +22,9 @@ class Legajo extends Model
         "cargo_id",
         "area_id",
     ];
-
+    public function histrorial(){
+        return $this->hasMany(Historialbaja::class);
+    }
     public function persona(){
         return $this->belongsTo(Persona::class, 'persona_id');
     }
@@ -35,5 +40,9 @@ class Legajo extends Model
     public function documentos()
     {
         return $this->hasMany(Documento::class);
+    }
+    public function isAlta()
+    {
+        return $this->estado == EstadoLegajoEnum::Alta;
     }
 }

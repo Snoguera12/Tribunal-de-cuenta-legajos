@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Historialbaja;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class HistorialbajaPolicy
 {
@@ -29,7 +28,7 @@ class HistorialbajaPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return false;
     }
 
     /**
@@ -37,7 +36,7 @@ class HistorialbajaPolicy
      */
     public function update(User $user, Historialbaja $historialbaja): bool
     {
-        return $user->isAdmin();
+        return false;
     }
 
     /**
@@ -45,7 +44,7 @@ class HistorialbajaPolicy
      */
     public function delete(User $user, Historialbaja $historialbaja): bool
     {
-        return $user->isAdmin();
+        return false;
     }
 
     /**
@@ -53,7 +52,7 @@ class HistorialbajaPolicy
      */
     public function restore(User $user, Historialbaja $historialbaja): bool
     {
-        return $user->isAdmin();
+        return false;
     }
 
     /**
@@ -61,6 +60,6 @@ class HistorialbajaPolicy
      */
     public function forceDelete(User $user, Historialbaja $historialbaja): bool
     {
-        return $user->isAdmin();
+        return false;
     }
 }

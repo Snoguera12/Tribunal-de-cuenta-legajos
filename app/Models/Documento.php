@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\TipodocEnum;
 use Illuminate\Database\Eloquent\Model;
 
 class Documento extends Model
 {
+    protected $casts = [
+        'tipodoc' => TipodocEnum::class,
+    ];
     protected $fillable = [
         'archivo',
         'descripcion',

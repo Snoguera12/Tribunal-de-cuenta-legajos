@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Personas\Schemas;
 
+use App\Enums\EstadoCivilEnum;
+use App\Enums\GeneroEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -114,11 +116,7 @@ class PersonaForm
                     ]),
                 Select::make('estado_civil')
                     ->label('Estado Civil')
-                    ->options([
-                        0 => 'Soltero/a',
-                        1 => 'Casado/a',
-                        2 => 'Viúdo/a',
-                    ])
+                    ->options(EstadoCivilEnum::class)
                     ->required()
                     ->validationMessages([
                         "required" => "Requiere selecionar el estado civil.",
@@ -129,18 +127,14 @@ class PersonaForm
                     ]),
                 Select::make("genero")
                     ->label("Género")
-                    ->options([
-                        0 => "Femenino",
-                        1 => "Masculino",
-                        2 => 'Otro',
-                    ])
+                    ->options(GeneroEnum::class)
                     ->required()
                     ->validationMessages([
                         "required" => "Requiere selecionar el género.",
                     ])
                     ->extraInputAttributes([
                         'oninvalid' => "this.setCustomValidity('Por favor, selecione el género.')",
-                        'oninput' => "this.setCustomValidity('')",
+                        'oninput' => "this.setCustoEstadoCivilEnum::classmValidity('')",
                     ]),
                 DatePicker::make('fecha_de_nacimiento')
                 ->label('Fecha de Nacimiento')

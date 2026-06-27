@@ -50,7 +50,7 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
+    
     public function isEmpleado(){
         return $this->rol == 1;
     }

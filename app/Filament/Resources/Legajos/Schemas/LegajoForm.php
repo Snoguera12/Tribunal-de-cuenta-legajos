@@ -6,7 +6,6 @@ use App\Models\Area;
 use App\Models\Cargo;
 use App\Models\Categoria;
 use App\Models\Persona;
-use App\Models\Titulo;
 use Carbon\Carbon;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
@@ -16,6 +15,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 
 class LegajoForm
@@ -24,10 +24,11 @@ class LegajoForm
     {
         return $schema
             ->components([
-                Tabs::make('Tabs')
+                Tabs::make('Tabs_Base')
                     ->tabs([
-                        Tabs\Tab::make('Tab 1')
+                        Tab::make('Tab Legajo')
                             ->label('Legajo')
+                            ->columns(2)
                             ->schema([
                                 TextInput::make('num_legajo')
                                     ->label('Número de legajo')
@@ -49,7 +50,7 @@ class LegajoForm
                                     ->label('Persona')
                                     ->required()
                                     ->searchable()
-                                    ->options(Persona::selectRaw("id, nombre || ' ' || apellido || ' (DNI: ' || dni || ')' AS nombre_completo")->pluck('nombre_completo', 'id'))
+                                    ->options(Persona::Opciones())
                                     ->validationMessages([
                                         "required" => "Requiere asociar una Persona.",
                                     ])
@@ -91,8 +92,9 @@ class LegajoForm
                                     ->native(false)
                                     ->helperText('Si no introduce la fecha de ingreso, se asigna la fecha de hoy.'),
                             ]),
-                        Tabs\Tab::make('Tab 2')
+                        Tab::make('Tab Documentos')
                             ->label('Documentos')
+                            ->columns(2)
                             ->schema([
                                 Repeater::make('documento')
                                 ->relationship('documentos')

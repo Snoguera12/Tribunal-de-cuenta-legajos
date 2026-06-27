@@ -18,18 +18,22 @@ class HistorialbajasTable
             ->columns([
                 TextColumn::make('legajo.num_legajo')
                     ->label("Número de legajo")
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('legajo.persona.nombre')
                     ->label("Nombre")
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('legajo.persona.apellido')
                     ->label("Apellido")
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('legajo.persona.dni')
                     ->label("DNI")
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('motivo')
                     ->label('Motivo de la baja')
                         ->formatStateUsing(fn (int $state): string => match ($state) {
@@ -41,10 +45,12 @@ class HistorialbajasTable
                         5 => 'Incapacidad',
                         6 => 'Traslado',
                         default => 'Desconocido',
-                    }),
+                    })
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('fecha_baja')
-                    ->dateTime('d/m/Y H:i')
-                    ->sortable(),
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 /*
                 TextColumn::make('created_at')
                     ->dateTime()

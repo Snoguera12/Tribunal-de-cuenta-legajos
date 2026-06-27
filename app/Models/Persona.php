@@ -2,10 +2,17 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoCivilEnum;
+use App\Enums\GeneroEnum;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class Persona extends Model
 {
+    protected $casts = [
+        'genero' => GeneroEnum::class,
+        'estado_civil' => EstadoCivilEnum::class,
+    ];
     protected $fillable = [
         "nombre",
         "apellido",
@@ -19,7 +26,7 @@ class Persona extends Model
         "telefono",
         "telefono_emergencia",
     ];
-
+    
     public function legajos()
     {
         return $this->hasMany(Legajo::class);
@@ -39,5 +46,9 @@ class Persona extends Model
                 WHEN nivel_estudio = 'Primario' THEN 4
                 ELSE 5 
             END")->latestOfMany(); // Garantiza que devuelva un solo registro compatible con Section::relationship
+    }
+    public static function Opciones(): Collection
+    {
+        return self::selectRaw("id, nombre || ' ' || apellido || ' (DNI: ' || dni || ')' AS nombre_completo")->pluck('nombre_completo', 'id');
     }
 }

@@ -2,14 +2,17 @@
 
 namespace App\Filament\Resources\Legajos\Tables;
 
+use App\Filament\Actions\MotivoBajaAction;
 use App\Models\Cargo;
 use App\Models\Historialbaja;
+use App\Models\Legajo;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -26,7 +29,7 @@ class LegajosTable
         return $table
             ->columns([
                 TextColumn::make('num_legajo')
-                    ->label('Número de legajo')
+                    ->label('Número de Legajo')
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: false),
@@ -34,7 +37,7 @@ class LegajosTable
                     ->label("Nombre")
                     ->sortable()
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('persona.apellido')
                     ->label("Apellido")
                     ->sortable()
@@ -45,8 +48,10 @@ class LegajosTable
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: false),
-                IconColumn::make('estado')
-                    ->boolean()
+                TextColumn::make('estado')
+                    ->icon(fn (Legajo $legajo) => $legajo->isAlta() ? Heroicon::CheckCircle : Heroicon::XCircle)
+                    ->color(fn (Legajo $legajo) => $legajo->isAlta() ? 'success' : 'danger')
+                    ->iconColor(fn (Legajo $legajo) => $legajo->isAlta() ? 'success' : 'danger')
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('area.nombre')
                     ->label("Área")
@@ -109,77 +114,7 @@ class LegajosTable
                 ->default(true),
             ])
             ->recordActions([
-                /* Action::make('menaje_razon')
-                ->label('Razón de la baja')
-                ->icon(Heroicon::Bars3)
-                ->color('danger')
-                ->visible(fn (Model $record) => $record->estado == 0)
-                ->modalHeading('El motivo de la baja del legajo.')
-                ->modalDescription(
-                    function(Model $record){
-                        $ultimo = Historialbaja::where('legajo_id', '$record->id');
-                        return $ultimo->descripcion;
-                    }
-                )
-                ->modalSubmitAction(false)
-                ->modalCancelActionLabel('Cerrar')
-                ->modalCancelAction(fn ($action) => $action->color('info')),*/
-                
-                Action::make('estado')
-                ->label(fn (Model $record) => $record->estado ? 'Dar de Baja' : 'Dar de Alta')
-                ->icon(fn (Model $record) => $record->estado ? Heroicon::ArrowDown : Heroicon::ArrowUp)
-                ->color(fn (Model $record) => $record->estado ? 'danger' : 'success')
-                ->visible(fn (Model $record) => $record->estado)
-                ->requiresConfirmation()
-                ->successNotification(NULL)
-                ->modalHeading(fn (Model $record) => $record->estado ? 'Cambiar estado a "Baja"' : 'Cambiar estado a "Alta"')
-                ->modalDescription('¿Estás seguro de que quieres cambiar el estado de este registro?')
-                ->modalSubmitActionLabel('Sí, cambiar estado')
-                ->form(function (Model $record){
-                    if($record->estado){
-                        return [
-                            Select::make('select_motivo')
-                            ->label('Motivo de la baja')
-                            ->required()
-                            ->options([
-                                0 => 'Renuncia',
-                                1 => 'Despido',
-                                2 => 'Vencimiento de Contrato',
-                                3 => 'Jubilación',
-                                4 => 'Fallecimiento',
-                                5 => 'Incapacidad',
-                                6 => 'Traslado'
-                            ])
-                            ->searchable()
-                            ->extraInputAttributes([
-                            'oninvalid' => "this.setCustomValidity('Por favor, seleccione el motivo de la baja.')",
-                            'oninput' => "this.setCustomValidity('')",])
-                        ];
-                    }
-                })
-                ->action(function (array $data, Model $record): void{
-                    $fecha_actual = Carbon::now();
-
-                    if($record->estado == 1){ 
-                    Historialbaja::create([
-                        'legajo_id' => $record->id,
-                        'motivo' => $data['select_motivo'],
-                        'fecha_baja' => $fecha_actual,
-                        'user_id' => auth()->id(),
-                    ]);
-                    }
-
-                    $record->update([
-                        'estado' => $record->estado ? false : true,
-                    ]);
-                    
-                    Notification::make('estado')
-                        ->success()
-                        ->title('Se cambió el estado del legajo.')
-                        ->body(fn () => $record->estado ? 'El registro ha sido cambiado a "Dado de alta" correctamente.' : 'El registro ha sido cambiado a "Dado de baja" correctamente.')
-                        ->send()
-                    ;
-                }),
+                MotivoBajaAction::make(),
                 EditAction::make(),
             ]);
     }
