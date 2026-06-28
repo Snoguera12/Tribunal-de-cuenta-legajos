@@ -63,4 +63,8 @@ class User extends Authenticatable
     public function isAdmin(){
         return $this->rol == 4;
     }
+    public function persona(){
+    return $this->belongsTo(Persona::class, 'persona_id');
+    }
 }
+

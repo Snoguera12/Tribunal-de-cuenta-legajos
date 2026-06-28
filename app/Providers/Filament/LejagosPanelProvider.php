@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\Legajos\Widgets\LegajoWidget;
+use App\Filament\Resources\Personas\Widgets\GeneroWidget;
+use App\Filament\Resources\Personas\Widgets\PersonaTotalWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -10,8 +13,6 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -25,14 +26,15 @@ class LejagosPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->sidebarFullyCollapsibleOnDesktop()
+            ->sidebarCollapsibleOnDesktop()
             ->brandName('TCSE Legajos')
             ->id('legajos')
             ->path('legajos')
             ->login()
             ->colors([
                 'primary' => Color::Amber,
-            ])->navigationGroups([
+            ])
+            ->navigationGroups([
                 'Agentes',
                 'Papeles',
                 'Institución',
@@ -44,8 +46,9 @@ class LejagosPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
+                LegajoWidget::class,
+                PersonaTotalWidget::class,
+                GeneroWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

@@ -47,6 +47,17 @@ class PersonaResource extends Resource
     {
         return PersonasTable::configure($table);
     }
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+    $query = parent::getEloquentQuery();
+    $user = auth()->user();
+
+    if ($user->isEmpleado()) {
+        return $query->where('id', $user->persona_id);
+    }
+
+    return $query;
+     }
 
     public static function getRelations(): array
     {
