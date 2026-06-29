@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\EstadoLegajoEnum;
+use App\Enums\TipoContratoEnum;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
 
 class Legajo extends Model
@@ -11,12 +13,14 @@ class Legajo extends Model
         "estado" => true,
     ];
     protected $casts = [
-        'estado' => EstadoLegajoEnum::class,
+        "estado" => EstadoLegajoEnum::class,
+        "tipo_contrato" => TipoContratoEnum::class,
     ];
     protected $fillable = [
         "num_legajo",
         "fecha_de_ingreso",
         "estado",
+        "tipo_contrato",
         "persona_id",
         "categoria_id",
         "cargo_id",
@@ -44,5 +48,13 @@ class Legajo extends Model
     public function isAlta()
     {
         return $this->estado == EstadoLegajoEnum::Alta;
+    }
+    public function getIcon()
+    {
+        return $this->isAlta() ? Heroicon::CheckCircle : Heroicon::XCircle;
+    }
+    public function getColor()
+    {
+        return $this->isAlta() ? 'success' : 'danger';
     }
 }

@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string("domicilio", 250)->nullable();
             $table->string("telefono", 20)->nullable();
             $table->string("telefono_emergencia", 20)->nullable();
+            $table->boolean('borrar_logico')->nullable();
             $table->timestamps();
         });
     }

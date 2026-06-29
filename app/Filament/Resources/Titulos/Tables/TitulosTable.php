@@ -14,17 +14,17 @@ class TitulosTable
     {
         return $table
             ->columns([
-                TextColumn::make('persona.nombre')
+                TextColumn::make('estudio.persona.nombre')
                     ->label('Nombre')
                     ->sortable()
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('persona.apellido')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('estudio.persona.apellido')
                     ->label('Apellido')
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('persona.dni')
+                TextColumn::make('estudio.persona.dni')
                     ->label('DNI')
                     ->sortable()
                     ->searchable()
@@ -32,7 +32,8 @@ class TitulosTable
                 TextColumn::make('nombre')
                     ->label('Nombre del Título')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('estudio.institucion')
                     ->label("Institución")
                     ->sortable()

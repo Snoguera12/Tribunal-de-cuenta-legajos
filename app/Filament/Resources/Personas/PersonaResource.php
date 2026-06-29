@@ -70,9 +70,9 @@ class PersonaResource extends Resource
     {
         return [
             'index' => ListPersonas::route('/'),
-            'create' => CreatePersona::route('/create'),
+            'create' => CreatePersona::route('/añadir'),
             'view' => ViewPersona::route('/{record}'),
-            'edit' => EditPersona::route('/{record}/edit'),
+            'edit' => EditPersona::route('/{record}/editar'),
         ];
     }
 }

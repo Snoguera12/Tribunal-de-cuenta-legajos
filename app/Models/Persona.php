@@ -14,28 +14,32 @@ class Persona extends Model
         'estado_civil' => EstadoCivilEnum::class,
     ];
     protected $fillable = [
-        "nombre",
-        "apellido",
-        "dni",
-        "cuil",
-        "email",
-        "genero",
-        "estado_civil",
-        "fecha_de_nacimiento",
-        "domicilio",
-        "telefono",
-        "telefono_emergencia",
+        'nombre',
+        'apellido',
+        'dni',
+        'cuil',
+        'email',
+        'genero',
+        'estado_civil',
+        'fecha_de_nacimiento',
+        'domicilio',
+        'telefono',
+        'telefono_emergencia',
+        'borrar_logico',
     ];
     
     public function legajos()
     {
-        return $this->hasMany(Legajo::class);
+        return $this->hasMany(Legajo::class)->where('estado', 1);
     }
     public function estudios()
     {
         return $this->hasMany(Estudio::class);
     }
-    
+    public function familiares()
+    {
+        return $this->hasMany(Familiar::class);
+    }
     public function estudioPrioritario()
     {
         return $this->hasOne(Estudio::class)

@@ -125,10 +125,10 @@ class PersonasTable
                 ViewAction::make(),
                 EditAction::make(),
             ])
-            ->toolbarActions([
+            /*->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])*/;
     }
 }

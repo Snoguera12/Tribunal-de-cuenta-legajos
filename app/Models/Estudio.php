@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\NivelEstudioEnum;
 use Illuminate\Database\Eloquent\Model;
 
 class Estudio extends Model
 {
+    protected $casts = [
+        'nivel_estudio' => NivelEstudioEnum::class,
+    ];
     protected $fillable = [
         'nombre',
         'institucion',

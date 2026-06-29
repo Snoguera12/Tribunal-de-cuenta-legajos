@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId("user_id");
             $table->integer("motivo");
             $table->dateTime('fecha_baja');
-            
             $table->timestamps();
         });
     }

@@ -41,6 +41,7 @@ class PersonaSeeder extends Seeder
                 'domicilio' => '',
                 'telefono' => '',
                 'telefono_emergencia' => '',
+                'borrar_logico' => true,
             ]
         );
         Persona::create(
@@ -56,6 +57,7 @@ class PersonaSeeder extends Seeder
                 'domicilio' => '',
                 'telefono' => '',
                 'telefono_emergencia' => '',
+                'borrar_logico' => true,
             ],
             
         );
@@ -72,6 +74,7 @@ class PersonaSeeder extends Seeder
                 'domicilio' => '',
                 'telefono' => '',
                 'telefono_emergencia' => '',
+                'borrar_logico' => true,
             ],
             
         );
@@ -88,6 +91,7 @@ class PersonaSeeder extends Seeder
                 'domicilio' => '',
                 'telefono' => '',
                 'telefono_emergencia' => '',
+                'borrar_logico' => true,
             ],
             
         );
@@ -104,6 +108,7 @@ class PersonaSeeder extends Seeder
                 'domicilio' => '',
                 'telefono' => '',
                 'telefono_emergencia' => '',
+                'borrar_logico' => true,
             ],
             
         );
@@ -120,6 +125,7 @@ class PersonaSeeder extends Seeder
                 'domicilio' => '',
                 'telefono' => '',
                 'telefono_emergencia' => '',
+                'borrar_logico' => true,
             ],
             
         );
@@ -136,6 +142,7 @@ class PersonaSeeder extends Seeder
                 'domicilio' => '',
                 'telefono' => '',
                 'telefono_emergencia' => '',
+                'borrar_logico' => true,
             ],
             
         );
@@ -152,6 +159,7 @@ class PersonaSeeder extends Seeder
                 'domicilio' => '',
                 'telefono' => '',
                 'telefono_emergencia' => '',
+                'borrar_logico' => true,
             ],
             
         );
@@ -168,6 +176,7 @@ class PersonaSeeder extends Seeder
                 'domicilio' => '',
                 'telefono' => '',
                 'telefono_emergencia' => '',
+                'borrar_logico' => true,
             ],
             
         );
@@ -184,6 +193,7 @@ class PersonaSeeder extends Seeder
                 'domicilio' => '',
                 'telefono' => '',
                 'telefono_emergencia' => '',
+                'borrar_logico' => true,
             ],
             
         );
@@ -200,6 +210,7 @@ class PersonaSeeder extends Seeder
                 'domicilio' => '',
                 'telefono' => '',
                 'telefono_emergencia' => '',
+                'borrar_logico' => true,
             ],
             
         );
@@ -216,6 +227,7 @@ class PersonaSeeder extends Seeder
                 'domicilio' => '',
                 'telefono' => '',
                 'telefono_emergencia' => '',
+                'borrar_logico' => true,
             ],
             
         );
@@ -232,6 +244,7 @@ class PersonaSeeder extends Seeder
                 'domicilio' => '',
                 'telefono' => '',
                 'telefono_emergencia' => '',
+                'borrar_logico' => true,
             ],
             
         );
@@ -248,6 +261,7 @@ class PersonaSeeder extends Seeder
                 'domicilio' => '',
                 'telefono' => '',
                 'telefono_emergencia' => '',
+                'borrar_logico' => true,
             ],
             
         );

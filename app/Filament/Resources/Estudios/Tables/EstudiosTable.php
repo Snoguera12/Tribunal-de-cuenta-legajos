@@ -18,7 +18,7 @@ class EstudiosTable
                     ->label('Nombre')
                     ->sortable()
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('persona.apellido')
                     ->label('Apellido')
                     ->sortable()
@@ -40,16 +40,6 @@ class EstudiosTable
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('nivel_estudio')
                     ->label('Nivel de Estudio')
-                    ->formatStateUsing(fn (int $state): string => match ($state) {
-                        1 => 'Primaria',
-                        2 => 'Secundaria',
-                        3 => 'Terciario',
-                        4 => 'Universitario',
-                        5 => 'Doctorado',
-                        6 => 'Maestría',
-                        default => 'Desconocido',
-                    }
-                )
                 ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('fecha_fin')
                     ->label('Fecha de Finalización')

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer("num_legajo")->nullable()->unique();
             $table->boolean("estado");
             $table->dateTime("fecha_de_ingreso");
+            $table->integer("tipo_contrato")->nullable();
             $table->foreignId("persona_id")->constrained()->onDelete("cascade");
             $table->foreignId("categoria_id")->constrained()->onDelete("cascade");
             $table->foreignId("cargo_id")->constrained()->onDelete("cascade");
