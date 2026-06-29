@@ -26,7 +26,7 @@ class LejagosPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->sidebarCollapsibleOnDesktop()
+            ->sidebarFullyCollapsibleOnDesktop()
             ->brandName('TCSE Legajos')
             ->id('legajos')
             ->path('legajos')

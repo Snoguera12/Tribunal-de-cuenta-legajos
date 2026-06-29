@@ -20,7 +20,7 @@ class LegajosTable
     {
         return $table
             ->columns([
-                TextColumn::make('num_legajo')->label('Número de Legajo')
+                TextColumn::make('num_legajo')->label('Número')
                 ->sortable()
                 ->searchable()
                 ->toggleable(isToggledHiddenByDefault: false),

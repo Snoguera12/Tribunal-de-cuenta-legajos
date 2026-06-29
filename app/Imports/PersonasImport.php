@@ -53,5 +53,4 @@ class PersonasImport implements ToModel, WithHeadingRow, WithValidation
             'fecha_de_nacimiento' => 'required|date',
         ];
     }
-}   }
 }

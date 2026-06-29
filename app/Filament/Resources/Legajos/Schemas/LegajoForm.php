@@ -58,6 +58,9 @@ class LegajoForm
                     ->required()
                     ->searchable()
                     ->options(Persona::Opciones())
+                    ->default(fn () => request()->query('persona_id'))
+                    ->disabled(fn () => request()->has('persona_id')) // Opcional: deshabilita el campo si ya viene en la URL
+                    ->dehydrated() // Obligatorio si usas disabled(), para que guarde el valor en la base de datos
                     ->validationMessages([
                         "required" => "Requiere asociar una Persona.",
                     ])

@@ -40,6 +40,18 @@ class Persona extends Model
     {
         return $this->hasMany(Familiar::class);
     }
+    public function cursos()
+    {
+        return $this->hasMany(Curso::class);
+    }
+    public function idiomas()
+    {
+        return $this->hasMany(Idioma::class);
+    }
+    public function antecedentesLaborales()
+    {
+        return $this->hasMany(AntecedenteLaboral::class);
+    }
     public function estudioPrioritario()
     {
         return $this->hasOne(Estudio::class)

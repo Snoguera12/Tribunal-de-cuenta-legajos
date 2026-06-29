@@ -36,15 +36,7 @@ class MotivoBajaAction extends Action
                         ->label('Motivo de la baja')
                         ->required()
                         ->searchable()
-                        ->options([
-                            0 => 'Renuncia',
-                            1 => 'Despido',
-                            2 => 'Vencimiento de Contrato',
-                            3 => 'Jubilación',
-                            4 => 'Fallecimiento',
-                            5 => 'Incapacidad',
-                            6 => 'Traslado'
-                        ])
+                        ->options(MotivoBajaAction::class)
                         ->extraInputAttributes([
                             'oninvalid' => "this.setCustomValidity('Por favor, seleccione el motivo de la baja.')",
                             'oninput' => "this.setCustomValidity('')",

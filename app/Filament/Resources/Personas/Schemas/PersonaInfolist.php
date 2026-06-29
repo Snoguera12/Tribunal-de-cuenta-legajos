@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Personas\Schemas;
 
 use App\Filament\Actions\MotivoBajaAction;
 use App\Filament\Resources\Legajos\LegajoResource;
+use App\Filament\Resources\Legajos\Schemas\LegajoForm;
 use App\Models\Legajo;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -49,22 +50,39 @@ class PersonaInfolist
                         TextEntry::make('telefono_emergencia')
                         ->label('Teléfono de Emergencia')->placeholder('-'),
                     ]),
-                    Section::make('Familiares')
+                    Grid::make(1)
+                    ->columnSpanFull()
+                    ->columns(2)
                     ->schema([
-                        RepeatableEntry::make('familiares')
-                        ->hiddenLabel()
-                        ->columns(2)
-                        ->placeholder('No se adjuntó ningún Familiar.')
-                        ->extraAttributes([
-                            'style' => 'max-height: 552px; overflow-y: auto;',
-                        ])
+                        Section::make('Familiares')
                         ->schema([
-                            TextEntry::make('nombre')->label('Nombre'),
-                            TextEntry::make('apellido')->label('Apellido'),
-                            TextEntry::make('dni')->label('DNI'),
-                            TextEntry::make('fecha_de_nacimiento')->label('Fecha de nacimiento')->date('d/m/Y'),
-                            TextEntry::make('parentesco')->label('Parentesco'),
-                            TextEntry::make('vive')->label('Estado Vital'),
+                            RepeatableEntry::make('familiares')
+                            ->hiddenLabel()
+                            ->columns(2)
+                            ->placeholder('No se adjuntó ningún Familiar.')
+                            ->extraAttributes([
+                                'style' => 'max-height: 552px; overflow-y: auto;',
+                            ])
+                            ->schema([
+                                TextEntry::make('nombre')->label('Nombre'),
+                                TextEntry::make('apellido')->label('Apellido'),
+                                TextEntry::make('dni')->label('DNI'),
+                                TextEntry::make('fecha_de_nacimiento')->label('Fecha de nacimiento')->date('d/m/Y'),
+                                TextEntry::make('parentesco')->label('Parentesco'),
+                                TextEntry::make('vive')->label('Estado Vital'),
+                            ]),
+                        ]),
+                        Section::make('Idiomas')
+                        
+                        ->schema([
+                            RepeatableEntry::make('idiomas')
+                            ->hiddenLabel()
+                            ->placeholder('Sin idiomas registrados')
+                            ->columns(2)
+                            ->schema([
+                                TextEntry::make('idioma')->label('Idioma'),
+                                TextEntry::make('nivel')->label('Nivel'),
+                            ]),
                         ]),
                     ]),
                 ]),
@@ -77,7 +95,7 @@ class PersonaInfolist
                     ->headerActions([
                         EditAction::make('editar')
                         ->label('Añadir legajos')
-                        ->url(fn (): string => LegajoResource::getUrl('create')),
+                        ->url(fn ($record): string => LegajoResource::getUrl('create',['persona_id' => $record->id])),
                     ])
                     ->schema([
                         RepeatableEntry::make('legajos')
@@ -92,7 +110,9 @@ class PersonaInfolist
                                 ->icon('heroicon-m-pencil-square')
                                 ->color('warning')
                                 // Accedemos al ID del legajo actual usando el $record
-                                ->url(fn (Legajo $record): string => LegajoResource::getUrl('edit', ['record' => $record])),
+                                ->form([
+                                    LegajoForm::class,
+                                ]),
                                 MotivoBajaAction::make(),
                             ]),
                             Grid::make(2)
@@ -172,6 +192,51 @@ class PersonaInfolist
                         ->placeholder('-')
                         ->date('d/m/Y'),
 
+                    ]),
+                ]),
+                Tab::make('Tab 4')
+                ->label('Cursos')
+                ->columnSpanFull()
+                ->schema([
+                    Section::make('Cursos y Capacitaciones')
+                    ->columnSpanFull()
+                    ->schema([
+                        RepeatableEntry::make('cursos')
+                        ->hiddenLabel()
+                        ->placeholder('Sin cursos registrados')
+                        ->columns(3)
+                        ->schema([
+                            TextEntry::make('nombre')->label('Curso'),
+                            TextEntry::make('institucion')->label('Institución')->placeholder('-'),
+                            TextEntry::make('duracion')->label('Duración')->placeholder('-'),
+                            TextEntry::make('fecha')->label('Fecha')->placeholder('-')
+                            ->date('d/m/Y'),
+                            TextEntry::make('tiene_certificado')->label('Certificado')
+                            ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No'),
+                        ]),
+                    ]),
+                ]),
+                Tab::make('Tab 5')
+                ->label('Antecedentes Laborales')
+                ->columnSpanFull()
+                ->schema([
+                    Section::make('Antecedentes Laborales')
+                    ->columnSpanFull()
+                    ->schema([
+                        RepeatableEntry::make('antecedentesLaborales')
+                        ->hiddenLabel()
+                        ->placeholder('Sin antecedentes registrados')
+                        ->columns(3)
+                        ->schema([
+                            TextEntry::make('empleador')->label('Empleador'),
+                            TextEntry::make('lugar_de_trabajo')->label('Lugar de trabajo'),
+                            TextEntry::make('cargo')->label('Cargo')->placeholder('-'),
+                            TextEntry::make('fecha_inicio')->label('Fecha inicio')->placeholder('-')
+                            ->date('d/m/Y'),
+                            TextEntry::make('fecha_fin')->label('Fecha fin')->placeholder('-')
+                            ->date('d/m/Y'),
+                            TextEntry::make('motivo_egreso')->label('Motivo de egreso')->placeholder('-'),
+                        ]),
                     ]),
                 ]),
             ]),

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Personas\Schemas;
 use App\Enums\EstadoCivilEnum;
 use App\Enums\FamiliarViveEnum;
 use App\Enums\GeneroEnum;
+use App\Enums\IdiomaNivelEnum;
 use App\Enums\NivelEstudioEnum;
 use App\Enums\ParentescoEnum;
 use App\Enums\TipoContratoEnum;
@@ -14,6 +15,7 @@ use App\Models\Cargo;
 use App\Models\Categoria;
 use Carbon\Carbon;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
@@ -221,7 +223,25 @@ class PersonaForm
                             ]),
                         ])
                     ]),
-                    
+                    Section::make('Idiomas')
+                    ->schema([
+                        Repeater::make('Idioma')->relationship('idiomas')
+                        ->columns(2)
+                        ->hiddenLabel()
+                        ->addActionLabel('Añadir un Idioma')
+                        ->extraAttributes([
+                            'style' => 'max-height: 552px; overflow-y: auto;', 
+                        ])
+                        ->schema([
+                            TextInput::make('idioma')->label('Idioma')
+                            ->required()
+                            ->maxLength(100),
+                            Select::make('nivel')->label('Nivel')
+                            ->required()
+                            ->options(IdiomaNivelEnum::class),
+                        ]),
+                        
+                    ])
                 ]),
                 Tab::make('Tab 2')
                 ->label('Papeles')
@@ -384,6 +404,44 @@ class PersonaForm
                                 ])
                             ])
                         ]),
+                    ])
+                ]),
+                Tab::make('Tab 4')
+                ->label('Cursos')
+                ->columnSpanFull()
+                ->schema([
+                    Repeater::make('Curso')->relationship('cursos')
+                    ->hiddenLabel()
+                    ->columnSpanFull()
+                    ->columns(3)
+                    ->schema([
+                        TextInput::make('nombre')->label('Nombre del curso')
+                        ->required()
+                        ->maxLength(255),
+                        TextInput::make('institucion')->label('Institución')
+                        ->maxLength(255),
+                        TextInput::make('duracion')->label('Duración'),
+                        DatePicker::make('fecha')->label('Fecha'),
+                        Checkbox::make('tiene_certificado')->label('Tiene certificado'),
+                    ])
+                ]),
+                Tab::make('Tab 5')
+                ->label('Antecedentes Laborales')
+                ->columnSpanFull()
+                ->schema([
+                    Repeater::make('Laboral')->relationship('antecedentesLaborales')
+                    ->hiddenLabel()
+                    ->columnSpanFull()
+                    ->columns(3)
+                    ->schema([
+                        TextInput::make('empleador')->label('Empleador')
+                        ->required(),
+                        TextInput::make('lugar_de_trabajo')->label('Lugar de trabajo')
+                        ->required(),
+                        TextInput::make('cargo')->label('Cargo'),
+                        DatePicker::make('fecha_inicio')->label('Fecha de inicio'),
+                        DatePicker::make('fecha_fin')->label('Fecha de fin'),
+                        TextInput::make('motivo_egreso')->label('Motivo de egreso'),
                     ])
                 ]),
             ]),
