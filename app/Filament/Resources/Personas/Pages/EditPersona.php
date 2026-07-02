@@ -18,6 +18,12 @@ class EditPersona extends EditRecord
             ViewAction::make(),
         ];
     }
+    public function getTitle(): string
+    {
+        $persona = $this->record;
+
+        return "Editar el registro de {$persona->nombre} {$persona->apellido} (DNI: {$persona->dni})";
+    }
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

@@ -22,7 +22,7 @@ class MisDatosPersonales extends Page
     public static function shouldRegisterNavigation(): bool
     {
         // Solo se muestra el acceso al recurso completo en la barra lateral a Administrador, RRHH y el Funcionario.
-        return auth()->user()->isAdmin_RRHH();
+        return auth()->user()->isAdmin_RRHH() || auth()->user()->isEmpleado();
     }
     public static function getNavigationUrl(): string
     {

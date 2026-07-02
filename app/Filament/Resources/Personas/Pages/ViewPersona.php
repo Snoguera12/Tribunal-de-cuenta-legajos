@@ -11,7 +11,9 @@ class ViewPersona extends ViewRecord
     protected static string $resource = PersonaResource::class;
     public function getTitle(): string
     {
-        return 'Perfil';
+        $persona = $this->record;
+
+        return "Perfil de {$persona->nombre} {$persona->apellido} (DNI: {$persona->dni})";
     }
     protected function getHeaderActions(): array
     {

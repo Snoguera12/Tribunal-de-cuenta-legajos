@@ -3,6 +3,7 @@
 namespace App\Filament\Actions;
 
 
+use App\Enums\MotivoBajaEnum;
 use App\Models\Historialbaja;
 use App\Models\Legajo;
 use App\Models\User;
@@ -36,7 +37,7 @@ class MotivoBajaAction extends Action
                         ->label('Motivo de la baja')
                         ->required()
                         ->searchable()
-                        ->options(MotivoBajaAction::class)
+                        ->options(MotivoBajaEnum::class)
                         ->extraInputAttributes([
                             'oninvalid' => "this.setCustomValidity('Por favor, seleccione el motivo de la baja.')",
                             'oninput' => "this.setCustomValidity('')",

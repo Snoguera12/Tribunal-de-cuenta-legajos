@@ -6,16 +6,24 @@ use Filament\Support\Contracts\HasLabel;
 
 enum MotivoBajaEnum: int implements HasLabel
 {
-    case Soltaro = 0;
-    case Casado = 1;
-    case Viudo = 2;
-
+    case Renuncia = 0;
+    case Despido = 1;
+    case VencimientoContrato = 2;
+    case Jubilacion = 3;
+    case Fallecimiento = 4;
+    case Incapacidad = 5;
+    case Traslado = 6;
+    
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::Soltaro => 'Soltero/a',
-            self::Casado => 'Casado/a',
-            self::Viudo => 'Viudo/a',
+            self::Renuncia => 'Renuncia',
+            self::Despido => 'Despido',
+            self::VencimientoContrato => 'Vencimiento de Contrato',
+            self::Jubilacion => 'Jubilación',
+            self::Fallecimiento => 'Fallecimiento',
+            self::Incapacidad => 'Incapacidad',
+            self::Traslado => 'Traslado',
         };
     }
 }
