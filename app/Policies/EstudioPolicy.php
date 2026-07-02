@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Estudio;
+use App\Models\Persona;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
@@ -27,9 +28,9 @@ class EstudioPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user, Persona $persona): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isAdmin() || $user->isRRHH() || $user->persona_id === $persona->id;
     }
 
     /**

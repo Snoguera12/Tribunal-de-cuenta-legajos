@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Legajo;
+use App\Models\Persona;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
@@ -19,9 +20,9 @@ class LegajoPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Legajo $legajo): bool
+    public function view(User $user): bool
     {
-        return $user->isAdmin() || $user->isRRHH() || $user->isFuncionario();
+        return $user->isAdmin() || $user->isRRHH() || $user->isFuncionario()|| $user->persona_id;
     }
 
     /**

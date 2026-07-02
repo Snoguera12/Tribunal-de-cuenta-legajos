@@ -63,5 +63,14 @@ class User extends Authenticatable
     public function isAdmin(){
         return $this->rol == 4;
     }
+    public function isAdmin_RRHH(): bool
+    {
+        return $this->isAdmin() || $this->isRRHH();
+    }
+
+    public function isAdmin_RRHH_Funcionario(): bool
+    {
+        return $this->isAdmin() || $this->isRRHH() || $this->isFuncionario();
+    }
 }
 

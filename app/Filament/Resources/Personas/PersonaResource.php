@@ -15,6 +15,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class PersonaResource extends Resource
 {
@@ -29,7 +31,7 @@ class PersonaResource extends Resource
     /*public static function getNavigationBadge(): ?string{
         return Persona::count();
     }*/
-
+    
     public static function getNavigationBadgeColor(): string|array|null{
         return "succes";
     }
@@ -47,23 +49,29 @@ class PersonaResource extends Resource
     {
         return PersonasTable::configure($table);
     }
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    // Esta función hace que solo se puede ver los datos a su respectivo empleados.
+    public static function getEloquentQuery(): Builder
     {
-    $query = parent::getEloquentQuery();
-    $user = auth()->user();
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
 
-    if ($user->isEmpleado()) {
-        return $query->where('id', $user->persona_id);
+        if ($user->isEmpleado()) {
+            return $query->where('id', $user->persona_id);
+        }
+
+        return $query;
     }
-
-    return $query;
-     }
 
     public static function getRelations(): array
     {
         return [
             //
         ];
+    }
+    public static function shouldRegisterNavigation(): bool
+    {
+        // Solo se muestra el acceso al recurso completo en la barra lateral a Administrador, RRHH y el Funcionario.
+        return auth()->user()->isAdmin_RRHH_Funcionario();
     }
 
     public static function getPages(): array

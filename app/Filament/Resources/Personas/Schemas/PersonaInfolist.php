@@ -5,7 +5,9 @@ namespace App\Filament\Resources\Personas\Schemas;
 use App\Filament\Actions\MotivoBajaAction;
 use App\Filament\Resources\Legajos\LegajoResource;
 use App\Filament\Resources\Legajos\Schemas\LegajoForm;
+use App\Filament\Resources\Personas\PersonaResource;
 use App\Models\Legajo;
+use App\Models\Persona;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Infolists\Components\RepeatableEntry;
@@ -95,7 +97,7 @@ class PersonaInfolist
                     ->headerActions([
                         EditAction::make('editar')
                         ->label('Añadir legajos')
-                        ->url(fn ($record): string => LegajoResource::getUrl('create',['persona_id' => $record->id])),
+                        ->url(fn (Persona $record): string => PersonaResource::getUrl('edit', ['record' => $record]) . '?tab=legajo'),
                     ])
                     ->schema([
                         RepeatableEntry::make('legajos')

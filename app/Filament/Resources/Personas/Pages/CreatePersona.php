@@ -34,4 +34,16 @@ class CreatePersona extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
+    protected function afterCreate(): void
+    {
+        $user = auth()->user();
+
+        // Solo se auto-asigna si el usuario actual NO tiene una persona vinculada
+        // Esto evita que Administradores o RRHH se adueñen del registro al crear otras personas
+        if (!$user->persona_id) {
+            $user->update([
+                'persona_id' => $this->record->id,
+            ]);
+        }
+    }
 }

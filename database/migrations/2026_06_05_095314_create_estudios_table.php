@@ -16,8 +16,7 @@ return new class extends Migration
             //$table->string('nombre', 100)->nullable();
             $table->string('institucion', 100)->nullable();
             $table->integer('nivel_estudio');
-            $table->boolean('activo')->nullable();
-            $table->date('fecha_fin');
+            $table->date('fecha_fin')->nullable();
             $table->foreignId('persona_id')->constrained()->onDelete("cascade");
             $table->timestamps();
         });

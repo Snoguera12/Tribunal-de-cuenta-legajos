@@ -18,4 +18,8 @@ class EditPersona extends EditRecord
             ViewAction::make(),
         ];
     }
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

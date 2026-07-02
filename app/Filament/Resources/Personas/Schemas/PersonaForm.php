@@ -42,9 +42,10 @@ class PersonaForm
             Tabs::make('Tabs_base')
             ->columns(2)
             ->columnSpanFull()
+            ->persistTabInQueryString()
             ->tabs([
-                Tab::make('Tab 1')
-                ->label('Persona')
+                Tab::make('Tab 1')->label('Persona')
+                ->id('persona')
                 ->schema([
                     Section::make('Datos Personales')
                     ->columns(4)
@@ -243,8 +244,8 @@ class PersonaForm
                         
                     ])
                 ]),
-                Tab::make('Tab 2')
-                ->label('Papeles')
+                Tab::make('Tab 2')->label('Papeles')
+                ->id('legajo')
                 ->schema([
                     Repeater::make('Legajo')->relationship('legajos')
                     ->extraAttributes([
@@ -356,8 +357,8 @@ class PersonaForm
                         
                     ]),
                 ]),
-                Tab::make('Tab 3')
-                ->label('Estudios/Títulos')
+                Tab::make('Tab 3')->label('Estudios/Títulos')
+                ->id('estudio')
                 ->columnSpanFull()
                 ->schema([
                     Repeater::make('Estudio')->relationship('estudios') // Relación Principal (Persona -> Estudios)
@@ -377,20 +378,26 @@ class PersonaForm
                                 /*TextInput::make('nombre')->label('Nombre')
                                 ->required()
                                 ->validationMessages(["required" => "Requiere introducir el Nombre del Estudio."]),*/
-                                TextInput::make('institucion')->label('Institución')
-                                ->required()
-                                ->validationMessages(["required" => "Requiere introducir la Institución."]),
                                 Select::make("nivel_estudio")->label("Nivel de Estudio")
                                 ->options(NivelEstudioEnum::class)
                                 ->required()
+                                ->live()
                                 ->validationMessages(["required" => "Requiere seleccionar el Nivel de Estudio."]),
+
+                                TextInput::make('institucion')->label('Institución')
+                                ->required(fn (Get $get): bool => $get('nivel_estudio') !== null && $get('nivel_estudio') != NivelEstudioEnum::SinEstudio)
+                                ->disabled(fn (Get $get): bool => $get('nivel_estudio') === null || $get('nivel_estudio') == NivelEstudioEnum::SinEstudio)
+                                ->validationMessages(["required" => "Requiere introducir la Institución."]),
+
                                 DatePicker::make('fecha_fin')->label('Fecha de Finalización')
-                                ->required()
+                                ->required(fn (Get $get): bool => $get('nivel_estudio') !== null && $get('nivel_estudio') != NivelEstudioEnum::SinEstudio)
+                                ->disabled(fn (Get $get): bool => $get('nivel_estudio') === null || $get('nivel_estudio') == NivelEstudioEnum::SinEstudio)
                                 ->validationMessages(["required" => "Requiere introducir la Fecha de Finalización."]),
                             ]),
                                 
                             Tab::make('Título')
                             ->label('Títulos')
+                            ->visible(fn (Get $get): bool => $get('nivel_estudio') !== null && $get('nivel_estudio') != NivelEstudioEnum::SinEstudio)
                             ->schema([
                                 Repeater::make('titulos')->relationship('titulos') 
                                 ->addActionLabel('Añadir un Título')
@@ -406,8 +413,8 @@ class PersonaForm
                         ]),
                     ])
                 ]),
-                Tab::make('Tab 4')
-                ->label('Cursos')
+                Tab::make('Tab 4')->label('Cursos')
+                ->id('curso')
                 ->columnSpanFull()
                 ->schema([
                     Repeater::make('Curso')->relationship('cursos')
@@ -427,6 +434,7 @@ class PersonaForm
                 ]),
                 Tab::make('Tab 5')
                 ->label('Antecedentes Laborales')
+                ->id('antecedenteslaborales')
                 ->columnSpanFull()
                 ->schema([
                     Repeater::make('Laboral')->relationship('antecedentesLaborales')

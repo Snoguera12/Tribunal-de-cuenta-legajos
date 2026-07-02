@@ -6,7 +6,7 @@ use Filament\Support\Contracts\HasLabel;
 
 enum NivelEstudioEnum: int implements HasLabel
 {
-    case Sin_Estudio = 0;
+    case SinEstudio = 0;
     case Primario = 1;
     case Secundaria = 2;
     case Terciario = 3;
@@ -16,7 +16,7 @@ enum NivelEstudioEnum: int implements HasLabel
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::Sin_Estudio => 'Sin Estudio',
+            self::SinEstudio => 'Sin Estudio',
             self::Primario => 'Primaria',
             self::Secundaria => 'Secundaria',
             self::Terciario => 'Terciario',
