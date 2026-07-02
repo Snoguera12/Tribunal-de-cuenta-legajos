@@ -28,7 +28,7 @@ class TituloPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user, Persona $persona): bool
+    public function create(User $user): bool
     {
         return $user->isAdmin() || $user->isRRHH();
     }

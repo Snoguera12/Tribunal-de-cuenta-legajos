@@ -17,7 +17,7 @@ class MotivoBajaAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make('Motivo')
-            ->visible(fn (Legajo $legajo) => $legajo->isAlta() /*|| auth()->user()->isAdmin()*/)
+            ->visible(fn (Legajo $legajo) => $legajo->isAlta() && auth()->user()->isAdmin_RRHH() /*|| auth()->user()->isAdmin()*/)
             ->label(fn (Legajo $legajo) => $legajo->isAlta() ? 'Dar de Baja' : 'Dar de Alta')
             ->icon(fn (Legajo $legajo) => $legajo->isAlta() ? 'heroicon-m-arrow-down' : 'heroicon-m-arrow-up')
             ->color(fn (Legajo $legajo) => $legajo->isAlta() ? 'danger' : 'success')

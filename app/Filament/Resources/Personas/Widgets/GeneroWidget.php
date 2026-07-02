@@ -7,9 +7,13 @@ use Filament\Widgets\ChartWidget;
 
 class GeneroWidget extends ChartWidget
 {
-    protected ?string $heading = 'Género Widget';
+    protected ?string $heading = 'Género';
     protected ?string $maxHeight = '200px';
     protected ?string $maxWidth = '5xl';
+    public static function canView(): bool
+    {
+        return auth()->user()->isAdmin_RRHH_Funcionario();
+    }
     protected function getData(): array
     {
         $femenino = Persona::query()->where('genero', 0)->count();

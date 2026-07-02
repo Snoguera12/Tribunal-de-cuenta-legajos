@@ -8,6 +8,10 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class LegajoWidget extends StatsOverviewWidget
 {
+    public static function canView(): bool
+    {
+        return auth()->user()->isAdmin_RRHH_Funcionario();
+    }
     protected function getStats(): array
     {
 

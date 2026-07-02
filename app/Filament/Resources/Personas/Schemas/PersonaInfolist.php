@@ -3,15 +3,16 @@
 namespace App\Filament\Resources\Personas\Schemas;
 
 use App\Filament\Actions\MotivoBajaAction;
-use App\Filament\Resources\Legajos\LegajoResource;
 use App\Filament\Resources\Legajos\Schemas\LegajoForm;
 use App\Filament\Resources\Personas\PersonaResource;
+use App\Filament\Resources\Users\UserResource;
 use App\Models\Legajo;
 use App\Models\Persona;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -97,6 +98,8 @@ class PersonaInfolist
                     ->headerActions([
                         EditAction::make('editar')
                         ->label('Añadir legajos')
+                        ->icon('heroicon-m-pencil-square')
+                        ->color('warning')
                         ->url(fn (Persona $record): string => PersonaResource::getUrl('edit', ['record' => $record]) . '?tab=legajo'),
                     ])
                     ->schema([
@@ -114,8 +117,9 @@ class PersonaInfolist
                                 // Accedemos al ID del legajo actual usando el $record
                                 ->form([
                                     LegajoForm::class,
-                                ]),
-                                MotivoBajaAction::make(),
+                                ])
+                                ->visible(auth()->user()->isAdmin_RRHH()),
+                                MotivoBajaAction::make()->visible(auth()->user()->isAdmin_RRHH()),
                             ]),
                             Grid::make(2)
                             ->schema([
@@ -184,17 +188,37 @@ class PersonaInfolist
                     ->columnSpanFull()
                     ->columns(3)
                     ->relationship('estudioPrioritario')
+                    ->headerActions([
+                        Action::make('editar')
+                        ->label('Añadir Estudio/Título')
+                        ->icon('heroicon-m-pencil-square')
+                        ->color('warning')
+                        ->visible(auth()->user()->isAdmin_RRHH())
+                        ->url(function (Component $component): string {
+                            // Navega hacia arriba en el árbol de componentes para obtener la Persona real
+                            $persona = $component->getLivewire()->getRecord();
+                            
+                            return PersonaResource::getUrl('edit', ['record' => $persona]) . '?tab=estudio';
+                        }),
+                    ])
                     ->schema([
-                        TextEntry::make('institucion')
-                        ->label('Institución')
-                        ->placeholder('-'),
+                        TextEntry::make('institucion')->label('Institución')->placeholder('-'),
                         TextEntry::make('nivel_estudio')->label('Nivel de Estudio'),
-                        TextEntry::make('fecha_fin')
-                        ->label('Fecha de Finalización')
-                        ->placeholder('-')
+                        TextEntry::make('fecha_fin')->label('Fecha de Finalización')->placeholder('-')
                         ->date('d/m/Y'),
+                        RepeatableEntry::make('titulos') // Nombre de la relación en tu modelo 'Estudio'
+                        ->label('Títulos Obtenidos')
+                        ->columnSpanFull() // Ocupa todo el ancho debajo de los campos anteriores
+                        ->placeholder('Sin títulos registrados para este estudio')
+                        ->grid(2) // Si tiene varios títulos, los muestra en 2 columnas
+                        ->schema([
+                            TextEntry::make('nombre') // Campo 'nombre' de tu tabla de títulos
+                                ->hiddenLabel() // Oculta la etiqueta repetitiva dentro de la cuadrícula
+                                ->icon('heroicon-m-academic-cap') // Un ícono visual para el título
+                        ]),
 
                     ]),
+                    
                 ]),
                 Tab::make('Tab 4')
                 ->label('Cursos')
@@ -202,6 +226,13 @@ class PersonaInfolist
                 ->schema([
                     Section::make('Cursos y Capacitaciones')
                     ->columnSpanFull()
+                    ->headerActions([
+                        EditAction::make('editar')
+                        ->label('Añadir Cursos')
+                        ->icon('heroicon-m-pencil-square')
+                        ->color('warning')
+                        ->url(fn (Persona $record): string => PersonaResource::getUrl('edit', ['record' => $record]) . '?tab=curso'),
+                    ])
                     ->schema([
                         RepeatableEntry::make('cursos')
                         ->hiddenLabel()
@@ -224,6 +255,13 @@ class PersonaInfolist
                 ->schema([
                     Section::make('Antecedentes Laborales')
                     ->columnSpanFull()
+                    ->headerActions([
+                        EditAction::make('editar')
+                        ->label('Añadir Antecedentes Laborales')
+                        ->icon('heroicon-m-pencil-square')
+                        ->color('warning')
+                        ->url(fn (Persona $record): string => PersonaResource::getUrl('edit', ['record' => $record]) . '?tab=antecedenteslaborales'),
+                    ])
                     ->schema([
                         RepeatableEntry::make('antecedentesLaborales')
                         ->hiddenLabel()
@@ -239,6 +277,53 @@ class PersonaInfolist
                             ->date('d/m/Y'),
                             TextEntry::make('motivo_egreso')->label('Motivo de egreso')->placeholder('-'),
                         ]),
+                    ]),
+                ]),
+                Tab::make('Tab 6')
+                ->label('Usuario')
+                ->columnSpanFull()
+                ->visible(auth()->user()->isAdmin_RRHH())
+                ->schema([
+                    Section::make('Usuario')
+                    ->columnSpanFull()
+                    ->relationship('Usuario')
+                    ->headerActions([
+                        EditAction::make('editar')
+                        ->label(function ($component): string {
+                            $persona = $component->getRecord();
+                            return $persona?->Usuario ? 'Editar Usuario Adjunto' : 'Adjuntar Usuario';
+                        })
+                        ->icon(function ($component): string {
+                            $persona = $component->getRecord();
+                            return $persona?->Usuario ? 'heroicon-m-pencil-square' : 'heroicon-m-plus';
+                        })
+                        ->color(function ($component): string {
+                            $persona = $component->getRecord();
+                            return $persona?->Usuario ? 'warning' : 'primary';
+                        })
+                        ->url(function ($component): string {
+                            $persona = $component->getRecord();
+                            
+                            // Si ya tiene usuario, lo mandamos a editar el usuario existente
+                            if ($persona?->Usuario) {
+                                return UserResource::getUrl('edit', ['record' => $persona->Usuario->id]);
+                            }
+                            
+                            // Si no tiene, lo mandamos a crear uno pasando el ID de la persona como parámetro
+                            return UserResource::getUrl('create', ['persona_id' => $persona->id]);
+                        }),
+                    ])
+                    ->schema([
+                        TextEntry::make('name')->label('Nombre de Usuario')->placeholder('-'),
+                        TextEntry::make('email')->label('Correo Electrónico')->placeholder('-'),
+                        TextEntry::make('rol')->label('Rol del Usuario')->placeholder('-')
+                        ->formatStateUsing(fn (int $state): string => match ($state) {
+                            1 => 'Empleado',
+                            2 => 'Funcionario',
+                            3 => 'RRHH (Recursos Humanos.)',
+                            4 => 'Administrador',
+                            default => 'Desconocido',
+                        }),
                     ]),
                 ]),
             ]),

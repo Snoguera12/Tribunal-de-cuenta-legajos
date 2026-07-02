@@ -63,6 +63,10 @@ class Persona extends Model
                 ELSE 5 
             END")->latestOfMany(); // Garantiza que devuelva un solo registro compatible con Section::relationship
     }
+    public function usuario()
+    {
+        return $this->hasOne(User::class);
+    }
     public static function Opciones(): Collection
     {
         return self::selectRaw("id, nombre || ' ' || apellido || ' (DNI: ' || dni || ')' AS nombre_completo")->pluck('nombre_completo', 'id');

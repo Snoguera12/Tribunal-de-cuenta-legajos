@@ -6,15 +6,17 @@ use Filament\Support\Contracts\HasLabel;
 
 enum EstadoCivilEnum: int implements HasLabel
 {
-    case Soltaro = 0;
+    case Soltero = 0;
     case Casado = 1;
-    case Viudo = 2;
+    case Divorciado = 2;
+    case Viudo = 3;
 
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::Soltaro => 'Soltero/a',
+            self::Soltero => 'Soltero/a',
             self::Casado => 'Casado/a',
+            self::Divorciado => 'Divorciado/a',
             self::Viudo => 'Viudo/a',
         };
     }
