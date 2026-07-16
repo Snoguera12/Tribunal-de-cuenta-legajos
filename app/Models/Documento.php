@@ -15,7 +15,6 @@ class Documento extends Model
         'descripcion',
         'tipodoc',
         'activo',
-        'fecha_de_creacion',
         'legajo_id',
     ];
 

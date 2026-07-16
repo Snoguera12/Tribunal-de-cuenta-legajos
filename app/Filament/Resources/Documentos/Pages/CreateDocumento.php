@@ -8,15 +8,8 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateDocumento extends CreateRecord
 {
     protected static string $resource = DocumentoResource::class;
-    protected function mutateFormDataBeforeCreate(array $data): array
+    protected function getRedirectUrl(): string
     {
-        if (empty($data['fecha_de_subida'])) {
-            $data['fecha_de_subida'] = now();
-        }
-        if (empty($data['fecha_de_creacion'])) {
-            $data['fecha_de_creacion'] = now();
-        }
-
-        return $data;
+        return $this->getResource()::getUrl('index');
     }
 }

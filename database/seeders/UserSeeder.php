@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'rol' => 1,
             'email_verified_at' => now(),
-            'persona_id' => 2,
+            'persona_id' => 1,
         ]);
         User::factory()->create([
             'name' => 'Empleado',

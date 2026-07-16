@@ -28,7 +28,7 @@ class DocumentosTable
                 ->sortable()
                 ->openUrlInNewTab()
                 ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('fecha_de_creacion')
+                /*TextColumn::make('fecha_de_creacion')
                 ->label('Fecha de Creación')
                 ->dateTime('d/m/Y H:i:s')
                 ->sortable()
@@ -37,7 +37,7 @@ class DocumentosTable
                 ->label('Fecha de Subida')
                 ->dateTime('d/m/Y H:i:s')
                 ->sortable()
-                ->toggleable(isToggledHiddenByDefault: false),
+                ->toggleable(isToggledHiddenByDefault: false),*/
             ])
             ->filters([
                 //

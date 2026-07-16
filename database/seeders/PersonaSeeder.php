@@ -29,27 +29,12 @@ class PersonaSeeder extends Seeder
             ],
             
         );*/
-        Persona::create([
-                'nombre' => 'Georgi',
-                'apellido' => 'Facello',
-                'dni' => 10000001,
-                'cuil' => 20100000012,
-                'email' => 'georgi@gmail.com',
-                'genero' => 1,
-                'estado_civil' => 2,
-                'fecha_de_nacimiento' => '1953-09-02',
-                'domicilio' => '',
-                'telefono' => '',
-                'telefono_emergencia' => '',
-                'borrar_logico' => true,
-            ]
-        );
         Persona::create(
             [
                 'nombre' => 'Pedro',
                 'apellido' => 'García',
-                'dni' => 10000002,
-                'cuil' => 20100000022,
+                'dni' => 10000001,
+                'cuil' => 20100000012,
                 'email' => 'pedrogarcia@gmail.com',
                 'genero' => 1,
                 'estado_civil' => 1,
@@ -60,6 +45,21 @@ class PersonaSeeder extends Seeder
                 'borrar_logico' => true,
             ],
             
+        );
+        Persona::create([
+                'nombre' => 'Georgi',
+                'apellido' => 'Facello',
+                'dni' => 10000002,
+                'cuil' => 20100000022,
+                'email' => 'georgi@gmail.com',
+                'genero' => 1,
+                'estado_civil' => 2,
+                'fecha_de_nacimiento' => '1953-09-02',
+                'domicilio' => '',
+                'telefono' => '',
+                'telefono_emergencia' => '',
+                'borrar_logico' => true,
+            ]
         );
         Persona::create(
             [

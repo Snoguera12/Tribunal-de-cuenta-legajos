@@ -17,6 +17,10 @@ class Area extends Model
     {
         return $this->hasMany(Oficina::class);
     }
+    public function legajos()
+    {
+        return $this->hasMany(Legajo::class);
+    }
     public static function Opciones(): Collection
     {
         return self::selectRaw("id, nombre || ' ' || apellido || ' (DNI: ' || dni || ')' AS nombre_completo")->pluck('nombre_completo', 'id');

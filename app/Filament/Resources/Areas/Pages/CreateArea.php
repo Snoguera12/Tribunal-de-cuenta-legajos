@@ -30,4 +30,8 @@ class CreateArea extends CreateRecord
         return parent::getCreateAnotherFormAction()
             ->label('Añadir y añadir otro');
     }
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

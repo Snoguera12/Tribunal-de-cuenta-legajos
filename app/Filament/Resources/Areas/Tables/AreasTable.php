@@ -19,15 +19,20 @@ class AreasTable
                     ->sortable()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('created_at')
+                TextColumn::make('legajos_count')
+                    ->label('Empleados Asociados')
+                    ->counts('legajos')
+                    //->badge() // Opcional: lo muestra dentro de una etiqueta visual limpia
+                    ->sortable(),
+                /*TextColumn::make('created_at')
                     ->label('Fecha de Creación')
                     ->dateTime('d/m/Y H:i:s')
-                    ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('updated_at')
+                    ->toggleable(isToggledHiddenByDefault: false),*/
+                /*TextColumn::make('updated_at')
                     ->label('Fecha de Actualización')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true),*/
             ])
             ->filters([
                 //

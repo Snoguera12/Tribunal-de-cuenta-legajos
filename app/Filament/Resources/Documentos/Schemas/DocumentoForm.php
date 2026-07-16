@@ -42,19 +42,14 @@ class DocumentoForm
             ->acceptedFileTypes(['application/pdf', 'image/*']) // Restringir formatos
             ->maxSize(10240) // Tamaño máximo en KB (10 MB)
             ->required(),
-            Textarea::make('descripcion')
-            ->label('Descripción')
-            ->required()
-            ->columnSpanFull(),
             Select::make('tipodoc')
             ->label('Tipo de Documento.')
             ->required()
             ->options(TipodocEnum::class),
-            Toggle::make('activo'),
-            DateTimePicker::make('fecha_de_creacion')
-            ->label('Fecha de Creación.')
-            ->native(false)
-            ->helperText('Si no introduce la fecha de creación, se asigna la fecha de hoy.'),
+            Textarea::make('descripcion')
+            ->label('Descripción')
+            ->required()
+            ->columnSpanFull(),
         ]);
     }
 }

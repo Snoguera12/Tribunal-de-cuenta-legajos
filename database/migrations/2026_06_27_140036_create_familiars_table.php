@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('familiars', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre')->after('persona_id');
-            $table->string('apellido')->after('nombre');
-            $table->integer('dni',)->nullable()->after('fecha_de_nacimiento');
-            $table->integer('parentesco')->after('apellido');
-            $table->date('fecha_de_nacimiento')->nullable()->after('parentesco');
-            $table->boolean('vive')->default(true)->after('dni');
-            $table->foreignId('persona_id')->constrained('personas')->cascadeOnDelete()->after('id');
+            $table->string('nombre');
+            $table->string('apellido');
+            $table->integer('dni',)->nullable();
+            $table->integer('parentesco');
+            $table->date('fecha_de_nacimiento')->nullable();
+            $table->boolean('vive');
+            $table->foreignId('persona_id')->constrained('personas')->cascadeOnDelete();
             $table->timestamps();
         });
     }

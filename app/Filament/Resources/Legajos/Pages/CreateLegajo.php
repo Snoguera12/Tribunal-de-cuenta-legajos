@@ -41,5 +41,5 @@ class CreateLegajo extends CreateRecord
         // Si se creó de forma aislada, regresa al listado general de legajos
         return $this->getResource()::getUrl('index');
     }
-
+    
 }

@@ -9,4 +9,8 @@ class Cargo extends Model
     protected $fillable = [
         "nombre"
     ];
+    public function legajos()
+    {
+        return $this->hasMany(Legajo::class);
+    }
 }

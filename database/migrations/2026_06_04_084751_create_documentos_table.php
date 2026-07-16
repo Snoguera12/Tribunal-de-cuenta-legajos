@@ -17,7 +17,6 @@ return new class extends Migration
             $table->text('descripcion');
             $table->integer('tipodoc')->nullable();
             $table->boolean('activo')->nullable();
-            $table->dateTime("fecha_de_creacion");
             $table->foreignId("legajo_id");
             $table->timestamps();
         });

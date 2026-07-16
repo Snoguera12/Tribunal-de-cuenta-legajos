@@ -14,6 +14,7 @@ use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -33,64 +34,68 @@ class PersonaInfolist
             ->tabs([
                 Tab::make('Tab 1')
                 ->label('Persona')
+                 ->columns(4)
                 ->schema([
-                    Section::make('Datos Personales')
-                    ->columns(4)
+                    TextEntry::make('nombre')->label('Nombre'),
+                    TextEntry::make('apellido')->label('Apellido'),
+                    TextEntry::make('dni')->label('DNI'),
+                    TextEntry::make('cuil')->label('CUIL'),
+                    TextEntry::make('email')
+                    ->label('Correo Electrónico')->placeholder('-'),
+                    TextEntry::make('genero')->label('Género'),
+                    TextEntry::make('estado_civil')->label('Estado Civil'),
+                    TextEntry::make('fecha_de_nacimiento')->date('d/m/Y'),
+                    TextEntry::make('domicilio')->placeholder('-'),
+                    TextEntry::make('telefono')
+                    ->label('Teléfono')->placeholder('-'),
+                    TextEntry::make('telefono_emergencia')
+                    ->label('Teléfono de Emergencia')->placeholder('-'),
+                ]),
+                Tab::make('Tab 2_')
+                ->label('Familiares')
+                ->schema([
+                    Section::make('Familiares')
                     ->columnSpanFull()
                     ->schema([
-                        TextEntry::make('nombre')->label('Nombre'),
-                        TextEntry::make('apellido')->label('Apellido'),
-                        TextEntry::make('dni')->label('DNI'),
-                        TextEntry::make('cuil')->label('CUIL'),
-                        TextEntry::make('email')
-                        ->label('Correo Electrónico')->placeholder('-'),
-                        TextEntry::make('genero')->label('Género'),
-                        TextEntry::make('estado_civil')->label('Estado Civil'),
-                        TextEntry::make('fecha_de_nacimiento')->date('d/m/Y'),
-                        TextEntry::make('domicilio')->placeholder('-'),
-                        TextEntry::make('telefono')
-                        ->label('Teléfono')->placeholder('-'),
-                        TextEntry::make('telefono_emergencia')
-                        ->label('Teléfono de Emergencia')->placeholder('-'),
-                    ]),
-                    Grid::make(1)
-                    ->columnSpanFull()
-                    ->columns(2)
-                    ->schema([
-                        Section::make('Familiares')
+                        RepeatableEntry::make('familiares')
+                        ->hiddenLabel()
+                        ->grid(2)
+                        ->columns(2)
+                        ->placeholder('No se adjuntó ningún Familiar.')
+                        ->extraAttributes([
+                            // Esto busca los elementos li internos con esa clase y les clava el borde negro grueso
+                            'style' => '--ring-color: transparent; border: 2px solid black !important; border-radius: 0.75rem;',
+                        ])
                         ->schema([
-                            RepeatableEntry::make('familiares')
-                            ->hiddenLabel()
-                            ->columns(2)
-                            ->placeholder('No se adjuntó ningún Familiar.')
-                            ->extraAttributes([
-                                'style' => 'max-height: 552px; overflow-y: auto;',
-                            ])
-                            ->schema([
-                                TextEntry::make('nombre')->label('Nombre'),
-                                TextEntry::make('apellido')->label('Apellido'),
-                                TextEntry::make('dni')->label('DNI'),
-                                TextEntry::make('fecha_de_nacimiento')->label('Fecha de nacimiento')->date('d/m/Y'),
-                                TextEntry::make('parentesco')->label('Parentesco'),
-                                TextEntry::make('vive')->label('Estado Vital'),
-                            ]),
+                            TextEntry::make('nombre')->label('Nombre'),
+                            TextEntry::make('apellido')->label('Apellido'),
+                            TextEntry::make('dni')->label('DNI'),
+                            TextEntry::make('fecha_de_nacimiento')->label('Fecha de nacimiento')->date('d/m/Y'),
+                            TextEntry::make('parentesco')->label('Parentesco'),
+                            TextEntry::make('vive')->label('Estado Vital'),
+
                         ]),
-                        Section::make('Idiomas')
-                        
+                    ]),
+                ]),
+                Tab::make('Tab 3_')
+                ->label('Idiomas')
+                ->schema([
+                    Section::make('Idiomas')
+                    
+                    ->schema([
+                        RepeatableEntry::make('idiomas')
+                        ->hiddenLabel()
+                        ->placeholder('Sin idiomas registrados')
+                        ->columns(2)
                         ->schema([
-                            RepeatableEntry::make('idiomas')
-                            ->hiddenLabel()
-                            ->placeholder('Sin idiomas registrados')
-                            ->columns(2)
-                            ->schema([
-                                TextEntry::make('idioma')->label('Idioma'),
-                                TextEntry::make('nivel')->label('Nivel'),
-                            ]),
+                            TextEntry::make('idioma')->label('Idioma'),
+                            TextEntry::make('nivel')->label('Nivel'),
                         ]),
                     ]),
                 ]),
                 Tab::make('Tab 2')
                 ->label('Papeles')
+                ->icon('heroicon-m-folder-open')
                 ->columnSpanFull()
                 ->schema([
                     Section::make('Legajos de la Persona')
@@ -114,12 +119,12 @@ class PersonaInfolist
                                 ->label('Editar')
                                 ->icon('heroicon-m-pencil-square')
                                 ->color('warning')
-                                // Accedemos al ID del legajo actual usando el $record
-                                ->form([
-                                    LegajoForm::class,
-                                ])
+                                ->url(function (Component $component): string {
+                                    $persona = $component->getLivewire()->getRecord();
+                                    
+                                    return PersonaResource::getUrl('edit', ['record' => $persona]) . '?tab=legajo';
+                                })
                                 ->visible(auth()->user()->isAdmin_RRHH()),
-                                MotivoBajaAction::make()->visible(auth()->user()->isAdmin_RRHH()),
                             ]),
                             Grid::make(2)
                             ->schema([
@@ -183,6 +188,7 @@ class PersonaInfolist
                 ]),
                 Tab::make('Tab 3')
                 ->label('Estudio/Título')
+                ->icon('heroicon-m-academic-cap')
                 ->schema([
                     Section::make('Estudio Alcanzado')
                     ->columnSpanFull()

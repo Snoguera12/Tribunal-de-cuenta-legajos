@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('cursos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('persona_id')->constrained('personas')->cascadeOnDelete()->after('id');
-            $table->string('nombre')->after('persona_id');
-            $table->string('institucion')->nullable()->after('nombre');
-            $table->string('duracion')->nullable()->after('institucion');
-            $table->date('fecha')->nullable()->after('duracion');
-            $table->boolean('tiene_certificado')->default(false)->after('fecha');
+            $table->foreignId('persona_id');
+            $table->string('nombre');
+            $table->string('institucion')->nullable();
+            $table->string('duracion')->nullable();
+            $table->date('fecha')->nullable();
+            $table->boolean('tiene_certificado');
             $table->timestamps();
         });
     }

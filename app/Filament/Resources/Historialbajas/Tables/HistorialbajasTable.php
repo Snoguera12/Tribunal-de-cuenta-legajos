@@ -36,16 +36,6 @@ class HistorialbajasTable
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('motivo')
                     ->label('Motivo de la baja')
-                        ->formatStateUsing(fn (int $state): string => match ($state) {
-                        0 => 'Renuncia',
-                        1 => 'Despido',
-                        2 => 'Vencimiento de Contrato',
-                        3 => 'Jubilación',
-                        4 => 'Fallecimiento',
-                        5 => 'Incapacidad',
-                        6 => 'Traslado',
-                        default => 'Desconocido',
-                    })
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('fecha_baja')
                     ->dateTime('d/m/Y H:i:s')

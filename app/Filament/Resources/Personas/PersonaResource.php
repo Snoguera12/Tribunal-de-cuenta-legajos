@@ -24,8 +24,8 @@ class PersonaResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     //protected static ?string $recordTitleAttribute = 'nombre'; 
-    protected static string|\UnitEnum|null $navigationGroup = "Agentes";
-    protected static ?string $modelLabel = "Datos Personales";
+    //protected static string|\UnitEnum|null $navigationGroup = "Agentes";
+    protected static ?string $modelLabel = "información de Agentes";
     protected static ?int $navigationSort = 1;
     
     /*public static function getNavigationBadge(): ?string{

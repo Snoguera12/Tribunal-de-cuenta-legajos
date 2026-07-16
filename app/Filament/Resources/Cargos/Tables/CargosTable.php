@@ -16,10 +16,14 @@ class CargosTable
             ->columns([
                 TextColumn::make('nombre')
                     ->label('Nombre del Cargo')
-                    ->searchable()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('created_at')
+                    ->searchable(),
+                /*TextColumn::make('cargos_count')
+                    ->label('Empleados Asociados')
+                    ->counts('legajos')
+                    //->badge() // Opcional: lo muestra dentro de una etiqueta visual limpia
+                    ->sortable(),*/
+                /*TextColumn::make('created_at')
                     ->label('Fecha de Creación')
                     ->dateTime('d/m/Y H:i:s')
                     ->toggleable(isToggledHiddenByDefault: false),
@@ -27,7 +31,7 @@ class CargosTable
                     ->label('Fecha de Actualización')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true),*/
             ])
             ->filters([
                 //
