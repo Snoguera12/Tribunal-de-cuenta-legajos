@@ -21,7 +21,7 @@ class LegajoResource extends Resource
 {
     protected static ?string $model = Legajo::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFolder;
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
     
     protected static ?int $navigationSort = 1;

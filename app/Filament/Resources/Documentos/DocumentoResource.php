@@ -18,7 +18,7 @@ class DocumentoResource extends Resource
 {
     protected static ?string $model = Documento::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPaperClip;
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
     
     protected static ?int $navigationSort = 10;
