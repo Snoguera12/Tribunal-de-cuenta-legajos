@@ -82,6 +82,7 @@ class PersonaForm
             ->persistTabInQueryString()
             ->tabs([
                 Tab::make('Tab 1')->label('Persona')
+                ->icon('heroicon-o-identification')
                 ->id('persona')
                 ->columns(4)
                 ->columnSpanFull()
@@ -216,6 +217,7 @@ class PersonaForm
                         TextInput::make('telefono_emergencia')->label('Teléfono de emergencia')->tel(),
                 ]),
                 Tab::make('Tab 2')
+                ->icon('heroicon-o-users')
                 ->id('familiar')
                 ->label('Familiares')
                 ->schema([
@@ -224,7 +226,14 @@ class PersonaForm
                     ->hiddenLabel()
                     ->columnSpanFull()
                     ->columns(2)
-                    ->addActionLabel('Añadir Familiar')
+                    ->addActionLabel('Agregar otro Familiar')
+                     ->addAction(
+                        fn (\Filament\Actions\Action $action) => $action
+                        ->icon('heroicon-m-plus')
+                        ->color('gray')
+                     )
+
+
                     ->schema([
                         TextInput::make('nombre')->label('Nombre')->required(),
                         TextInput::make('apellido')->label('Apellido')->required(),
@@ -235,6 +244,7 @@ class PersonaForm
                     ]),
                 ]),
                 Tab::make('Tab 3')
+                ->icon('heroicon-o-language')
                 ->id('idioma')
                 ->label('Idiomas')
                 ->schema([
@@ -243,7 +253,14 @@ class PersonaForm
                     ->schema([
                         Repeater::make('idiomas')->relationship('idiomas')->hiddenLabel()
                         ->columns(2)
-                        ->addActionLabel('Añadir Idioma')
+
+                        ->addActionLabel('Añadir otro Idioma')
+                        ->addAction(
+                              fn (\Filament\Actions\Action $action) => $action
+                              ->icon('heroicon-m-plus')
+                              ->color('gray')
+                        )
+                            
                         ->schema([
                             TextInput::make('idioma')->label('Idioma')->required()->maxLength(100),
                             Select::make('nivel')->label('Nivel')->options(IdiomaNivelEnum::class)->required(),
@@ -251,6 +268,7 @@ class PersonaForm
                     ]),
                 ]),
                 Tab::make('Legajos')
+                ->icon('heroicon-o-folder-open')
                 ->id('legajo')
                 ->label('Legajos') // Etiqueta más descriptiva para el usuario
                 ->icon('heroicon-m-folder-open')
@@ -262,6 +280,11 @@ class PersonaForm
                         ->collapsible() // Permite encoger legajos antiguos para mantener orden visual
                         //->cloneable()
                         ->addActionLabel('Añadir un Legajo')
+                        ->addAction(
+                            fn (\Filament\Actions\Action $action) => $action
+                            ->icon('heroicon-m-plus')
+                            ->color('gray')
+                        )
                         ->itemLabel(fn (array $state): ?string => 
                             // Muestra un título claro en cada bloque (Ej: "Legajo N° 4512")
                             ($state['num_legajo'] ?? null) 
@@ -393,6 +416,7 @@ class PersonaForm
 
                 Tab::make('Tab 3')
                 ->label("Estudios/Títulos")
+                ->icon('heroicon-o-academic-cap')
                 ->id('estudio')
                 ->icon('heroicon-m-academic-cap')
                 ->columnSpanFull()
@@ -401,7 +425,12 @@ class PersonaForm
                     ->relationship('estudios') 
                     ->hiddenLabel()
                     ->columnSpanFull()
-                    ->addActionLabel('Añadir un Estudio')
+                    ->addActionLabel('Añadir otro Estudio')
+                    ->addAction(
+                         fn (\Filament\Actions\Action $action) => $action
+                         ->icon('heroicon-m-plus')
+                          ->color('gray')
+                          )
                     ->collapsible()
                     ->defaultItems(0)
                     ->itemLabel(fn (array $state): ?string => 
@@ -470,6 +499,7 @@ class PersonaForm
                 ]),
 
                 Tab::make('Tab 4')->label('Cursos')
+                 ->icon('heroicon-o-book-open')
                 ->id('curso')
                 ->columnSpanFull()
                 ->schema([
@@ -477,6 +507,12 @@ class PersonaForm
                     ->hiddenLabel()
                     ->columnSpanFull()
                     ->columns(3)
+                    ->addActionLabel('Agregar otro Curso')
+                    ->addAction(
+                         fn (\Filament\Actions\Action $action) => $action
+                         ->icon('heroicon-m-plus')
+                         ->color('gray')
+                         )
                     ->schema([
                         TextInput::make('nombre')->label('Nombre del curso')
                         ->required()
@@ -489,6 +525,7 @@ class PersonaForm
                     ])
                 ]),
                 Tab::make('Tab 5')
+                ->icon('heroicon-o-briefcase')
                 ->id('antecedenteslaborales')
                 ->label('Antecedentes Laborales')
                 ->columnSpanFull()
@@ -496,6 +533,12 @@ class PersonaForm
                     Repeater::make('Laboral')->relationship('antecedentesLaborales')
                     ->hiddenLabel()
                     ->columnSpanFull()
+                    ->addActionLabel('Añadir antecedente laboral')
+                    ->addAction(
+                        fn (\Filament\Actions\Action $action) => $action
+                        ->icon('heroicon-m-plus')
+                        ->color('gray')
+                    )
                     ->columns(3)
                     ->schema([
                         TextInput::make('empleador')->label('Empleador')
@@ -509,6 +552,7 @@ class PersonaForm
                     ])
                 ]),
                 Tab::make('Tab 6')
+                ->icon('heroicon-o-user-circle')
                 ->label('Usuario')
                 ->columnSpanFull()
                 ->visible(auth()->user()->isAdmin_RRHH())
