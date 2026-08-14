@@ -34,7 +34,7 @@ class LejagosPanelProvider extends PanelProvider
             ->login()
             ->databaseNotifications()
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Purple,
             ])
             ->navigationGroups([
                 'Agentes',
