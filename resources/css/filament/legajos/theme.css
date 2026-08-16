@@ -1,0 +1,432 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+/* ==========================================================
+   TCSE - BASE ACCESIBLE
+   ========================================================== */
+
+html {
+    font-size: 100%;
+}
+
+body {
+    line-height: 1.55;
+}
+
+/* ==========================================================
+   TCSE - TIPOGRAFÍA
+   ========================================================== */
+
+.fi-header-heading {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.fi-header-subheading {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.fi-sidebar-item-label {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.fi-tabs-item-label {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.fi-fo-field-wrp-label,
+.fi-fo-field-wrp-label span {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.fi-fo-field-wrp-helper-text,
+.fi-fo-field-wrp-hint {
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+/* ==========================================================
+   TCSE - CONTROLES
+   ========================================================== */
+
+.fi-input,
+.fi-select-input,
+.fi-textarea,
+.fi-fo-date-time-picker input {
+    min-height: 2.875rem;
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+.fi-btn {
+    min-height: 2.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.fi-fo-field-wrp {
+    row-gap: 0.4rem;
+}
+
+/* ==========================================================
+   TCSE - FOCO ACCESIBLE
+   ========================================================== */
+
+:focus-visible {
+    outline: 0.1875rem solid currentColor;
+    outline-offset: 0.125rem;
+}
+
+/* ==========================================================
+   TCSE - SIDEBAR ACCESIBLE
+   ========================================================== */
+
+.fi-sidebar,
+.fi-sidebar-nav {
+    background-color: #102c4c;
+}
+
+.fi-sidebar-group-label {
+    color: #d6dee8;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.fi-sidebar .fi-sidebar-item-label,
+.fi-sidebar .fi-sidebar-item-icon {
+    color: #ffffff;
+}
+
+.fi-sidebar-item-btn {
+    min-height: 3rem;
+    padding-inline: 0.9rem;
+    border-radius: 0.625rem;
+}
+
+.fi-sidebar-item-btn:hover {
+    background-color: rgb(255 255 255 / 10%);
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background-color: var(--primary-600);
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-icon {
+    color: #ffffff;
+}
+
+/* ==========================================================
+   TCSE - PESTAÑAS ACCESIBLES
+   ========================================================== */
+
+.fi-tabs-item {
+    min-height: 2.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.fi-tabs-item .fi-icon {
+    margin-inline-end: 0.375rem;
+}
+
+/* Modo claro */
+
+html:not(.dark) .fi-tabs-item:not(.fi-active) .fi-tabs-item-label {
+    color: #374151;
+}
+
+html:not(.dark) .fi-tabs-item:not(.fi-active) .fi-icon {
+    color: #4b5563;
+}
+
+.fi-tabs-item.fi-active .fi-tabs-item-label {
+    font-weight: 700;
+}
+
+/* Modo oscuro */
+
+html.dark .fi-tabs-item:not(.fi-active) .fi-tabs-item-label {
+    color: #e5e7eb;
+}
+
+html.dark .fi-tabs-item:not(.fi-active) .fi-icon {
+    color: #d1d5db;
+}
+
+html.dark .fi-tabs-item.fi-active .fi-tabs-item-label {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* ==========================================================
+   TCSE - FORMULARIOS ACCESIBLES
+   ========================================================== */
+
+/* ----------------------------------------------------------
+   MODO CLARO
+   ---------------------------------------------------------- */
+
+/* Contorno visible aun sin seleccionar */
+html:not(.dark) .fi-input-wrp {
+    background-color: #ffffff !important;
+    box-shadow: 0 0 0 1px #64748b !important;
+}
+
+/* Texto ingresado y selects */
+html:not(.dark) .fi-input,
+html:not(.dark) .fi-select-input,
+html:not(.dark) .fi-textarea,
+html:not(.dark) .fi-fo-date-time-picker input {
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    background-color: transparent !important;
+    opacity: 1 !important;
+}
+
+/* Placeholder */
+html:not(.dark) .fi-input::placeholder,
+html:not(.dark) .fi-textarea::placeholder {
+    color: #6b7280 !important;
+    -webkit-text-fill-color: #6b7280 !important;
+}
+
+/* Foco violeta */
+html:not(.dark) .fi-input-wrp:focus-within {
+    box-shadow: 0 0 0 2px var(--primary-600) !important;
+}
+
+/* Opciones de select */
+html:not(.dark) .fi-select-input option {
+    color: #111827;
+    background-color: #ffffff;
+}
+
+/* ----------------------------------------------------------
+   MODO OSCURO
+   ---------------------------------------------------------- */
+
+/*
+   IMPORTANTE:
+   Se colorean los controles.
+   NO se colorean .fi-section-content ni .fi-section-content-ctn.
+*/
+
+html.dark .fi-input-wrp {
+    background-color: #334155 !important;
+    box-shadow: 0 0 0 1px #94a3b8 !important;
+}
+
+/* Texto visible dentro de inputs/selects */
+html.dark .fi-input,
+html.dark .fi-select-input,
+html.dark .fi-textarea,
+html.dark .fi-fo-date-time-picker input {
+    color: #f8fafc !important;
+    -webkit-text-fill-color: #f8fafc !important;
+    background-color: transparent !important;
+    opacity: 1 !important;
+}
+
+/* Placeholder */
+html.dark .fi-input::placeholder,
+html.dark .fi-textarea::placeholder {
+    color: #cbd5e1 !important;
+    -webkit-text-fill-color: #cbd5e1 !important;
+}
+
+/* Etiquetas de campos */
+html.dark .fi-fo-field-wrp-label,
+html.dark .fi-fo-field-wrp-label span {
+    color: #f1f5f9 !important;
+}
+
+/* Texto de ayuda */
+html.dark .fi-fo-field-wrp-helper-text,
+html.dark .fi-fo-field-wrp-hint {
+    color: #cbd5e1 !important;
+}
+
+/* Foco */
+html.dark .fi-input-wrp:focus-within {
+    box-shadow: 0 0 0 2px var(--primary-400) !important;
+}
+
+/* Select nativo */
+html.dark .fi-select-input option {
+    color: #f8fafc !important;
+    background-color: #1e293b !important;
+}
+
+/* ==========================================================
+   TCSE - BOTONES PRIMARIOS
+   ========================================================== */
+
+.fi-btn.fi-color-primary {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease;
+}
+
+/* Cursor encima */
+.fi-btn.fi-color-primary:hover {
+    background-color: #1e40af !important;
+    color: #ffffff !important;
+}
+
+/* Clic */
+.fi-btn.fi-color-primary:active {
+    background-color: #1e3a8a !important;
+}
+
+/* Navegación mediante teclado */
+.fi-btn.fi-color-primary:focus-visible {
+    outline: 0.1875rem solid #7c3aed !important;
+    outline-offset: 0.125rem;
+}
+
+/* ==========================================================
+   TCSE - BOTONES SECUNDARIOS
+   Feedback visual al pasar el cursor
+   ========================================================== */
+
+.fi-btn:not(.fi-color-primary) {
+    transition:
+        background-color 0.18s ease,
+        color 0.18s ease,
+        border-color 0.18s ease;
+}
+
+/* Modo claro */
+html:not(.dark) .fi-btn:not(.fi-color-primary):hover {
+    background-color: #dbeafe !important;
+    color: #172554 !important;
+    border-color: #93c5fd !important;
+}
+
+/* Modo oscuro */
+html.dark .fi-btn:not(.fi-color-primary):hover {
+    background-color: #475569 !important;
+    color: #ffffff !important;
+    border-color: #94a3b8 !important;
+}
+
+/* Clic en botón secundario */
+.fi-btn:not(.fi-color-primary):active {
+    transform: translateY(1px);
+}
+/* ==========================================================
+   TCSE - IDENTIDAD INSTITUCIONAL DEL LOGIN
+   Versión definitiva
+   ========================================================== */
+
+.tcse-institutional {
+    position: absolute;
+    top: 2rem;
+    left: 3.5rem;
+    bottom: auto;
+
+    z-index: 5;
+
+    width: min(28rem, calc(55% - 7rem));
+
+    color: #ffffff;
+    text-align: left;
+
+    text-shadow: 0 2px 8px rgb(0 0 0 / 60%);
+
+    pointer-events: none;
+}
+
+/* Tribunal de Cuentas */
+.tcse-institution-title {
+    margin: 0;
+
+    max-width: 24rem;
+
+    font-size: 2.3rem;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+
+    color: #ffffff;
+}
+
+/* Santiago del Estero */
+.tcse-institution-province {
+    margin-top: 0.55rem;
+
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 0.15em;
+
+    color: #d8b35a;
+}
+
+/* Línea institucional dorada */
+.tcse-institution-line {
+    width: 3.75rem;
+    height: 2px;
+
+    margin: 1.35rem 0 1.3rem;
+
+    background-color: #d8b35a;
+}
+
+/* Mensaje institucional */
+.tcse-institution-description {
+    max-width: 23rem;
+    margin: 0;
+
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.55;
+
+    color: #e2e8f0;
+}
+
+/* Sistema de legajos */
+.tcse-system {
+    margin-top: 2rem;
+}
+
+.tcse-system-title {
+    font-size: 0.88rem;
+    font-weight: 800;
+    line-height: 1.35;
+    letter-spacing: 0.08em;
+
+    color: #ffffff;
+}
+
+.tcse-system-description {
+    margin-top: 0.3rem;
+
+    font-size: 0.83rem;
+    font-weight: 500;
+    line-height: 1.4;
+
+    color: #d8b35a;
+}
+
+/* ==========================================================
+   RESPONSIVE DEL BLOQUE INSTITUCIONAL
+   ========================================================== */
+
+@media (max-width: 900px) {
+    .tcse-institutional {
+        display: none;
+    }
+}

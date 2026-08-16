@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\Login;
 use App\Filament\Resources\Legajos\Widgets\LegajoWidget;
 use App\Filament\Resources\Personas\Widgets\GeneroWidget;
 use App\Filament\Resources\Personas\Widgets\PersonaTotalWidget;
@@ -27,19 +28,21 @@ class LejagosPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->sidebarFullyCollapsibleOnDesktop()
+            ->sidebarCollapsibleOnDesktop()
             ->brandName('TCSE Legajos')
             ->id('legajos')
             ->path('legajos')
-            ->login()
+            ->login(Login::class)
             ->databaseNotifications()
             ->colors([
-                'primary' => Color::Purple,
+                'primary' => Color::Blue,
             ])
+            ->viteTheme('resources/css/filament/legajos/theme.css')
             ->navigationGroups([
                 'Agentes',
                 'Papeles',
                 'Institución',
+                'Departamento',
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
