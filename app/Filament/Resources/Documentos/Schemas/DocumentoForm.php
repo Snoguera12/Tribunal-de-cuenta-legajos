@@ -4,13 +4,11 @@ namespace App\Filament\Resources\Documentos\Schemas;
 
 use App\Enums\TipodocEnum;
 use App\Models\Legajo;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
 
 
 class DocumentoForm
@@ -23,9 +21,6 @@ class DocumentoForm
             ->label('Número de legajo')
             ->required()
             ->searchable()
-            //Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')->selectRaw("legajos.id, CONCAT(personas.nombre, ' ', personas.apellido) as nombre_completo")->pluck('nombre_completo', 'id')
-            //->options(Legajo::selectRaw('id, num_legajo')->pluck('num_legajo', 'id'))
-            //Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')->selectRaw("legajos.id, CONCAT(personas.nombre, ' ', personas.apellido, ' (Legajo: ', legajos.num_legajo, ' - DNI: ', personas.dni, ')') as nombre_completo")->pluck('nombre_completo', 'id');
             ->options(Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')->selectRaw("legajos.id, CONCAT('Legajo: ', ' ',legajos.num_legajo, ' (', personas.nombre, ' ', personas.apellido, ' - DNI: ', personas.dni, ')') as nombre_completo")->pluck('nombre_completo', 'id'))
             ->validationMessages([
                 'required' => 'Requiere asociar a un Legajo.',
@@ -36,11 +31,12 @@ class DocumentoForm
             ]),
             FileUpload::make('archivo')
             ->label('Documento Adjunto')
-            ->disk('public') // Disco de almacenamiento (config/filesystems.php)
-            ->directory('documentos/') // Carpeta destino dentro del disco
-            ->visibility('public') // Visibilidad del archivo
-            ->acceptedFileTypes(['application/pdf', 'image/*']) // Restringir formatos
-            ->maxSize(10240) // Tamaño máximo en KB (10 MB)
+            ->disk('local') // antes era 'public', lo cambiamos para que no quede accesible por url directa
+            ->directory('documentos')
+            ->visibility('private')
+            ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png']) // sacamos image/* porque permitia subir svg
+            ->maxSize(10240) // 10 MB
+            ->getUploadedFileNameForStorageUsing(fn ($file) => Str::uuid() . '.' . $file->getClientOriginalExtension()) // asi no se guarda el nombre original del archivo
             ->required(),
             Select::make('tipodoc')
             ->label('Tipo de Documento.')

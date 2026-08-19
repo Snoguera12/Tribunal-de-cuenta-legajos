@@ -5,7 +5,6 @@ namespace App\Filament\Resources\Documentos\Tables;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Storage;
 
 class DocumentosTable
 {
@@ -19,25 +18,14 @@ class DocumentosTable
                 ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('archivo')
                 ->label('Documento')
-                //->formatStateUsing(fn () => 'Abrir Archivo')
-                ->url(fn (string $state): string => Storage::url($state))
+                ->formatStateUsing(fn () => 'Descargar archivo')
+                ->url(fn ($record): string => route('documentos.descargar', $record)) // antes usaba Storage::url(), ahora va por la ruta protegida
                 ->openUrlInNewTab()
                 ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('tipodoc')
                 ->label('Tipo de Documento')
                 ->sortable()
-                ->openUrlInNewTab()
                 ->toggleable(isToggledHiddenByDefault: false),
-                /*TextColumn::make('fecha_de_creacion')
-                ->label('Fecha de Creación')
-                ->dateTime('d/m/Y H:i:s')
-                ->sortable()
-                ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('created_at')
-                ->label('Fecha de Subida')
-                ->dateTime('d/m/Y H:i:s')
-                ->sortable()
-                ->toggleable(isToggledHiddenByDefault: false),*/
             ])
             ->filters([
                 //
@@ -46,9 +34,7 @@ class DocumentosTable
                 EditAction::make(),
             ])
             ->toolbarActions([
-                /*BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),*/
+                //
             ]);
     }
 }

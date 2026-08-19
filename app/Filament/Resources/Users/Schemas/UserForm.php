@@ -3,11 +3,11 @@
 namespace App\Filament\Resources\Users\Schemas;
 
 use App\Models\Persona;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Hash;
+use Illuminate\Validation\Rules\Password;
 
 class UserForm
 {
@@ -20,6 +20,7 @@ class UserForm
                 
                 TextInput::make('email')->label('Correo Electrónico')
                 ->email()
+                ->unique(ignoreRecord: true)
                 ->default(function () {
                     // Captura el 'persona_id' enviado desde la URL
                     $personaId = request()->query('persona_id');
@@ -33,8 +34,6 @@ class UserForm
                 })
                 ->required(),
 
-                //DateTimePicker::make('email_verified_at')->label('Correo Verificado'),
-
                 TextInput::make('password')
                 ->label('Contraseña')
                 ->password()
@@ -44,11 +43,13 @@ class UserForm
 
                 // Encripta la contraseña automáticamente antes de guardarla (si se modificó)
                 ->mutateDehydratedStateUsing(fn (string $state) => Hash::make($state))
+                // pedimos minimo de seguridad para que no pongan contraseñas como "1234"
+                ->rule(Password::min(8)->mixedCase()->numbers())
                 ->helperText(function (string $context) {
                     if ($context === 'edit') {
-                        return 'Deje este campo en blanco si no desea cambiar la contraseña.';
+                        return 'Deje este campo en blanco si no desea cambiar la contraseña. Mínimo 8 caracteres, con mayúsculas, minúsculas y números.';
                     }
-                    return null; // No muestra nada al crear
+                    return 'Mínimo 8 caracteres, con mayúsculas, minúsculas y números.';
                 }),
 
                 Select::make('rol')->label('Rol del Usuario')
