@@ -17,7 +17,7 @@ class DocumentosTable
                 ->label("Número de legajo")
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('archivo')
+                TextColumn::make('ruta')
                 ->label('Documento')
                 //->formatStateUsing(fn () => 'Abrir Archivo')
                 ->url(fn (string $state): string => Storage::url($state))

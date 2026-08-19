@@ -3,9 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Estudio;
-use App\Models\Persona;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class EstudioPolicy
 {

@@ -18,7 +18,7 @@ class HistorialbajaResource extends Resource
 {
     protected static ?string $model = Historialbaja::class;
 
-    //protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::Bars3;
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
     protected static ?string $modelLabel = "Historial de Bajas";
     //protected static ?string $navigationParentItem = "Legajos";

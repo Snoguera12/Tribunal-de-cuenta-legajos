@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('documentos', function (Blueprint $table) {
             $table->id();
-            $table->string('archivo')->nullable();
-            $table->text('descripcion');
+            $table->string('ruta')->nullable();
+            $table->string('nombre_original')->nullable();
+            $table->text('descripcion')->nullable();
             $table->integer('tipodoc')->nullable();
-            $table->boolean('activo')->nullable();
-            $table->foreignId("legajo_id");
+            $table->foreignId("legajo_id")->nullable();
             $table->timestamps();
         });
     }

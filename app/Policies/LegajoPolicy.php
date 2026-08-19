@@ -3,9 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Legajo;
-use App\Models\Persona;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class LegajoPolicy
 {

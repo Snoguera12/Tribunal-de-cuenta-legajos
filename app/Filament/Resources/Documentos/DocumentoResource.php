@@ -20,8 +20,7 @@ class DocumentoResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPaperClip;
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
-    
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 5;
 
     public static function form(Schema $schema): Schema
     {
@@ -44,8 +43,8 @@ class DocumentoResource extends Resource
     {
         return [
             'index' => ListDocumentos::route('/'),
-            'create' => CreateDocumento::route('/create'),
-            'edit' => EditDocumento::route('/{record}/edit'),
+            'create' => CreateDocumento::route('/crear'),
+            //'edit' => EditDocumento::route('/{record}/editar'),
         ];
     }
 }

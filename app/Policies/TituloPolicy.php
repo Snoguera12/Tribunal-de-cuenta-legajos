@@ -2,10 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Persona;
 use App\Models\Titulo;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class TituloPolicy
 {
@@ -14,7 +12,7 @@ class TituloPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin_RRHH_Funcionario();
+        return $user->isAdmin();
     }
 
     /**
@@ -22,7 +20,7 @@ class TituloPolicy
      */
     public function view(User $user): bool
     {
-        return $user->isAdmin_RRHH_Funcionario();
+        return $user->isAdmin();
     }
 
     /**
@@ -30,7 +28,7 @@ class TituloPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isAdmin();
     }
 
     /**
@@ -38,7 +36,7 @@ class TituloPolicy
      */
     public function update(User $user, Titulo $titulo): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isAdmin();
     }
 
     /**
@@ -46,7 +44,7 @@ class TituloPolicy
      */
     public function delete(User $user, Titulo $titulo): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isAdmin();
     }
 
     /**
@@ -54,7 +52,7 @@ class TituloPolicy
      */
     public function restore(User $user, Titulo $titulo): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isAdmin();
     }
 
     /**
@@ -62,6 +60,6 @@ class TituloPolicy
      */
     public function forceDelete(User $user, Titulo $titulo): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isAdmin();
     }
 }

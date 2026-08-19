@@ -3,8 +3,6 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
-use function PHPUnit\Framework\isArray;
 
 class UserPolicy
 {

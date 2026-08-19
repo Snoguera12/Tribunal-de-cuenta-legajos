@@ -1,0 +1,74 @@
+<?php
+
+namespace App\Filament\Pages;
+
+use App\Models\Documento;
+use BackedEnum;
+use Filament\Forms\Components\FileUpload;
+use Filament\Schemas\Schema;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Pages\Page;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
+
+class SubirDocumentos extends Page implements HasForms
+{
+    use InteractsWithForms;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-arrow-up-tray';
+    protected string $view = 'filament.pages.subir-documentos';
+    protected static string|\UnitEnum|null $navigationGroup = "Papeles";
+    protected static ?int $navigationSort = 6;
+    public ?array $data = [];
+
+    public function mount(): void
+    {
+        $this->form->fill();
+    }
+
+    public function form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                FileUpload::make('archivos')
+                    ->label('Archivos')
+                    ->multiple()
+                    ->directory('documentos') // subdirectorio dentro del disk
+                    ->disk('public') // o el disk que uses
+                    ->visibility('public')
+                    ->preserveFilenames()
+                    ->required(),
+            ])
+            ->statePath('data');
+    }
+
+    protected function getFormActions(): array
+    {
+        return [
+            Action::make('guardar')
+                ->label('Guardar')
+                ->submit('guardar')
+                ->formId('form'), // apunta al id del <form>
+        ];
+    }
+
+    public function guardar(): void
+    {
+        $paths = $this->form->getState()['archivos'] ?? [];
+
+        foreach ($paths as $path) {
+            Documento::create([
+                'ruta' => $path, // FileUpload ya devuelve el path como string
+                'nombre_original' => basename($path),
+                // legajo_id queda null hasta que lo asocien
+            ]);
+        }
+
+        $this->form->fill(); // limpia el form
+
+        Notification::make()
+            ->title('Documentos subidos correctamente')
+            ->success()
+            ->send();
+    }
+}

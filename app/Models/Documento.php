@@ -11,10 +11,10 @@ class Documento extends Model
         'tipodoc' => TipodocEnum::class,
     ];
     protected $fillable = [
-        'archivo',
+        'ruta',
+        'nombre_original',
         'descripcion',
         'tipodoc',
-        'activo',
         'legajo_id',
     ];
 
