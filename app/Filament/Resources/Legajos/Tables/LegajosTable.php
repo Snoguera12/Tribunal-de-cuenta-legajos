@@ -7,11 +7,13 @@ use App\Filament\Actions\MotivoBajaAction;
 use App\Models\Cargo;
 use App\Models\Legajo;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Table;
+use Filament\Tables\Enums\RecordActionsPosition;
 use Illuminate\Database\Eloquent\Builder;
 
 class LegajosTable
@@ -40,12 +42,19 @@ class LegajosTable
                 ->searchable()
                 ->toggleable(isToggledHiddenByDefault: false),
 
+                TextColumn::make('persona.nivel_estudio') // O el campo exacto donde guardes el título
+                    ->label('Títulos / Estudios')
+                    ->sortable()
+                    ->searchable()
+                    ->placeholder('Sin registrar') // Si está vacío, muestra esto de forma prolija
+                    ->toggleable(isToggledHiddenByDefault: false),
+
                 TextColumn::make('estado')
                 ->icon(fn (Legajo $legajo) => $legajo->getIcon())
                 ->color(fn (Legajo $legajo) => $legajo->getColor())
                 ->iconColor(fn (Legajo $legajo) => $legajo->getColor())
                 ->toggleable(isToggledHiddenByDefault: true),
-                
+
                 TextColumn::make('tipo_contrato')->label('Tipo de Contratación')
                 ->toggleable(isToggledHiddenByDefault: false),
 
@@ -105,8 +114,26 @@ class LegajosTable
                 ->default(true),
             ])
             ->recordActions([
-                MotivoBajaAction::make(),
-                EditAction::make(),
-            ]);
+                // Botón "Ver"
+                ViewAction::make()
+                    ->label('Ver')
+                    ->button()
+                    ->color('gray')
+                    ->icon('heroicon-m-eye'),
+
+                // Botón "Editar"
+                EditAction::make()
+                    ->label('Editar')
+                    ->button()
+                    ->color('primary')
+                    ->icon('heroicon-m-pencil-square'),
+
+                // Tu botón personalizado de baja se mantiene igual
+                MotivoBajaAction::make()
+                    ->label('Dar de Baja')
+                    ->button()
+                    ->color('danger')
+                    ->icon('heroicon-m-user-minus'),
+            ], position: RecordActionsPosition::AfterColumns);
     }
 }
