@@ -16,6 +16,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class LegajoResource extends Resource
 {
@@ -23,16 +24,17 @@ class LegajoResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFolder;
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
-    
+
     protected static ?int $navigationSort = 1;
-    
+
     /*public static function getNavigationBadge(): ?string{
-        return Legajo::count();
-    }*/
+     *       return Legajo::count();
+}*/
 
     public static function getNavigationBadgeColor(): string|array|null{
         return "succes";
     }
+
     public static function form(Schema $schema): Schema
     {
         return LegajoForm::configure($schema);
@@ -41,6 +43,19 @@ class LegajoResource extends Resource
     public static function table(Table $table): Table
     {
         return LegajosTable::configure($table);
+    }
+
+    // <-- El método se coloca aquí, separado y al mismo nivel que los demás métodos estáticos
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        if ($user->isEmpleado()) {
+            return $query->where('persona_id', $user->persona_id);
+        }
+
+        return $query;
     }
 
     public static function getRelations(): array

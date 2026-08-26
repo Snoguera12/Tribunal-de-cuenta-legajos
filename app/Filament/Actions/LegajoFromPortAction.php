@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\Legajos\Schemas;
+// IMPORTANTE: El namespace debe coincidir exactamente con la estructura de carpetas
+namespace App\Filament\Actions;
 
 use App\Enums\TipoContratoEnum;
 use App\Enums\TipodocEnum;
 use App\Models\Area;
 use App\Models\Cargo;
 use App\Models\Categoria;
-use App\Models\Persona;
+use App\Models\Legajo;
 use Carbon\Carbon;
+
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -18,14 +20,31 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
-use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Model;
 
-class LegajoForm
+class LegajoFormPortAction extends Action
 {
-    public static function configure(Schema $schema): Schema
+    /**
+     * El nombre por defecto de la acción.
+     */
+    public static function getDefaultName(): ?string
     {
-        return $schema
-        ->components([
+        return 'crearLegajo';
+    }
+
+    /**
+     * Configuración inicial de la acción.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->label('Agregar Legajo')
+        ->icon('heroicon-o-document-plus')
+        ->color('success')
+
+        // Tu esquema de pestañas exacto
+        ->form([
             Tabs::make('Tabs_Base')
             ->columnSpanFull()
             ->tabs([
@@ -36,8 +55,10 @@ class LegajoForm
                     TextInput::make('num_legajo')->label('Número de legajo')
                     ->required()
                     ->numeric()
-                    ->unique(table: 'legajos', column: 'num_legajo')
-                    ->rules(['gt:0'])
+                    ->rules([
+                        'gt:0',
+                        'unique:legajos,num_legajo'
+                    ])
                     ->minLength(1)
                     ->validationMessages([
                         'required' => 'Requiere introducir el Número de legajo.',
@@ -53,21 +74,6 @@ class LegajoForm
                     ->label('Tipo de Contratación.')
                     ->required()
                     ->options(TipoContratoEnum::class),
-
-                         Select::make('persona_id')->label('Persona')
-                         ->required()
-                         ->searchable()
-                         ->options(Persona::Opciones())
-                         ->default(fn () => request()->query('persona_id'))
-                         ->disabled(fn () => request()->has('persona_id')) // Opcional: deshabilita el campo si ya viene en la URL
-                         ->dehydrated() // Obligatorio si usas disabled(), para que guarde el valor en la base de datos
-                         ->validationMessages([
-                             "required" => "Requiere asociar una Persona.",
-                         ])
-                         ->extraInputAttributes([
-                             'oninvalid' => "this.setCustomValidity('Requiere asociar a una Persona.')",
-                                                'oninput' => "this.setCustomValidity('')",
-                         ]),
 
                          Select::make("area_id")->label("Nombre del Área")
                          ->searchable()
@@ -102,10 +108,11 @@ class LegajoForm
                              "required" => "Requiere introducir la Fecha de ingreso.",
                          ]),
                 ]),
+
                 Tab::make('Tab Documentos')->label('Documentos')
                 ->columns(2)
                 ->schema([
-                    Repeater::make('documento')->relationship('documentos')
+                    Repeater::make('documentos')
                     ->hiddenLabel()
                     ->columns(2)
                     ->columnSpanFull()
@@ -120,9 +127,9 @@ class LegajoForm
                                  ->required()
                                  ->options(TipodocEnum::class),
                                  DateTimePicker::make('fecha_de_creacion')->label('Fecha de Creación.')
-                                 ->displayFormat('d/m/Y H:i:s') // Formato visual para el usuario en la interfaz
-                                 ->format('Y-m-d H:i:s')        // Asegura el formato correcto para la base de datos MySQL/PostgreSQL
-                                 ->dehydrateStateUsing(fn ($state) => $state ? Carbon::parse($state)->format('Y-m-d H:i:s') : Carbon::now()->format('Y-m-d H:i:s'))
+                                 ->displayFormat('d/m/Y H:i:s')
+                                 ->format('Y-m-d H:i:s')
+                                 ->default(Carbon::now())
                                  ->helperText('Si no introduce la fecha de creación, se asigna la fecha de hoy.'),
                         ]),
                         Grid::make(1)
@@ -136,10 +143,37 @@ class LegajoForm
                             ->maxSize(10240)
                             ->required(),
                         ]),
-
                     ])
                 ]),
             ]),
-        ]);
+        ])
+        // Guardado utilizando el $record inyectado dinámicamente por Filament (el modelo Persona actual)
+        ->action(function (array $data, Model $record): void {
+            $fechaIngreso = $data['fecha_de_ingreso'] ?? Carbon::now()->format('Y-m-d H:i:s');
+
+            $legajo = Legajo::create([
+                'num_legajo'       => $data['num_legajo'],
+                'tipo_contrato'    => $data['tipo_contrato'],
+                'persona_id'       => $record->id,
+                'area_id'          => $data['area_id'],
+                'cargo_id'         => $data['cargo_id'],
+                'categoria_id'     => $data['categoria_id'],
+                'fecha_de_ingreso' => $fechaIngreso,
+            ]);
+
+            if (!empty($data['documentos'])) {
+                foreach ($data['documentos'] as $doc) {
+                    $legajo->documentos()->create([
+                        'descripcion'       => $doc['descripcion'],
+                        'tipodoc'           => $doc['tipodoc'],
+                        'fecha_de_creacion' => $doc['fecha_de_creacion'] ?? Carbon::now()->format('Y-m-d H:i:s'),
+                                                  'archivo'           => $doc['archivo'],
+                    ]);
+                }
+            }
+
+            redirect(request()->header('Referer'));
+        })
+        ->successNotificationTitle('Legajo y documentos asociados correctamente');
     }
 }

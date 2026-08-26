@@ -53,7 +53,7 @@ class PersonaImporter extends Importer
             ImportColumn::make('fecha_de_nacimiento')->requiredMapping()
             ->castStateUsing(function (string $state): ?string {
                 if (blank($state)) return null;
-                
+
                 // Convierte dd/mm/aaaa a aaaa-mm-dd
                 return Carbon::createFromFormat('d/m/Y', trim($state))->format('Y-m-d');
             }),
@@ -66,7 +66,7 @@ class PersonaImporter extends Importer
     public function resolveRecord(): Persona
     {
         return Persona::firstOrNew([
-            'DNI' => $this->data['DNI'],
+            'dni' => $this->data['dni'],
         ]);
     }
 

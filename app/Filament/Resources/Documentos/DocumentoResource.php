@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class DocumentoResource extends Resource
 {
@@ -20,7 +21,7 @@ class DocumentoResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPaperClip;
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
-    
+
     protected static ?int $navigationSort = 10;
 
     public static function form(Schema $schema): Schema
@@ -31,6 +32,19 @@ class DocumentoResource extends Resource
     public static function table(Table $table): Table
     {
         return DocumentosTable::configure($table);
+    }
+
+    // <-- El método va aquí afuera, respetando el nivel de la clase
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        if ($user->isEmpleado()) {
+            return $query->whereHas('legajo', fn ($q) => $q->where('persona_id', $user->persona_id));
+        }
+
+        return $query;
     }
 
     public static function getRelations(): array

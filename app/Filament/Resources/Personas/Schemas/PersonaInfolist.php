@@ -20,36 +20,35 @@ use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Facades\Storage;
 
 class PersonaInfolist
 {
     public static function configure(Schema $schema): Schema
     {
         return $schema
-            ->components([
+        ->components([
             Tabs::make('Tabs_base')
             ->columns(2)
             ->columnSpanFull()
             ->tabs([
                 Tab::make('Tab 1')
                 ->label('Persona')
-                 ->columns(4)
+                ->columns(4)
                 ->schema([
                     TextEntry::make('nombre')->label('Nombre'),
-                    TextEntry::make('apellido')->label('Apellido'),
-                    TextEntry::make('dni')->label('DNI'),
-                    TextEntry::make('cuil')->label('CUIL'),
-                    TextEntry::make('email')
-                    ->label('Correo Electrónico')->placeholder('-'),
-                    TextEntry::make('genero')->label('Género'),
-                    TextEntry::make('estado_civil')->label('Estado Civil'),
-                    TextEntry::make('fecha_de_nacimiento')->date('d/m/Y'),
-                    TextEntry::make('domicilio')->placeholder('-'),
-                    TextEntry::make('telefono')
-                    ->label('Teléfono')->placeholder('-'),
-                    TextEntry::make('telefono_emergencia')
-                    ->label('Teléfono de Emergencia')->placeholder('-'),
+                         TextEntry::make('apellido')->label('Apellido'),
+                         TextEntry::make('dni')->label('DNI'),
+                         TextEntry::make('cuil')->label('CUIL'),
+                         TextEntry::make('email')
+                         ->label('Correo Electrónico')->placeholder('-'),
+                         TextEntry::make('genero')->label('Género'),
+                         TextEntry::make('estado_civil')->label('Estado Civil'),
+                         TextEntry::make('fecha_de_nacimiento')->date('d/m/Y'),
+                         TextEntry::make('domicilio')->placeholder('-'),
+                         TextEntry::make('telefono')
+                         ->label('Teléfono')->placeholder('-'),
+                         TextEntry::make('telefono_emergencia')
+                         ->label('Teléfono de Emergencia')->placeholder('-'),
                 ]),
                 Tab::make('Tab 2_')
                 ->label('Familiares')
@@ -68,11 +67,11 @@ class PersonaInfolist
                         ])
                         ->schema([
                             TextEntry::make('nombre')->label('Nombre'),
-                            TextEntry::make('apellido')->label('Apellido'),
-                            TextEntry::make('dni')->label('DNI'),
-                            TextEntry::make('fecha_de_nacimiento')->label('Fecha de nacimiento')->date('d/m/Y'),
-                            TextEntry::make('parentesco')->label('Parentesco'),
-                            TextEntry::make('vive')->label('Estado Vital'),
+                                 TextEntry::make('apellido')->label('Apellido'),
+                                 TextEntry::make('dni')->label('DNI'),
+                                 TextEntry::make('fecha_de_nacimiento')->label('Fecha de nacimiento')->date('d/m/Y'),
+                                 TextEntry::make('parentesco')->label('Parentesco'),
+                                 TextEntry::make('vive')->label('Estado Vital'),
 
                         ]),
                     ]),
@@ -81,7 +80,7 @@ class PersonaInfolist
                 ->label('Idiomas')
                 ->schema([
                     Section::make('Idiomas')
-                    
+
                     ->schema([
                         RepeatableEntry::make('idiomas')
                         ->hiddenLabel()
@@ -89,7 +88,7 @@ class PersonaInfolist
                         ->columns(2)
                         ->schema([
                             TextEntry::make('idioma')->label('Idioma'),
-                            TextEntry::make('nivel')->label('Nivel'),
+                                 TextEntry::make('nivel')->label('Nivel'),
                         ]),
                     ]),
                 ]),
@@ -121,7 +120,7 @@ class PersonaInfolist
                                 ->color('warning')
                                 ->url(function (Component $component): string {
                                     $persona = $component->getLivewire()->getRecord();
-                                    
+
                                     return PersonaResource::getUrl('edit', ['record' => $persona]) . '?tab=legajo';
                                 })
                                 ->visible(auth()->user()->isAdmin_RRHH()),
@@ -132,30 +131,30 @@ class PersonaInfolist
                                 ->columnSpan(1)
                                 ->schema([
                                     TextEntry::make('num_legajo')->label('Número de legajo'),
-                                    TextEntry::make('fecha_de_ingreso')->label('Fecha de Ingreso'),
+                                         TextEntry::make('fecha_de_ingreso')->label('Fecha de Ingreso'),
 
-                                    TextEntry::make('estado')
-                                    ->label('Estado')
-                                    ->icon(fn (Legajo $record) => $record->isAlta() ? Heroicon::CheckCircle : Heroicon::XCircle)
-                                    ->color(fn (Legajo $record) => $record->isAlta() ? 'success' : 'danger')
-                                    ->iconColor(fn (Legajo $record) => $record->isAlta() ? 'success' : 'danger')
-                                    ->placeholder('-'),
-                                    
-                                    TextEntry::make('tipo_contrato')->label('Tipo de Contratación'),
+                                         TextEntry::make('estado')
+                                         ->label('Estado')
+                                         ->icon(fn (Legajo $record) => $record->isAlta() ? Heroicon::CheckCircle : Heroicon::XCircle)
+                                         ->color(fn (Legajo $record) => $record->isAlta() ? 'success' : 'danger')
+                                         ->iconColor(fn (Legajo $record) => $record->isAlta() ? 'success' : 'danger')
+                                         ->placeholder('-'),
 
-                                    TextEntry::make('area.nombre')->label('Área'),
-                                    TextEntry::make('categoria.nombre')->label('Categoría'),
-                                    TextEntry::make('cargo.nombre')->label('Cargo'),
+                                         TextEntry::make('tipo_contrato')->label('Tipo de Contratación'),
+
+                                         TextEntry::make('area.nombre')->label('Área'),
+                                         TextEntry::make('categoria.nombre')->label('Categoría'),
+                                         TextEntry::make('cargo.nombre')->label('Cargo'),
                                 ]),
                                 Section::make('Documentos Adjuntos')
                                 ->columnSpan(1)
                                 ->extraAttributes([
-                                    'style' => 'max-height: 300px; overflow-y: auto;', 
+                                    'style' => 'max-height: 300px; overflow-y: auto;',
                                 ])
                                 ->schema([
                                     RepeatableEntry::make('documentos')
                                     ->label('Archivos Adjuntos')
-                                    
+
                                     ->hiddenLabel()
                                     ->placeholder('Sin documentos')
                                     ->contained(false) // Quita el recuadro gris individual por documento
@@ -169,16 +168,16 @@ class PersonaInfolist
                                         ->columns(2)
                                         ->schema([
                                             TextEntry::make('tipodoc')->label('Tipo'),
-                                            TextEntry::make('fecha_de_creacion')
-                                            ->label('Fecha de Creación')
-                                            ->dateTime('d/m/Y H:i:m'),
+                                                 TextEntry::make('fecha_de_creacion')
+                                                 ->label('Fecha de Creación')
+                                                 ->dateTime('d/m/Y H:i:m'),
                                         ]),
                                         TextEntry::make('archivo')
                                         ->hiddenLabel()
                                         ->bulleted()
                                         ->icon('heroicon-o-document-arrow-down')
                                         ->color('primary')
-                                        ->url(fn ($record) => $record->archivo ? Storage::url($record->archivo) : null)
+                                        ->url(fn ($record) => $record->archivo ? route('documentos.descargar', $record) : null)
                                         ->openUrlInNewTab(),
                                     ]),
                                 ])
@@ -203,28 +202,28 @@ class PersonaInfolist
                         ->url(function (Component $component): string {
                             // Navega hacia arriba en el árbol de componentes para obtener la Persona real
                             $persona = $component->getLivewire()->getRecord();
-                            
+
                             return PersonaResource::getUrl('edit', ['record' => $persona]) . '?tab=estudio';
                         }),
                     ])
                     ->schema([
                         TextEntry::make('institucion')->label('Institución')->placeholder('-'),
-                        TextEntry::make('nivel_estudio')->label('Nivel de Estudio'),
-                        TextEntry::make('fecha_fin')->label('Fecha de Finalización')->placeholder('-')
-                        ->date('d/m/Y'),
-                        RepeatableEntry::make('titulos') // Nombre de la relación en tu modelo 'Estudio'
-                        ->label('Títulos Obtenidos')
-                        ->columnSpanFull() // Ocupa todo el ancho debajo de los campos anteriores
-                        ->placeholder('Sin títulos registrados para este estudio')
-                        ->grid(2) // Si tiene varios títulos, los muestra en 2 columnas
-                        ->schema([
-                            TextEntry::make('nombre') // Campo 'nombre' de tu tabla de títulos
-                                ->hiddenLabel() // Oculta la etiqueta repetitiva dentro de la cuadrícula
-                                ->icon('heroicon-m-academic-cap') // Un ícono visual para el título
-                        ]),
+                             TextEntry::make('nivel_estudio')->label('Nivel de Estudio'),
+                             TextEntry::make('fecha_fin')->label('Fecha de Finalización')->placeholder('-')
+                             ->date('d/m/Y'),
+                             RepeatableEntry::make('titulos') // Nombre de la relación en tu modelo 'Estudio'
+                             ->label('Títulos Obtenidos')
+                             ->columnSpanFull() // Ocupa todo el ancho debajo de los campos anteriores
+                             ->placeholder('Sin títulos registrados para este estudio')
+                             ->grid(2) // Si tiene varios títulos, los muestra en 2 columnas
+                             ->schema([
+                                 TextEntry::make('nombre') // Campo 'nombre' de tu tabla de títulos
+                                 ->hiddenLabel() // Oculta la etiqueta repetitiva dentro de la cuadrícula
+                                 ->icon('heroicon-m-academic-cap') // Un ícono visual para el título
+                             ]),
 
                     ]),
-                    
+
                 ]),
                 Tab::make('Tab 4')
                 ->label('Cursos')
@@ -246,12 +245,12 @@ class PersonaInfolist
                         ->columns(3)
                         ->schema([
                             TextEntry::make('nombre')->label('Curso'),
-                            TextEntry::make('institucion')->label('Institución')->placeholder('-'),
-                            TextEntry::make('duracion')->label('Duración')->placeholder('-'),
-                            TextEntry::make('fecha')->label('Fecha')->placeholder('-')
-                            ->date('d/m/Y'),
-                            TextEntry::make('tiene_certificado')->label('Certificado')
-                            ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No'),
+                                 TextEntry::make('institucion')->label('Institución')->placeholder('-'),
+                                 TextEntry::make('duracion')->label('Duración')->placeholder('-'),
+                                 TextEntry::make('fecha')->label('Fecha')->placeholder('-')
+                                 ->date('d/m/Y'),
+                                 TextEntry::make('tiene_certificado')->label('Certificado')
+                                 ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No'),
                         ]),
                     ]),
                 ]),
@@ -275,13 +274,13 @@ class PersonaInfolist
                         ->columns(3)
                         ->schema([
                             TextEntry::make('empleador')->label('Empleador'),
-                            TextEntry::make('lugar_de_trabajo')->label('Lugar de trabajo'),
-                            TextEntry::make('cargo')->label('Cargo')->placeholder('-'),
-                            TextEntry::make('fecha_inicio')->label('Fecha inicio')->placeholder('-')
-                            ->date('d/m/Y'),
-                            TextEntry::make('fecha_fin')->label('Fecha fin')->placeholder('-')
-                            ->date('d/m/Y'),
-                            TextEntry::make('motivo_egreso')->label('Motivo de egreso')->placeholder('-'),
+                                 TextEntry::make('lugar_de_trabajo')->label('Lugar de trabajo'),
+                                 TextEntry::make('cargo')->label('Cargo')->placeholder('-'),
+                                 TextEntry::make('fecha_inicio')->label('Fecha inicio')->placeholder('-')
+                                 ->date('d/m/Y'),
+                                 TextEntry::make('fecha_fin')->label('Fecha fin')->placeholder('-')
+                                 ->date('d/m/Y'),
+                                 TextEntry::make('motivo_egreso')->label('Motivo de egreso')->placeholder('-'),
                         ]),
                     ]),
                 ]),
@@ -309,27 +308,27 @@ class PersonaInfolist
                         })
                         ->url(function ($component): string {
                             $persona = $component->getRecord();
-                            
+
                             // Si ya tiene usuario, lo mandamos a editar el usuario existente
                             if ($persona?->Usuario) {
                                 return UserResource::getUrl('edit', ['record' => $persona->Usuario->id]);
                             }
-                            
+
                             // Si no tiene, lo mandamos a crear uno pasando el ID de la persona como parámetro
                             return UserResource::getUrl('create', ['persona_id' => $persona->id]);
                         }),
                     ])
                     ->schema([
                         TextEntry::make('name')->label('Nombre de Usuario')->placeholder('-'),
-                        TextEntry::make('email')->label('Correo Electrónico')->placeholder('-'),
-                        TextEntry::make('rol')->label('Rol del Usuario')->placeholder('-')
-                        ->formatStateUsing(fn (int $state): string => match ($state) {
-                            1 => 'Empleado',
-                            2 => 'Funcionario',
-                            3 => 'RRHH (Recursos Humanos.)',
-                            4 => 'Administrador',
-                            default => 'Desconocido',
-                        }),
+                             TextEntry::make('email')->label('Correo Electrónico')->placeholder('-'),
+                             TextEntry::make('rol')->label('Rol del Usuario')->placeholder('-')
+                             ->formatStateUsing(fn (int $state): string => match ($state) {
+                                 1 => 'Empleado',
+                                 2 => 'Funcionario',
+                                 3 => 'RRHH (Recursos Humanos.)',
+                                                4 => 'Administrador',
+                                                default => 'Desconocido',
+                             }),
                     ]),
                 ]),
             ]),
