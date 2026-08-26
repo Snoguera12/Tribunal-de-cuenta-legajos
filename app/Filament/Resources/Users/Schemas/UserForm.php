@@ -43,8 +43,9 @@ class UserForm
                      ->revealable()
                      ->required(fn (string $context): bool => $context === 'create')
                      ->minLength(8)
-                     ->rules(['regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'])
-                     ->same('password_confirmation')
+                     ->rules(fn (string $context): array => $context === 'create'
+                    ? ['regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', 'same:password_confirmation']
+                    : ['regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'])
                      ->dehydrated(fn (?string $state) => filled($state))
                      ->mutateDehydratedStateUsing(fn (string $state) => Hash::make($state))
                      ->helperText(function (string $context) {

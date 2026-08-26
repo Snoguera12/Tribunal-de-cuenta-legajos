@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             LegajoSeeder::class,
             PersonaSeeder::class,
             UserSeeder::class,
+            PersonalSantiagoSeeder::class,
         ]);
     }
 }
