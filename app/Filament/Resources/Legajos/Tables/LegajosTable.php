@@ -117,23 +117,23 @@ class LegajosTable
                 // Botón "Ver"
                 ViewAction::make()
                     ->label('Ver')
-                    ->button()
-                    ->color('gray')
+                    ->iconButton()
+                    ->color('success')
                     ->icon('heroicon-m-eye'),
 
                 // Botón "Editar"
                 EditAction::make()
                     ->label('Editar')
-                    ->button()
+                    ->iconButton()
                     ->color('primary')
                     ->icon('heroicon-m-pencil-square'),
 
                 // Tu botón personalizado de baja se mantiene igual
                 MotivoBajaAction::make()
                     ->label('Dar de Baja')
-                    ->button()
+                    ->iconButton()
                     ->color('danger')
-                    ->icon('heroicon-m-user-minus'),
+                    ->icon('heroicon-m-trash'),
             ], position: RecordActionsPosition::AfterColumns);
     }
 }

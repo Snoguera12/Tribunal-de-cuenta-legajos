@@ -12,8 +12,19 @@ export default defineConfig({
             ],
             refresh: true,
         }),
+
+        // CORREGIDO: antes decía tailwindcss({ include: ['resources/css/app.css'] })
+        // con el comentario "para que NO toque la carpeta de Filament".
+        //
+        // @tailwindcss/vite no acepta opciones: el objeto se descartaba en
+        // silencio y Tailwind procesaba theme.css igual. La premisa era falsa.
+        //
+        // Que lo procese es lo correcto, además: theme.css importa el tema de
+        // Filament, que a su vez hace @import 'tailwindcss'. Excluirlo de
+        // verdad rompería los estilos base del panel.
         tailwindcss(),
     ],
+
     server: {
         watch: {
             ignored: ['**/storage/framework/views/**'],

@@ -38,7 +38,11 @@ class AreasTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->label('Editar')
+                    ->iconButton()
+                    ->color('primary')
+                    ->icon('heroicon-m-pencil-square'),
             ])
             ->toolbarActions([
                 /*BulkActionGroup::make([
