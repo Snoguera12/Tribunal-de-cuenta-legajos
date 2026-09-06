@@ -1,28 +1,30 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace App\Filament\Resources\Documentos\Pages;
 
+use App\Filament\Resources\Documentos\DocumentoResource;
 use App\Models\Documento;
 use App\Models\Legajo;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\Select;
-use Filament\Pages\Page;
+use Filament\Resources\Pages\Page;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Filament\Navigation\NavigationItem;
 
 class RevisarDocumentos extends Page implements HasTable
 {
     use InteractsWithTable;
-
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-exclamation-triangle';
+    protected static string $resource = DocumentoResource::class;
+    /*protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-exclamation-triangle';
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
     protected static ?string $navigationLabel = 'Revisar Documentos';
+    protected static ?int $navigationSort = 7;*/
     protected string $view = 'filament.pages.revisar-documentos';
-    protected static ?int $navigationSort = 7;
     public function table(Table $table): Table
     {
         return $table
@@ -56,6 +58,6 @@ class RevisarDocumentos extends Page implements HasTable
                 DeleteAction::make(),
             ])
             ->emptyStateHeading('Todo en orden')
-            ->emptyStateDescription('No hay documentos pendientes de asignación.');
+            ->emptyStateDescription('No hay documentos pendientes en asignar.');
     }
 }

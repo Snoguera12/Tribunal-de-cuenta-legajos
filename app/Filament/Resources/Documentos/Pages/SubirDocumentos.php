@@ -1,26 +1,27 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace App\Filament\Resources\Documentos\Pages;
 
+use App\Filament\Resources\Documentos\DocumentoResource;
 use App\Models\Documento;
 use BackedEnum;
 use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Schema;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Pages\Page;
+use Filament\Resources\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 
 class SubirDocumentos extends Page implements HasForms
 {
     use InteractsWithForms;
+    protected static string $resource = DocumentoResource::class;
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-arrow-up-tray';
     protected string $view = 'filament.pages.subir-documentos';
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
     protected static ?int $navigationSort = 6;
     public ?array $data = [];
-
     public function mount(): void
     {
         $this->form->fill();
