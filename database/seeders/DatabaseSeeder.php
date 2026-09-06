@@ -15,9 +15,9 @@ class DatabaseSeeder extends Seeder
             AreaSeeder::class,
             CargoSeeder::class,
             CategoriaSeeder::class,
-            LegajoSeeder::class,
             PersonaSeeder::class,
             UserSeeder::class,
+            LegajoSeeder::class,
         ]);
     }
 }
