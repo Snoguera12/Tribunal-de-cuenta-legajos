@@ -12,7 +12,7 @@ class GeneroWidget extends ChartWidget
     protected ?string $maxWidth = '5xl';
     public static function canView(): bool
     {
-        return auth()->user()->isAdmin_RRHH_Funcionario();
+        return auth()->user()->isStaffRoles();
     }
     protected function getData(): array
     {

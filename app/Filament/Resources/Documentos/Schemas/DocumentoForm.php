@@ -37,8 +37,8 @@ class DocumentoForm
             FileUpload::make('ruta')
             ->label('Documento')
             ->directory('documentos') // subdirectorio dentro del disk
-            ->disk('public') // o el disk que uses
-            ->visibility('public')
+            ->disk('local') // o el disk que uses
+            ->visibility('private')
             ->preserveFilenames()
             ->visible(fn (string $operation): bool => $operation === 'create')
             ->required(),

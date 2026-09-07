@@ -9,25 +9,13 @@ use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-
-    /* 
-    0 = Genérico
-    1 = Funcionario
-    2 = RRHH
-    3 = Empleado
-    4 = Administrador
-    */
-
     public function run(): void
     {
         User::factory()->create([
             'name' => 'Pedro',
             'email' => 'pedrogarcia@gmail.com',
             'password' => Hash::make('123456'),
-            'rol' => 1,
+            'rol' => 'empleado',
             'email_verified_at' => now(),
             'persona_id' => 1,
         ]);
@@ -35,7 +23,7 @@ class UserSeeder extends Seeder
             'name' => 'Empleado',
             'email' => 'empleado@gmail.com',
             'password' => Hash::make('123456'),
-            'rol' => 1,
+            'rol' => 'empleado',
             'email_verified_at' => now(),
             'persona_id' => NULL,
         ]);
@@ -43,7 +31,7 @@ class UserSeeder extends Seeder
             'name' => 'Funcionario',
             'email' => 'funcionario@gmail.com',
             'password' => Hash::make('123456'),
-            'rol' => 2,
+            'rol' => 'funcionario',
             'email_verified_at' => now(),
             'persona_id' => NULL,
         ]);
@@ -51,7 +39,7 @@ class UserSeeder extends Seeder
             'name' => 'RRHH',
             'email' => 'rrhh@gmail.com',
             'password' => Hash::make('123456'),
-            'rol' => 3,
+            'rol' => 'rrhh',
             'email_verified_at' => now(),
             'persona_id' => NULL,
         ]);
@@ -59,7 +47,7 @@ class UserSeeder extends Seeder
             'name' => 'Administador',
             'email' => 'correofalso123@gmail.com',
             'password' => Hash::make('123456'),
-            'rol' => 4,
+            'rol' => 'administrador',
             'email_verified_at' => now(),
             'persona_id' => NULL,
         ]);

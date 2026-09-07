@@ -34,9 +34,9 @@ class SubirDocumentos extends Page implements HasForms
                 FileUpload::make('archivos')
                     ->label('Archivos')
                     ->multiple()
-                    ->directory('documentos') // subdirectorio dentro del disk
-                    ->disk('public') // o el disk que uses
-                    ->visibility('public')
+                    ->directory('documentos_revisar') // subdirectorio dentro del disk
+                    ->disk('local') // o el disk que uses
+                    ->visibility('private')
                     ->preserveFilenames()
                     ->required(),
             ])
@@ -71,5 +71,10 @@ class SubirDocumentos extends Page implements HasForms
             ->title('Documentos subidos correctamente')
             ->success()
             ->send();
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 }

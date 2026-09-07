@@ -71,7 +71,7 @@ class PersonaResource extends Resource
     public static function shouldRegisterNavigation(): bool
     {
         // Solo se muestra el acceso al recurso completo en la barra lateral a Administrador, RRHH y el Funcionario.
-        return auth()->user()->isAdmin_RRHH_Funcionario();
+        return auth()->user()->isStaffRoles();
     }
 
     public static function getPages(): array

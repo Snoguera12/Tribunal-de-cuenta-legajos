@@ -15,15 +15,12 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Filament\Navigation\NavigationItem;
+use Illuminate\Support\Facades\URL;
 
 class RevisarDocumentos extends Page implements HasTable
 {
     use InteractsWithTable;
     protected static string $resource = DocumentoResource::class;
-    /*protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-exclamation-triangle';
-    protected static string|\UnitEnum|null $navigationGroup = "Papeles";
-    protected static ?string $navigationLabel = 'Revisar Documentos';
-    protected static ?int $navigationSort = 7;*/
     protected string $view = 'filament.pages.revisar-documentos';
     public function table(Table $table): Table
     {
@@ -34,8 +31,20 @@ class RevisarDocumentos extends Page implements HasTable
             )
             ->columns([
                 TextColumn::make('nombre_original')
-                    ->label('Archivo')
-                    ->searchable(),
+                    ->label('Documento')
+                    ->searchable()
+                    ->color('blue')
+                    ->openUrlInNewTab()
+                    ->url(function ($record): ?string {
+                        if (!$record->ruta) return null;
+                        
+                        return URL::temporarySignedRoute(
+                            'documentos_revisar.ver',
+                            now()->addMinutes(5),
+                            ['path' => $record->ruta]
+                        );
+                    }),
+                    
                 TextColumn::make('created_at')
                     ->label('Subido')
                     ->dateTime('d/m/Y H:i')

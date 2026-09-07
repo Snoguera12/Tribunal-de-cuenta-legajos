@@ -128,9 +128,9 @@ class LegajoForm
                         Grid::make(1)
                         ->schema([
                             FileUpload::make('archivo')->label('Documento Adjunto')
-                            ->disk('public') // Disco de almacenamiento (config/filesystems.php)
+                            ->disk('local') // Disco de almacenamiento (config/filesystems.php)
                             ->directory('documentos/') // Carpeta destino dentro del disco
-                            ->visibility('public') // Visibilidad del archivo
+                            ->visibility('private') // Visibilidad del archivo
                             ->acceptedFileTypes(['application/pdf', 'image/*']) // Restringir formatos
                             ->maxSize(10240) // Tamaño máximo en KB (10 MB)
                             ->required(),

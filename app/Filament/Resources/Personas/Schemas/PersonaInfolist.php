@@ -8,6 +8,7 @@ use App\Filament\Resources\Personas\PersonaResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Models\Legajo;
 use App\Models\Persona;
+use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Infolists\Components\RepeatableEntry;
@@ -307,30 +308,9 @@ class PersonaInfolist
                             $persona = $component->getRecord();
                             return $persona?->Usuario ? 'warning' : 'primary';
                         })
-                        ->url(function ($component): string {
-                            $persona = $component->getRecord();
-                            
-                            // Si ya tiene usuario, lo mandamos a editar el usuario existente
-                            if ($persona?->Usuario) {
-                                return UserResource::getUrl('edit', ['record' => $persona->Usuario->id]);
-                            }
-                            
-                            // Si no tiene, lo mandamos a crear uno pasando el ID de la persona como parámetro
-                            return UserResource::getUrl('create', ['persona_id' => $persona->id]);
-                        }),
+                        ->url(fn (User $record): string => PersonaResource::getUrl('edit', ['record' => $record]) . '?tab=usuario'),
                     ])
-                    ->schema([
-                        TextEntry::make('name')->label('Nombre de Usuario')->placeholder('-'),
-                        TextEntry::make('email')->label('Correo Electrónico')->placeholder('-'),
-                        TextEntry::make('rol')->label('Rol del Usuario')->placeholder('-')
-                        ->formatStateUsing(fn (int $state): string => match ($state) {
-                            1 => 'Empleado',
-                            2 => 'Funcionario',
-                            3 => 'RRHH (Recursos Humanos.)',
-                            4 => 'Administrador',
-                            default => 'Desconocido',
-                        }),
-                    ]),
+                    ->schema(User::getOutputSchema('folist')),
                 ]),
             ]),
         ]);

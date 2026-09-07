@@ -6,6 +6,7 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class DocumentosTable
 {
@@ -17,12 +18,22 @@ class DocumentosTable
                 ->label("Número de legajo")
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: false),
+
                 TextColumn::make('ruta')
                 ->label('Documento')
                 //->formatStateUsing(fn () => 'Abrir Archivo')
-                ->url(fn (string $state): string => Storage::url($state))
+                ->url(function ($record): ?string {
+                    if (!$record->ruta) return null;
+                    
+                    return URL::temporarySignedRoute(
+                        'documentos_revisar.ver',
+                        now()->addMinutes(5),
+                        ['path' => $record->ruta]
+                    );
+                })
                 ->openUrlInNewTab()
                 ->toggleable(isToggledHiddenByDefault: false),
+
                 TextColumn::make('tipodoc')
                 ->label('Tipo de Documento')
                 ->sortable()
@@ -43,7 +54,7 @@ class DocumentosTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                //EditAction::make(),
             ])
             ->toolbarActions([
                 /*BulkActionGroup::make([

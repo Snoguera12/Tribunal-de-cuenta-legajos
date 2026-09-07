@@ -15,21 +15,6 @@ class ListLegajos extends ListRecords
             //LegajoWidget::class,
         ];
     }
-    /*public function getTabs(): array
-    {
-        return [
-            // Botón "Todos": No aplica ningún filtro a la consulta
-            'Todos' => Tab::make(),
-
-            // Botón "Alta": Filtra donde el estado sea 'alta'
-            'alta' => Tab::make()
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('estado', 1)),
-
-            // Botón "Baja": Filtra donde el estado sea 'baja'
-            'baja' => Tab::make()
-                ->modifyQueryUsing(fn (Builder $query) => $query->where('estado', 0)),
-        ];
-    }*/
 
     protected function getHeaderActions(): array
     {

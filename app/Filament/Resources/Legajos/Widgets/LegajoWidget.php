@@ -10,7 +10,7 @@ class LegajoWidget extends StatsOverviewWidget
 {
     public static function canView(): bool
     {
-        return auth()->user()->isAdmin_RRHH_Funcionario();
+        return auth()->user()->isStaffRoles();
     }
     protected function getStats(): array
     {
