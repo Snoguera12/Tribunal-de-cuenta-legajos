@@ -10,4 +10,13 @@ class Categoria extends Model
         "nombre",
         "descripcion",
     ];
+    public static function Opciones(): array
+    {
+        return self::query()
+            ->get(['id', 'nombre', 'descripcion'])
+            ->mapWithKeys(fn ($item) => [
+                $item->id => "{$item->nombre} {$item->descripcion}"
+            ])
+            ->toArray();
+    }
 }

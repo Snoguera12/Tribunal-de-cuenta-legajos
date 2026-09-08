@@ -265,5 +265,21 @@ class PersonaSeeder extends Seeder
             ],
             
         );
+        Persona::create(
+            [
+                'nombre' => 'Mario',
+                'apellido' => 'Santos',
+                'dni' => 26146985,
+                'cuil' => 20261469852,
+                'email' => 'mariosantos1@gmail.com',
+                'genero' => 1,
+                'estado_civil' => 3,
+                'fecha_de_nacimiento' => '1991-04-03',
+                'domicilio' => 'Belgrano 123',
+                'telefono' => '3855237845',
+                'telefono_emergencia' => '3855114436',
+            ],
+            
+        );
     }
 }

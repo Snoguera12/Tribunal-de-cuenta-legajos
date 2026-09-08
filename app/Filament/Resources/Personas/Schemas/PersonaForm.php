@@ -306,9 +306,7 @@ class PersonaForm
                             ->label('Categoría')
                             ->searchable()
                             ->required()
-                            ->options(fn () => Categoria::selectRaw("id, nombre || ' ' || descripcion AS nombre_completo")
-                                ->pluck('nombre_completo', 'id')
-                            ) // Optimizado
+                            ->options(Categoria::Opciones())
                             ->validationMessages(['required' => 'Debe asociar una categoría.']),
 
                             DateTimePicker::make('fecha_de_ingreso')

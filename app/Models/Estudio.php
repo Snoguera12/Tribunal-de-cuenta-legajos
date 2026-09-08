@@ -11,7 +11,6 @@ class Estudio extends Model
         'nivel_estudio' => NivelEstudioEnum::class,
     ];
     protected $fillable = [
-        'nombre',
         'institucion',
         'nivel_estudio',
         'fecha_fin',

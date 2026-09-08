@@ -47,9 +47,17 @@ class UserSeeder extends Seeder
             'name' => 'Administador',
             'email' => 'correofalso123@gmail.com',
             'password' => Hash::make('123456'),
-            'rol' => 'administrador',
+            'rol' => 'empleado',
             'email_verified_at' => now(),
             'persona_id' => NULL,
+        ]);
+        User::factory()->create([
+            'name' => 'Mario',
+            'email' => 'mariosantos1@gmail.com',
+            'password' => Hash::make('123456'),
+            'rol' => 'administrador',
+            'email_verified_at' => now(),
+            'persona_id' => 15,
         ]);
     }
 }

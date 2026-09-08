@@ -67,8 +67,14 @@ class Persona extends Model
     {
         return $this->hasOne(User::class);
     }
-    public static function Opciones(): Collection
+
+    public static function Opciones(): array
     {
-        return self::selectRaw("id, nombre || ' ' || apellido || ' (DNI: ' || dni || ')' AS nombre_completo")->pluck('nombre_completo', 'id');
+        return self::query()
+            ->get(['id', 'nombre', 'apellido', 'dni'])
+            ->mapWithKeys(fn ($item) => [
+                $item->id => "{$item->nombre} {$item->apellido} (DNI: {$item->dni})"
+            ])
+            ->toArray();
     }
 }

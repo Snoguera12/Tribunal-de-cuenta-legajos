@@ -18,7 +18,7 @@ class PersonaTotalWidget extends StatsOverviewWidget
             Stat::make('Personas Registradas', Persona::count())
             //->description("Personas Registradas.")
             ->chart(
-                Persona::selectRaw("strftime('%m', created_at) as month, COUNT(*) as count")
+                Persona::selectRaw("DATE_FORMAT(created_at, '%m') as month, COUNT(*) as count")
                     ->whereYear("created_at", now()->year)
                     ->groupBy("month")
                     ->orderBy("month")
