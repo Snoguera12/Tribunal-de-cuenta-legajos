@@ -11,7 +11,7 @@ class UsersTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->columns(User::getOutputSchema('table'))
+            ->columns(User::getOutSchema('table'))
             ->filters([
                 //
             ])

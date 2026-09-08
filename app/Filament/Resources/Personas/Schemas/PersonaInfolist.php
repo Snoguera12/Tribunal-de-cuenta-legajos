@@ -2,10 +2,7 @@
 
 namespace App\Filament\Resources\Personas\Schemas;
 
-use App\Filament\Actions\MotivoBajaAction;
-use App\Filament\Resources\Legajos\Schemas\LegajoForm;
 use App\Filament\Resources\Personas\PersonaResource;
-use App\Filament\Resources\Users\UserResource;
 use App\Models\Legajo;
 use App\Models\Persona;
 use App\Models\User;
@@ -15,13 +12,12 @@ use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class PersonaInfolist
 {
@@ -156,7 +152,6 @@ class PersonaInfolist
                                 ->schema([
                                     RepeatableEntry::make('documentos')
                                     ->label('Archivos Adjuntos')
-                                    
                                     ->hiddenLabel()
                                     ->placeholder('Sin documentos')
                                     ->contained(false) // Quita el recuadro gris individual por documento
@@ -170,17 +165,27 @@ class PersonaInfolist
                                         ->columns(2)
                                         ->schema([
                                             TextEntry::make('tipodoc')->label('Tipo'),
-                                            TextEntry::make('fecha_de_creacion')
-                                            ->label('Fecha de Creación')
-                                            ->dateTime('d/m/Y H:i:m'),
+
+                                            TextEntry::make('ruta')
+                                            ->label('Documento')
+                                            ->hiddenLabel()
+                                            ->bulleted()
+                                            ->icon('heroicon-o-document-arrow-down')
+                                            ->color('primary')
+                                            ->openUrlInNewTab()
+                                            ->url(function ($record): ?string {
+                                                if (!$record->ruta) return null;
+                                                
+                                                return URL::temporarySignedRoute(
+                                                    'documentos.ver',
+                                                    now()->addMinutes(5),
+                                                    [
+                                                        'path' => $record->ruta,
+                                                        'legajo_id' => $record->legajo_id,
+                                                    ]
+                                                );
+                                            }),
                                         ]),
-                                        TextEntry::make('archivo')
-                                        ->hiddenLabel()
-                                        ->bulleted()
-                                        ->icon('heroicon-o-document-arrow-down')
-                                        ->color('primary')
-                                        ->url(fn ($record) => $record->archivo ? Storage::url($record->archivo) : null)
-                                        ->openUrlInNewTab(),
                                     ]),
                                 ])
                             ]),
@@ -308,9 +313,12 @@ class PersonaInfolist
                             $persona = $component->getRecord();
                             return $persona?->Usuario ? 'warning' : 'primary';
                         })
-                        ->url(fn (User $record): string => PersonaResource::getUrl('edit', ['record' => $record]) . '?tab=usuario'),
+                        ->url(function($component) : string{
+                            $persona = $component->getRecord();
+                            return PersonaResource::getUrl('edit', ['record' => $persona->id]) . '?tab=usuario';
+                        }),
                     ])
-                    ->schema(User::getOutputSchema('folist')),
+                    ->schema(User::getOutSchema('folist')),
                 ]),
             ]),
         ]);

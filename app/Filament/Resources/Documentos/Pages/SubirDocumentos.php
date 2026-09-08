@@ -32,13 +32,13 @@ class SubirDocumentos extends Page implements HasForms
         return $schema
             ->components([
                 FileUpload::make('archivos')
-                    ->label('Archivos')
-                    ->multiple()
-                    ->directory('documentos_revisar') // subdirectorio dentro del disk
-                    ->disk('local') // o el disk que uses
-                    ->visibility('private')
-                    ->preserveFilenames()
-                    ->required(),
+                ->label('Archivos')
+                ->multiple()
+                ->directory('documentos') // subdirectorio dentro del disk
+                ->disk('local') // o el disk que uses
+                ->visibility('private')
+                //->preserveFilenames()
+                ->required(),
             ])
             ->statePath('data');
     }
@@ -47,9 +47,9 @@ class SubirDocumentos extends Page implements HasForms
     {
         return [
             Action::make('guardar')
-                ->label('Guardar')
-                ->submit('guardar')
-                ->formId('form'), // apunta al id del <form>
+            ->label('Guardar')
+            ->submit('guardar')
+            ->formId('form'), // apunta al id del <form>
         ];
     }
 

@@ -9,24 +9,18 @@ use App\Enums\IdiomaNivelEnum;
 use App\Enums\NivelEstudioEnum;
 use App\Enums\ParentescoEnum;
 use App\Enums\TipoContratoEnum;
-use App\Enums\TipodocEnum;
 use App\Models\Area;
 use App\Models\Cargo;
 use App\Models\Categoria;
-use App\Models\Persona;
+use App\Models\Documento;
 use App\Models\User;
 use Carbon\Carbon;
-use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -257,139 +251,111 @@ class PersonaForm
                 ->icon('heroicon-m-folder-open')
                 ->schema([
                     Repeater::make('Legajo')
-                        ->relationship('legajos')
-                        ->hiddenLabel()
-                        ->columnSpanFull()
-                        ->collapsible() // Permite encoger legajos antiguos para mantener orden visual
-                        //->cloneable()
-                        ->addActionLabel('Añadir un Legajo')
-                        ->itemLabel(fn (array $state): ?string => 
-                            // Muestra un título claro en cada bloque (Ej: "Legajo N° 4512")
-                            ($state['num_legajo'] ?? null) 
-                                ? "Legajo N° " . $state['num_legajo'] 
-                                : 'Nuevo Registro de Legajo'
-                        )
-                        ->schema([
-                            // BLOQUE 1: Datos Administrativos del Legajo
-                            Grid::make([
-                                'default' => 1,
-                                'sm' => 3, // Distribución limpia en 3 columnas
-                            ])->schema([
-                                TextInput::make('num_legajo')
-                                    ->label('Número de Legajo')
-                                    ->placeholder('Ej. 1045')
-                                    ->required()
-                                    ->numeric()
-                                    ->unique(table: 'legajos', column: 'num_legajo', ignoreRecord: true) // Corregido: ignoreRecord evita fallos al editar
-                                    ->rules(['gt:0'])
-                                    ->validationMessages([
-                                        'required' => 'El número de legajo es obligatorio.',
-                                        'unique' => 'Este número de legajo ya está registrado.',
-                                        'gt' => 'El número debe ser mayor a cero.',
-                                    ]),
-                                Select::make('tipo_contrato')
-                                    ->label('Tipo de Contratación')
-                                    ->required()
-                                    ->options(TipoContratoEnum::class)
-                                    ->validationMessages(['required' => 'Seleccione el tipo de contratación.']),
-
-                                Select::make('area_id')
-                                    ->label('Área')
-                                    ->searchable()
-                                    ->required()
-                                    ->options(fn () => Area::pluck('nombre', 'id')) // Optimizado: Carga diferida (lazy load)
-                                    ->validationMessages(['required' => 'Debe asociar un área.']),
-
-                                Select::make('cargo_id')
-                                    ->label('Cargo')
-                                    ->searchable()
-                                    ->required()
-                                    ->options(fn () => Cargo::pluck('nombre', 'id')) // Optimizado
-                                    ->validationMessages(['required' => 'Debe asociar un cargo.']),
-
-                                Select::make('categoria_id')
-                                    ->label('Categoría')
-                                    ->searchable()
-                                    ->required()
-                                    ->options(fn () => Categoria::selectRaw("id, nombre || ' ' || descripcion AS nombre_completo")
-                                        ->pluck('nombre_completo', 'id')
-                                    ) // Optimizado
-                                    ->validationMessages(['required' => 'Debe asociar una categoría.']),
-
-                                DateTimePicker::make('fecha_de_ingreso')
-                                    ->label('Fecha de Ingreso')
-                                    ->native(false)
-                                    ->format('Y-m-d H:i:s')
-                                    ->placeholder('Hoy (Si se deja vacío)')
-                                    ->helperText('Si se deja vacío, se asignará la fecha y hora actual.')
-                                    ->dehydrateStateUsing(fn ($state) => $state ? Carbon::parse($state)->format('Y-m-d H:i:s') : Carbon::now()),
+                    ->relationship('legajos')
+                    ->hiddenLabel()
+                    ->columnSpanFull()
+                    ->collapsible() // Permite encoger legajos antiguos para mantener orden visual
+                    //->cloneable()
+                    ->addActionLabel('Añadir un Legajo')
+                    ->itemLabel(fn (array $state): ?string => 
+                        // Muestra un título claro en cada bloque (Ej: "Legajo N° 4512")
+                        ($state['num_legajo'] ?? null) 
+                            ? "Legajo N° " . $state['num_legajo'] 
+                            : 'Nuevo Registro de Legajo'
+                    )
+                    ->schema([
+                        // BLOQUE 1: Datos Administrativos del Legajo
+                        Grid::make([
+                            'default' => 1,
+                            'sm' => 3, // Distribución limpia en 3 columnas
+                        ])->schema([
+                            TextInput::make('num_legajo')
+                            ->label('Número de Legajo')
+                            ->placeholder('Ej. 1045')
+                            ->required()
+                            ->numeric()
+                            ->unique(table: 'legajos', column: 'num_legajo', ignoreRecord: true) // Corregido: ignoreRecord evita fallos al editar
+                            ->rules(['gt:0'])
+                            ->validationMessages([
+                                'required' => 'El número de legajo es obligatorio.',
+                                'unique' => 'Este número de legajo ya está registrado.',
+                                'gt' => 'El número debe ser mayor a cero.',
                             ]),
 
-                            // BLOQUE 2: Sección Integrada de Documentos Adjuntos (Reemplaza a la pestaña)
-                            Section::make('Documentación Digitalizada')
-                                ->description('Cargue los archivos adjuntos y documentos que respaldan este legajo.')
-                                ->icon('heroicon-o-document-arrow-up')
-                                ->collapsible() // El usuario puede ocultar la zona de archivos si no la necesita en el momento
-                                ->columnSpanFull()
-                                ->extraAttributes([
-                                    // Forzamos un borde más oscuro y fondo claro para que resalte del contenedor de Legajos
-                                    'style' => '
-                                        border: 2px solid #2e3032 !important; 
-                                        border-radius: 12px !important; 
-                                        background-color: #f9fafb !important;
-                                        box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
-                                    '
-                                ])
-                                ->schema([
-                                    Repeater::make('Documento')
-                                    ->relationship('Documentos')
-                                    ->hiddenLabel()
-                                    ->columnSpanFull()
-                                    ->addActionLabel('Adjuntar un Documento')
-                                    ->grid(2) // Mantiene tus dos columnas de documentos lado a lado
-                                    ->schema([
-                                        // SOLUCIÓN NATIVA: Usamos un Fieldset o una Section interna. 
-                                        // Cada vez que se crea un documento, Filament genera este recuadro contenedor.
-                                        Section::make()
-                                            ->columns(1) // Distribuye el contenido internamente en 2 columnas
-                                            ->schema([
-                                                // Columna Izquierda: Metadatos del documento
-                                                Grid::make(1)
-                                                    ->columnSpan(1)
-                                                    ->schema([
-                                                        Select::make('tipodoc')
-                                                            ->label('Tipo de Documento')
-                                                            ->required()
-                                                            ->native(false)
-                                                            ->options(TipodocEnum::class)
-                                                            ->validationMessages(['required' => 'Seleccione el tipo de documento.']),
-                                                        Textarea::make('descripcion')
-                                                            ->label('Descripción / Notas')
-                                                            ->placeholder('Ej. Copia certificada del título...')
-                                                            ->required()
-                                                            ->rows(2),
-                                                    ]),
-                                                
-                                                // Columna Derecha: Zona de arrastre de archivos
-                                                Grid::make(1)
-                                                    ->columnSpan(1)
-                                                    ->schema([
-                                                        FileUpload::make('archivo')
-                                                            ->label('Documento Adjunto (PDF o Imagen)')
-                                                            ->disk('local')
-                                                            ->directory('documentos')
-                                                            ->visibility('private')
-                                                            ->acceptedFileTypes(['application/pdf', 'image/*'])
-                                                            ->maxSize(10240)
-                                                            ->required()
-                                                            ->downloadable()
-                                                            ->openable()
-                                                            ->validationMessages(['required' => 'Debe subir un archivo válido.']),
-                                                    ]),
-                                            ]),
-                                    ]),
-                                ]),
+                            Select::make('tipo_contrato')
+                            ->label('Tipo de Contratación')
+                            ->required()
+                            ->options(TipoContratoEnum::class)
+                            ->validationMessages(['required' => 'Seleccione el tipo de contratación.']),
+
+                            Select::make('area_id')
+                            ->label('Área')
+                            ->searchable()
+                            ->required()
+                            ->options(fn () => Area::pluck('nombre', 'id')) // Optimizado: Carga diferida (lazy load)
+                            ->validationMessages(['required' => 'Debe asociar un área.']),
+
+                            Select::make('cargo_id')
+                            ->label('Cargo')
+                            ->searchable()
+                            ->required()
+                            ->options(fn () => Cargo::pluck('nombre', 'id')) // Optimizado
+                            ->validationMessages(['required' => 'Debe asociar un cargo.']),
+
+                            Select::make('categoria_id')
+                            ->label('Categoría')
+                            ->searchable()
+                            ->required()
+                            ->options(fn () => Categoria::selectRaw("id, nombre || ' ' || descripcion AS nombre_completo")
+                                ->pluck('nombre_completo', 'id')
+                            ) // Optimizado
+                            ->validationMessages(['required' => 'Debe asociar una categoría.']),
+
+                            DateTimePicker::make('fecha_de_ingreso')
+                            ->label('Fecha de Ingreso')
+                            ->native(false)
+                            ->format('Y-m-d H:i:s')
+                            ->placeholder('Hoy (Si se deja vacío)')
+                            ->helperText('Si se deja vacío, se asignará la fecha y hora actual.')
+                            ->dehydrateStateUsing(fn ($state) => $state ? Carbon::parse($state)->format('Y-m-d H:i:s') : Carbon::now()),
                         ]),
+
+                        // BLOQUE 2: Sección Integrada de Documentos Adjuntos (Reemplaza a la pestaña)
+                        Section::make('Documentación Digitalizada')
+                        ->description('Cargue los archivos adjuntos y documentos que respaldan este legajo.')
+                        ->icon('heroicon-o-document-arrow-up')
+                        ->collapsible() // El usuario puede ocultar la zona de archivos si no la necesita en el momento
+                        ->columnSpanFull()
+                        ->extraAttributes([
+                            // Forzamos un borde más oscuro y fondo claro para que resalte del contenedor de Legajos
+                            'style' => '
+                                border: 2px solid #2e3032 !important; 
+                                border-radius: 12px !important; 
+                                background-color: #f9fafb !important;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+                            '
+                        ])
+                        ->schema([
+                            Repeater::make('Documento')
+                            ->relationship('Documentos')
+                            ->hiddenLabel()
+                            ->columnSpanFull()
+                            ->addActionLabel('Adjuntar un Documento')
+                            ->grid(2) // Mantiene tus dos columnas de documentos lado a lado
+                            ->schema([
+                                // SOLUCIÓN NATIVA: Usamos un Fieldset o una Section interna. 
+                                // Cada vez que se crea un documento, Filament genera este recuadro contenedor.
+                                Section::make()
+                                ->columns(1) // Distribuye el contenido internamente en 2 columnas
+                                ->schema([
+                                    // Columna Izquierda: Metadatos del documento
+                                    Grid::make(1)
+                                    ->columnSpan(1)
+                                    ->schema(Documento::getFromSchema(false, false)),
+                                ]),
+                            ]),
+                        ]),
+                    ]),
                 ]),
 
                 Tab::make('Tab 3')
@@ -416,58 +382,55 @@ class PersonaForm
                             'sm' => 3,
                         ])->schema([
                             Select::make('nivel_estudio')
-                                ->label('Nivel de Estudio')
-                                ->options(NivelEstudioEnum::class)
-                                ->required()
-                                ->live()
-                                ->native(true) // Al usar el select nativo, el navegador evita que el scroll corte la lista
-                                ->validationMessages(['required' => 'Debe seleccionar el nivel de estudio.']),
-
+                            ->label('Nivel de Estudio')
+                            ->options(NivelEstudioEnum::class)
+                            ->required()
+                            ->live()
+                            ->native(true) // Al usar el select nativo, el navegador evita que el scroll corte la lista
+                            ->validationMessages(['required' => 'Debe seleccionar el nivel de estudio.']),
 
                             TextInput::make('institucion')
-                                ->label('Institución')
-                                ->placeholder('Ej. Universidad Nacional')
-                                ->required(fn (Get $get) => self::tieneEstudiosActivos($get('nivel_estudio')))
-                                ->hidden(fn (Get $get) => !self::tieneEstudiosActivos($get('nivel_estudio')))
-                                ->validationMessages(['required' => 'Ingrese el nombre de la institución.']),
+                            ->label('Institución')
+                            ->placeholder('Ej. Universidad Nacional')
+                            ->required(fn (Get $get) => self::tieneEstudiosActivos($get('nivel_estudio')))
+                            ->hidden(fn (Get $get) => !self::tieneEstudiosActivos($get('nivel_estudio')))
+                            ->validationMessages(['required' => 'Ingrese el nombre de la institución.']),
 
                             DatePicker::make('fecha_fin')
-                                ->label('Fecha de Finalización')
-                                ->maxDate(now())
-                                ->required(fn (Get $get) => self::requiereFechaFin($get('nivel_estudio')))
-                                ->hidden(fn (Get $get) => !self::requiereFechaFin($get('nivel_estudio')))
-                                
-                                ->validationMessages(['required' => 'Seleccione la fecha de finalización.']),
+                            ->label('Fecha de Finalización')
+                            ->maxDate(now())
+                            ->required(fn (Get $get) => self::requiereFechaFin($get('nivel_estudio')))
+                            ->hidden(fn (Get $get) => !self::requiereFechaFin($get('nivel_estudio')))
+                            ->validationMessages(['required' => 'Seleccione la fecha de finalización.']),
                         ]),
 
                         Section::make('Títulos Obtenidos')
-                            ->compact()
-                            ->visible(fn (Get $get) => self::requiereTitulo($get('nivel_estudio')))
-                            ->extraAttributes([
-                                    // Forzamos un borde más oscuro y fondo claro para que resalte del contenedor de Legajos
-                                    'style' => '
-                                        border: 2px solid #2e3032 !important; 
-                                        border-radius: 12px !important; 
-                                        background-color: #f9fafb !important;
-                                        box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
-                                    '
-                                ])
-                            ->schema([
-                                Repeater::make('titulos')
-                                    ->relationship('titulos') 
-                                    ->addActionLabel('Añadir un Título')
-                                    ->hiddenLabel()
-                                    ->grid(2)
-                                    ->schema([
-                                        TextInput::make('nombre')
-                                            ->label('Nombre del Título')
-                                            ->placeholder('Ej. Licenciado en Administración')
-                                            ->required()
-                                            ->validationMessages(['required' => 'Ingrese el nombre del título.']),
-                                    ])
+                        ->compact()
+                        ->visible(fn (Get $get) => self::requiereTitulo($get('nivel_estudio')))
+                        ->extraAttributes([
+                                // Forzamos un borde más oscuro y fondo claro para que resalte del contenedor de Legajos
+                                'style' => '
+                                    border: 2px solid #2e3032 !important; 
+                                    border-radius: 12px !important; 
+                                    background-color: #f9fafb !important;
+                                    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+                                '
                             ])
+                        ->schema([
+                            Repeater::make('titulos')
+                            ->relationship('titulos') 
+                            ->addActionLabel('Añadir un Título')
+                            ->hiddenLabel()
+                            ->grid(2)
+                            ->schema([
+                                TextInput::make('nombre')
+                                ->label('Nombre del Título')
+                                ->placeholder('Ej. Licenciado en Administración')
+                                ->required()
+                                ->validationMessages(['required' => 'Ingrese el nombre del título.']),
+                            ])
+                        ])
                     ]),
-
                 ]),
 
                 Tab::make('Tab 4')->label('Cursos')
@@ -518,6 +481,7 @@ class PersonaForm
                     Section::make('Usuario')
                     ->columnSpanFull()
                     ->relationship('Usuario')
+                    ->columns(2)
                     ->schema([
                         // Esos tres puntos se llama operador de propagación (spread operator)
                         ...User::getFormSchema(false)
