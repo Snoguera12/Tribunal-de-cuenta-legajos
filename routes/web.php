@@ -35,7 +35,7 @@ Route::get('/{path}', function (Request $request, string $path) {
         && $usuario->persona_id === $legajo->persona_id;
         
         if (!$tieneMismaPersona) {
-            abort(403, 'No tienes autorización para ver los documentos de esta persona.');
+            abort(403, 'No tienes autorización para ver este documento de esta persona.');
         }
     }
 

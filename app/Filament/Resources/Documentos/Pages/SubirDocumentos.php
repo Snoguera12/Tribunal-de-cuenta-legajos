@@ -22,6 +22,12 @@ class SubirDocumentos extends Page implements HasForms
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
     protected static ?int $navigationSort = 6;
     public ?array $data = [];
+    public static function canAccess(array $parameters = []): bool{
+        if(!auth()->user()->isAdmin_RRHH()){
+            abort(403, 'No tienes acceso a esta función');
+        }
+        return true;
+    }
     public function mount(): void
     {
         $this->form->fill();
@@ -59,9 +65,7 @@ class SubirDocumentos extends Page implements HasForms
 
         foreach ($paths as $path) {
             Documento::create([
-                'ruta' => $path, // FileUpload ya devuelve el path como string
-                'nombre_original' => basename($path),
-                // legajo_id queda null hasta que lo asocien
+                'ruta' => $path,
             ]);
         }
 

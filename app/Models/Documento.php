@@ -113,7 +113,6 @@ class Documento extends Model
                 ->visibility('private')
                 ->directory('documentos/')
                 ->maxSize(10240)
-                ->openable()
                 ->acceptedFileTypes(['application/pdf', 'image/jpeg'])
                 ->rules(['mimes:pdf,jpg,jpeg'])
                 ->validationMessages(['required' => 'Debe subir un archivo válido.'])

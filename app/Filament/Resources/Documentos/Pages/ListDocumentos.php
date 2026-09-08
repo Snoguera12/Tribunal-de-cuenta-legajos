@@ -20,12 +20,14 @@ class ListDocumentos extends ListRecords
             ->label('Revisar documentos')
             ->icon('heroicon-o-exclamation-triangle')
             ->color('gray')
+            ->visible(auth()->user()->isAdmin_RRHH())
             ->url(RevisarDocumentos::getUrl()),
             
             Action::make('subirDocumentos')
             ->label('Subir documentos')
             ->icon('heroicon-o-arrow-up-tray')
             ->color('gray')
+            ->visible(auth()->user()->isAdmin_RRHH())
             ->url(SubirDocumentos::getUrl()),
 
             CreateAction::make(),

@@ -18,6 +18,12 @@ class RevisarDocumentos extends Page implements HasTable
     use InteractsWithTable;
     protected static string $resource = DocumentoResource::class;
     protected string $view = 'filament.pages.revisar-documentos';
+    public static function canAccess(array $parameters = []): bool{
+        if(!auth()->user()->isAdmin_RRHH()){
+            abort(403, 'No tienes acceso a esta función');
+        }
+        return true;
+    }
     public function table(Table $table): Table
     {
         return $table
@@ -52,7 +58,11 @@ class RevisarDocumentos extends Page implements HasTable
                 ->icon('heroicon-o-link')
                 ->schema(Documento::getFromSchemaRevisar())
                 ->action(function (Documento $record, array $data): void {
-                    $record->update(['legajo_id' => $data['legajo_id']]);
+                    $record->update([
+                        'legajo_id' => $data['legajo_id'],
+                        'descripcion' => $data['descripcion'],
+                        'tipodoc' => $data['tipodoc'],
+                    ]);
                 }),
                 DeleteAction::make(),
             ])

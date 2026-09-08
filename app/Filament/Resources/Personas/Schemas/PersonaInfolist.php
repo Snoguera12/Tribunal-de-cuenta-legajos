@@ -162,10 +162,10 @@ class PersonaInfolist
                                     ])
                                     ->schema([
                                         Grid::make(2)
-                                        ->columns(2)
+                                        ->columns(3)
                                         ->schema([
+                                            TextEntry::make('descripcion')->label('Descripción'),
                                             TextEntry::make('tipodoc')->label('Tipo'),
-
                                             TextEntry::make('ruta')
                                             ->label('Documento')
                                             ->hiddenLabel()
