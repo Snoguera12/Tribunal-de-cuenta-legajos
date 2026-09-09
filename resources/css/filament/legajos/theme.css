@@ -1,0 +1,890 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament';
+@source '../../../../resources/views/filament';
+
+/* ═══════════════════════════════════════════════════════════════════
+   TCSE — TOKENS
+   Una sola fuente de verdad. Antes había tres azules sueltos:
+   #0b1a2c (login), #102c4c (sidebar), #2563eb (botón, forzado).
+   El primario ahora sale de ->colors() en LegajosPanelProvider, así
+   que las variables --primary-* de Filament ya son correctas y no hay
+   que pisarlas.
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+    --tcse-navy:      #0b1a2c;   /* fondo institucional */
+    --tcse-navy-600:  #102c4c;   /* sidebar */
+    --tcse-navy-500:  #1e4270;   /* primario, coincide con Color::hex() */
+
+    --tcse-gold:      #cda851;   /* sobre azul — 7.8:1, correcto */
+    --tcse-gold-700:  #9a7420;   /* sobre blanco — 4.3:1.
+                                    El #cda851 sobre blanco da 2.25:1 y no
+                                    llega al 3:1 que pide WCAG 1.4.11 */
+
+    --tcse-ink:       #0b1a2c;
+    --tcse-muted:     #64748b;
+    --tcse-hairline:  #cbd5e1;
+
+    --tcse-serif:     'Libre Baskerville', Georgia, 'Times New Roman', serif;
+
+    /* Radios anidados: hijo = padre − padding. Esto evita el doble
+       recorte en las esquinas superiores de la card. */
+    --tcse-shell-radius: 1.25rem;
+    --tcse-card-radius:  1rem;
+    --tcse-pane-pad:     clamp(1.75rem, 4vw, 3rem);
+
+    /* Sombra teñida de azul, no negra: sobre fondo oscuro una sombra
+       negra desaparece y la card se ve plana. */
+    --tcse-shadow:
+        0 1px 2px rgb(11 26 44 / 30%),
+        0 10px 24px -8px rgb(11 26 44 / 45%),
+        0 28px 56px -16px rgb(11 26 44 / 38%);
+
+    /* Un solo tracking para las dos líneas del lockup */
+    --tcse-tracking: 0.09em;
+
+    /* Ajustes finos de la columna izquierda */
+    --tcse-crest-size:  4.5rem;
+    --tcse-ray-angle:   -13deg;
+    --tcse-photo-focus: 32%;   /* subir el % baja el encuadre */
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TCSE — BASE
+
+   RETIRADO: html { font-size: 118% !important }
+
+   Reescalaba la raíz y además abajo se fijan tamaños explícitos en rem,
+   así que el aumento se aplicaba dos veces: un .fi-input de 2.875rem
+   medía 54px en vez de 46px. Todo el espaciado quedaba corrido un 18%
+   respecto de lo que dice el código. Forzar la raíz también interfiere
+   con el zoom del navegador, que es el control que tiene el usuario.
+
+   Los tamaños explícitos de más abajo sostienen la accesibilidad solos:
+   .fi-btn queda en 44px, el mínimo de WCAG 2.5.5 (AAA).
+   ═══════════════════════════════════════════════════════════════════ */
+
+body {
+    line-height: 1.55;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TCSE — TIPOGRAFÍA
+   ═══════════════════════════════════════════════════════════════════ */
+
+.fi-header-heading {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.fi-header-subheading {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.fi-sidebar-item-label {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.fi-tabs-item-label {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.fi-fo-field-wrp-label,
+.fi-fo-field-wrp-label span {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.fi-fo-field-wrp-helper-text,
+.fi-fo-field-wrp-hint {
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TCSE — CONTROLES
+   ═══════════════════════════════════════════════════════════════════ */
+
+.fi-input,
+.fi-select-input,
+.fi-textarea,
+.fi-fo-date-time-picker input {
+    min-height: 2.875rem;
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+.fi-btn {
+    min-height: 2.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.fi-fo-field-wrp {
+    row-gap: 0.4rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TCSE — FOCO ACCESIBLE
+   Antes era un `:focus-visible` global sin scope: alcanzaba a <body>,
+   a wrappers y a cualquier elemento con tabindex. Acotado al panel y
+   con color explícito, porque currentColor daba resultados impredecibles
+   según el elemento.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.fi-body :focus-visible,
+.tcse-login :focus-visible {
+    outline: 0.1875rem solid var(--tcse-gold);
+    outline-offset: 0.125rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TCSE — SIDEBAR
+   ═══════════════════════════════════════════════════════════════════ */
+
+.fi-sidebar,
+.fi-sidebar-nav {
+    background-color: var(--tcse-navy-600);
+}
+
+.fi-sidebar-group-label {
+    color: #d6dee8;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.fi-sidebar .fi-sidebar-item-label,
+.fi-sidebar .fi-sidebar-item-icon {
+    color: #ffffff;
+}
+
+.fi-sidebar-item-btn {
+    min-height: 3rem;
+    padding-inline: 0.9rem;
+    border-radius: 0.625rem;
+}
+
+.fi-sidebar-item-btn:hover {
+    background-color: rgb(255 255 255 / 10%);
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background-color: var(--primary-600);
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-icon {
+    color: #ffffff;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TCSE — PESTAÑAS
+   ═══════════════════════════════════════════════════════════════════ */
+
+.fi-tabs-item {
+    min-height: 2.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.fi-tabs-item .fi-icon {
+    margin-inline-end: 0.375rem;
+}
+
+html:not(.dark) .fi-tabs-item:not(.fi-active) .fi-tabs-item-label {
+    color: #374151;
+}
+
+html:not(.dark) .fi-tabs-item:not(.fi-active) .fi-icon {
+    color: #4b5563;
+}
+
+.fi-tabs-item.fi-active .fi-tabs-item-label {
+    font-weight: 700;
+}
+
+html.dark .fi-tabs-item:not(.fi-active) .fi-tabs-item-label {
+    color: #e5e7eb;
+}
+
+html.dark .fi-tabs-item:not(.fi-active) .fi-icon {
+    color: #d1d5db;
+}
+
+html.dark .fi-tabs-item.fi-active .fi-tabs-item-label {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TCSE — FORMULARIOS ACCESIBLES
+
+   Este bloque queda tal como lo escribiste, con !important incluido.
+   Acá está justificado: compite contra estilos de agente de usuario
+   (autofill de Chrome pisa color y background con su propia hoja) y
+   -webkit-text-fill-color no se puede ganar de otra forma. Los
+   !important que sí saqué son los de layout, donde sólo peleaban
+   contra Filament.
+   ═══════════════════════════════════════════════════════════════════ */
+
+html:not(.dark) .fi-input-wrp {
+    background-color: #ffffff !important;
+    box-shadow: 0 0 0 1px #64748b !important;
+}
+
+html:not(.dark) .fi-input,
+html:not(.dark) .fi-select-input,
+html:not(.dark) .fi-textarea,
+html:not(.dark) .fi-fo-date-time-picker input {
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    background-color: transparent !important;
+    opacity: 1 !important;
+}
+
+html:not(.dark) .fi-input::placeholder,
+html:not(.dark) .fi-textarea::placeholder {
+    color: #6b7280 !important;
+    -webkit-text-fill-color: #6b7280 !important;
+}
+
+html:not(.dark) .fi-input-wrp:focus-within {
+    box-shadow: 0 0 0 2px var(--primary-600) !important;
+}
+
+html:not(.dark) .fi-select-input option {
+    color: #111827;
+    background-color: #ffffff;
+}
+
+html.dark .fi-input-wrp {
+    background-color: #334155 !important;
+    box-shadow: 0 0 0 1px #94a3b8 !important;
+}
+
+html.dark .fi-input,
+html.dark .fi-select-input,
+html.dark .fi-textarea,
+html.dark .fi-fo-date-time-picker input {
+    color: #f8fafc !important;
+    -webkit-text-fill-color: #f8fafc !important;
+    background-color: transparent !important;
+    opacity: 1 !important;
+}
+
+html.dark .fi-input::placeholder,
+html.dark .fi-textarea::placeholder {
+    color: #cbd5e1 !important;
+    -webkit-text-fill-color: #cbd5e1 !important;
+}
+
+html.dark .fi-fo-field-wrp-label,
+html.dark .fi-fo-field-wrp-label span {
+    color: #f1f5f9 !important;
+}
+
+html.dark .fi-fo-field-wrp-helper-text,
+html.dark .fi-fo-field-wrp-hint {
+    color: #cbd5e1 !important;
+}
+
+html.dark .fi-input-wrp:focus-within {
+    box-shadow: 0 0 0 2px var(--primary-400) !important;
+}
+
+html.dark .fi-select-input option {
+    color: #f8fafc !important;
+    background-color: #1e293b !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TCSE — BOTONES
+
+   RETIRADO el bloque `.fi-btn.fi-color-primary { background-color:
+   #2563eb !important }`. Ese color contradecía el Color::Blue del panel
+   y obligaba a forzar cada estado. Ahora el primario se define en
+   LegajosPanelProvider::colors() y las variables --primary-* quedan
+   correctas por sí solas.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.fi-btn {
+    transition:
+        background-color 0.18s ease,
+        color 0.18s ease,
+        border-color 0.18s ease;
+}
+
+.fi-btn:not(.fi-color-primary):active {
+    transform: translateY(1px);
+}
+
+html:not(.dark) .fi-btn:not(.fi-color-primary):hover {
+    background-color: #dbeafe;
+    color: #172554;
+    border-color: #93c5fd;
+}
+
+html.dark .fi-btn:not(.fi-color-primary):hover {
+    background-color: #475569;
+    color: #ffffff;
+    border-color: #94a3b8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fi-btn {
+        transition-duration: 0.01ms;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TCSE — LOGIN: NEUTRALIZAR EL LAYOUT SIMPLE
+
+   Todo acotado con :has(.tcse-login), así que sólo aplica en la página
+   de acceso y no toca el resto del panel. La especificidad de
+   `.fi-simple-layout:has(.tcse-login)` (0,2,0) ya gana contra los
+   estilos propios de Filament (0,1,0): no hace falta !important.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Neutraliza el layout Y todo contenedor intermedio hasta .tcse-login.
+   Nombrar sólo .fi-simple-main-ctn y .fi-simple-main no alcanzaba: queda
+   algún wrapper con padding propio y su fondo asoma como una franja
+   arriba. El :not() protege nuestro markup del reset. */
+.fi-simple-layout:has(.tcse-login),
+.fi-simple-layout:has(.tcse-login) *:not(.tcse-login):not(.tcse-login *) {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+/* El alto lo declara .tcse-login y nadie más. Con 100dvh en el layout Y
+   en el hijo, la suma pasaba del viewport y aparecía scroll vertical. */
+.fi-simple-layout:has(.tcse-login) {
+    display: block;
+    min-height: 0;
+    background-color: var(--tcse-navy);
+}
+
+/* El logo de marca del layout simple duplicaría el escudo */
+.fi-simple-layout:has(.tcse-login) .fi-simple-header,
+.fi-simple-layout:has(.tcse-login) .fi-simple-footer {
+    display: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TCSE — LOGIN: ESTRUCTURA
+
+   Grilla real de dos columnas. Antes no había split: la card se
+   empujaba con `justify-content: flex-end` + `padding-inline: 6rem` y
+   el bloque institucional flotaba en `position: fixed; left: 8%`. Dos
+   sistemas de posicionamiento independientes que derivaban solos en
+   cada ancho de viewport.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.tcse-login {
+    min-height: 100dvh;
+    display: grid;
+
+    /* Dos columnas iguales, topadas en 34rem cada una y centradas en el
+       viewport. Sin el tope, en un monitor de 2560px las columnas se
+       estiran hasta volverse ilegibles. */
+    grid-template-columns: repeat(2, minmax(0, 34rem));
+    grid-auto-rows: minmax(min(42rem, 88dvh), auto);
+    justify-content: center;
+    align-content: center;
+
+    padding: clamp(0px, 3vw, 2.5rem);
+    background:
+        radial-gradient(120% 90% at 15% 0%, #10253b, transparent 60%),
+        var(--tcse-navy);
+}
+
+.tcse-login__brand,
+.tcse-login__access {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.tcse-login__brand {
+    position: relative;
+    overflow: hidden;             /* el recorte vive sólo acá */
+    border-start-start-radius: var(--tcse-shell-radius);
+    border-end-start-radius: var(--tcse-shell-radius);
+    background-color: var(--tcse-navy);
+}
+
+.tcse-login__access {
+    justify-content: space-between;
+    padding: var(--tcse-pane-pad);
+    /* Sin overflow:hidden: recortaría la sombra de la card */
+    border-start-end-radius: var(--tcse-shell-radius);
+    border-end-end-radius: var(--tcse-shell-radius);
+}
+
+/* ── Lockup institucional ────────────────────────────────────────── */
+
+.tcse-brand {
+    position: relative;
+    padding: var(--tcse-pane-pad) var(--tcse-pane-pad) 1.75rem;
+}
+
+.tcse-brand__crest {
+    display: block;
+    width: var(--tcse-crest-size);
+    height: auto;
+}
+
+/* Nace en el borde derecho del escudo y sale por la esquina superior.
+   Ya no flota: tiene origen visible. */
+.tcse-brand:has(.tcse-brand__crest[style*="none"]) .tcse-brand__ray {
+    display: none;   /* sin escudo, el rayo no tiene de dónde nacer */
+}
+
+.tcse-brand__ray {
+    position: absolute;
+    top: calc(var(--tcse-pane-pad) + 0.25rem);
+    left: calc(var(--tcse-pane-pad) + var(--tcse-crest-size));
+    width: 130%;
+    height: 2px;
+    transform-origin: 0 50%;
+    transform: rotate(var(--tcse-ray-angle));
+    background: linear-gradient(
+        to right,
+        var(--tcse-gold) 0,
+        rgb(205 168 81 / 45%) 55%,
+        rgb(205 168 81 / 0%) 100%
+    );
+    pointer-events: none;
+}
+
+.tcse-brand__wordmark {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-family: var(--tcse-serif);
+    text-transform: uppercase;
+    color: #ffffff;
+}
+
+/* Las dos líneas comparten tracking. Antes divergían (0.15em en la
+   provincia contra el default en el título) y desnivelaban el bloque.
+   La jerarquía ahora la carga el tamaño y el color. */
+.tcse-brand__name {
+    font-size: clamp(1.125rem, 2vw, 1.4rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: var(--tcse-tracking);
+}
+
+.tcse-brand__place {
+    font-size: clamp(0.75rem, 1.2vw, 0.875rem);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: var(--tcse-tracking);
+    color: #cbd5e1;
+}
+
+/* El rombo se separa con margen propio. Heredando el tracking quedaba
+   a la deriva respecto de la palabra anterior. */
+.tcse-brand__diamond {
+    margin-inline-start: 0.6em;
+    letter-spacing: normal;
+    font-size: 0.7em;
+    vertical-align: 0.15em;
+    color: var(--tcse-gold);
+}
+
+.tcse-brand__description {
+    margin-top: 1.25rem;
+    max-width: 26rem;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: #94a3b8;
+}
+
+/* ── Fotografía + franja de valores ──────────────────────────────── */
+
+.tcse-login__photo {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    margin: 0;
+}
+
+.tcse-login__photo img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: 50% var(--tcse-photo-focus);
+}
+
+/* Funde la base de la foto con el azul de la franja: sin corte duro,
+   el portón deja de leerse como cortado al medio. */
+.tcse-login__photo::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -1px;                 /* evita costura de subpíxel */
+    height: 48%;
+    background: linear-gradient(
+        to top,
+        var(--tcse-navy) 0,
+        rgb(11 26 44 / 60%) 48%,
+        rgb(11 26 44 / 0%) 100%
+    );
+    pointer-events: none;
+}
+
+.tcse-values {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding:
+        1.75rem
+        var(--tcse-pane-pad)
+        calc(1.75rem + env(safe-area-inset-bottom, 0px));
+    list-style: none;
+    background-color: var(--tcse-navy);
+}
+
+.tcse-values__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #94a3b8;
+}
+
+.tcse-values__icon {
+    width: 1.375rem;
+    height: 1.375rem;
+    color: var(--tcse-gold);
+}
+
+/* ── Card de acceso ──────────────────────────────────────────────── */
+
+.tcse-card {
+    background-color: #ffffff;
+    border: 1px solid rgb(255 255 255 / 8%);
+    border-radius: var(--tcse-card-radius);
+    box-shadow: var(--tcse-shadow);
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+html.dark .tcse-card {
+    background-color: #1e293b;
+    border-color: rgb(255 255 255 / 10%);
+}
+
+.tcse-card__header {
+    margin-bottom: 2.25rem;   /* aire real contra el primer label */
+}
+
+.tcse-card__title {
+    font-family: var(--tcse-serif);
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--tcse-ink);
+}
+
+html.dark .tcse-card__title {
+    color: #f8fafc;
+}
+
+.tcse-card__subtitle {
+    margin-top: 0.5rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--tcse-muted);
+}
+
+html.dark .tcse-card__subtitle {
+    color: #cbd5e1;
+}
+
+/* Este padding es lo que despega el botón del ojo del borde derecho.
+   Va en el wrapper, no en el input, para que valga igual para prefijo
+   y sufijo. */
+.tcse-login .fi-input-wrp {
+    padding-inline: 0.375rem;
+    border-radius: 0.625rem;
+}
+
+.tcse-login .fi-input {
+    padding-block: 0.6875rem;
+}
+
+/* CORREGIDO: en modo oscuro el navy quedaba invisible sobre el fondo
+   #334155 del wrapper. Cada modo necesita su valor. */
+html:not(.dark) .tcse-login .fi-input-wrp-prefix .fi-icon,
+html:not(.dark) .tcse-login .fi-input-wrp-prefix svg {
+    color: var(--tcse-navy-500);
+}
+
+html.dark .tcse-login .fi-input-wrp-prefix .fi-icon,
+html.dark .tcse-login .fi-input-wrp-prefix svg {
+    color: var(--tcse-gold);
+}
+
+/* El prefijo y el sufijo heredan el fondo del wrapper: sin esto se ven
+   como recuadros separados pegados al input. */
+.tcse-login .fi-input-wrp-prefix,
+.tcse-login .fi-input-wrp-suffix {
+    background: transparent;
+    border: 0;
+}
+
+.tcse-login .fi-input-wrp-suffix .fi-icon-btn {
+    margin-inline-end: 0.125rem;
+    color: var(--tcse-muted);
+}
+
+html:not(.dark) .tcse-login .fi-input-wrp-suffix .fi-icon-btn:hover {
+    color: var(--tcse-gold-700);
+}
+
+html.dark .tcse-login .fi-input-wrp-suffix .fi-icon-btn:hover {
+    color: var(--tcse-gold);
+}
+
+.tcse-login .fi-btn.tcse-btn-primary {
+    width: 100%;
+    justify-content: center;
+    letter-spacing: 0.02em;
+    border-radius: 0.625rem;
+    padding-block: 0.75rem;
+}
+
+/* ── Separador "o" ───────────────────────────────────────────────── */
+
+.tcse-sep {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    margin-block: 1.5rem;
+}
+
+/* flex-basis 0 es la clave. Con `flex: 1` (basis auto) cada regla parte
+   de un ancho intrínseco distinto y el texto queda descentrado. */
+.tcse-sep__rule {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 1px;
+}
+
+.tcse-sep__rule:first-child {
+    background: linear-gradient(to right, transparent, var(--tcse-hairline));
+}
+
+.tcse-sep__rule:last-child {
+    background: linear-gradient(to left, transparent, var(--tcse-hairline));
+}
+
+.tcse-sep__label {
+    flex: none;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--tcse-muted);
+}
+
+/* ── Botón SSO ───────────────────────────────────────────────────── */
+
+.tcse-btn-sso {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    width: 100%;
+    min-height: 2.75rem;
+    padding-block: 0.75rem;
+    border-radius: 0.625rem;
+    border: 1px solid rgb(11 26 44 / 20%);
+    background-color: #ffffff;
+    color: var(--tcse-navy);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.tcse-btn-sso:hover {
+    background-color: #eef3f9;
+    border-color: rgb(11 26 44 / 35%);
+}
+
+/* Dorado institucional oscurecido, no gris genérico ni #cda851 puro:
+   sobre blanco, el dorado original no llega al mínimo de contraste. */
+.tcse-btn-sso__icon {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex: none;
+    color: var(--tcse-gold-700);
+}
+
+html.dark .tcse-btn-sso {
+    background-color: #334155;
+    border-color: rgb(255 255 255 / 18%);
+    color: #f8fafc;
+}
+
+html.dark .tcse-btn-sso__icon {
+    color: var(--tcse-gold);
+}
+
+/* ── Pie ─────────────────────────────────────────────────────────── */
+
+.tcse-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    font-size: 0.8125rem;
+    color: #94a3b8;
+}
+
+.tcse-footer__link {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.tcse-footer__link:hover {
+    color: var(--tcse-gold);
+    border-bottom-color: rgb(205 168 81 / 50%);
+}
+
+/* Punto medio en lugar de la barra: a 13px el "|" no tenía masa
+   suficiente para leerse. */
+.tcse-footer__dot {
+    margin-inline: 0.875rem;
+    font-size: 1.25em;
+    line-height: 0;
+    color: var(--tcse-gold);
+}
+
+.tcse-footer__secure {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.tcse-footer__icon {
+    width: 0.875rem;
+    height: 0.875rem;
+    color: var(--tcse-gold);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TCSE — LOGIN: RESPONSIVE
+
+   Corte en 1024px, no en 768. Con dos columnas iguales, a 768px cada
+   una queda en 384px: la foto del edificio ya no comunica nada y la
+   card queda apretada.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.tcse-brand--compact {
+    display: none;
+}
+
+@media (max-width: 1023.98px) {
+    .tcse-login {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 0;
+        /* La foto sobrevive como textura: ocultar la columna izquierda
+           sin más dejaría al usuario móvil sin ninguna señal
+           institucional. */
+        background:
+            linear-gradient(rgb(11 26 44 / 92%), rgb(11 26 44 / 98%)),
+            url('/images/tribunal-edificio.jpg') center / cover no-repeat,
+            var(--tcse-navy);
+    }
+
+    .tcse-login__brand {
+        display: none;
+    }
+
+    .tcse-login__access {
+        justify-content: center;
+        gap: 2rem;
+        padding:
+            clamp(2rem, 8vw, 3rem)
+            1.25rem
+            calc(clamp(2rem, 6vh, 3rem) + env(safe-area-inset-bottom, 0px));
+        border-radius: 0;
+    }
+
+    .tcse-card,
+    .tcse-brand--compact,
+    .tcse-footer {
+        width: 100%;
+        max-width: 27rem;
+        margin-inline: auto;
+    }
+
+    .tcse-brand--compact {
+        display: flex;
+        align-items: center;
+        gap: 0.875rem;
+    }
+
+    .tcse-brand--compact .tcse-brand__wordmark {
+        margin-top: 0;
+        gap: 0.15rem;
+    }
+
+    .tcse-brand--compact .tcse-brand__name {
+        font-size: 1rem;
+    }
+
+    .tcse-brand--compact .tcse-brand__place {
+        font-size: 0.6875rem;
+    }
+}
+
+/* Landscape de teléfono */
+@media (max-height: 640px) and (max-width: 1023.98px) {
+    .tcse-login__access {
+        justify-content: flex-start;
+        gap: 1.25rem;
+    }
+
+    .tcse-card__header {
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tcse-login *,
+    .tcse-login *::before,
+    .tcse-login *::after {
+        transition-duration: 0.01ms;
+        animation-duration: 0.01ms;
+    }
+}

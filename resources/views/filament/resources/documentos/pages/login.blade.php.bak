@@ -24,7 +24,6 @@
                 aria-hidden="true"
                 width="72"
                 height="88"
-                onerror="this.style.display='none'"
             >
 
             {{-- Nace en el borde derecho del escudo y sale por la esquina.
@@ -104,42 +103,38 @@
                 <p class="tcse-card__subtitle">Accedé al sistema de Legajos</p>
             </header>
 
-            {{--
-                v4 renderiza el formulario desde el schema de la página
-                (content(), en Filament\Auth\Pages\Login). Esto incluye ya:
-                  · los render hooks AUTH_LOGIN_FORM_BEFORE / _AFTER
-                  · el formulario y sus acciones
-                  · el desafío de doble factor, si está habilitado
+            {{-- Punto de extensión que ya usabas. Hoy no hay nada
+                 registrado en él, pero se conserva. --}}
+            {{ \Filament\Facades\Filament::renderHook('panels::auth.login.form.before') }}
 
-                NO ensamblar esto a mano. getCachedFormActions() es de v3 y
-                no existe en v4.11.4; hasFullWidthFormActions() es protected
-                y no se puede llamar desde el Blade.
-            --}}
-            {{ $this->content }}
+            <x-filament-panels::form id="form" wire:submit="authenticate">
+                {{ $this->form }}
 
-            {{--
-                SSO — DESACTIVADO
-                La ruta 'sso.redirect' no existe todavía (no figura en
-                `php artisan route:list`). Descomentá este bloque recién
-                cuando la tengas, o el render falla con RouteNotFoundException.
+                <x-filament-panels::form.actions
+                    :actions="$this->getCachedFormActions()"
+                    :full-width="$this->hasFullWidthFormActions()"
+                />
+            </x-filament-panels::form>
 
+            {{ \Filament\Facades\Filament::renderHook('panels::auth.login.form.after') }}
+
+            {{-- Dos reglas con flex-basis 0 → mitades exactamente iguales --}}
             <div class="tcse-sep" role="separator" aria-orientation="horizontal">
                 <span class="tcse-sep__rule"></span>
                 <span class="tcse-sep__label">o</span>
                 <span class="tcse-sep__rule"></span>
             </div>
 
+            {{-- Si todavía no existe la ruta de SSO, comentá este bloque
+                 entero junto con el separador de arriba. --}}
             <a href="{{ route('sso.redirect') }}" class="tcse-btn-sso">
                 @svg('heroicon-m-shield-check', 'tcse-btn-sso__icon')
                 <span>Iniciar sesión con SSO</span>
             </a>
-            --}}
         </section>
 
         <footer class="tcse-footer">
-            {{-- Cuando exista la ruta de ayuda, reemplazar el <span> por:
-                 <a href="{{ route('ayuda') }}" class="tcse-footer__link">Ayuda</a> --}}
-            <span class="tcse-footer__link">Ayuda</span>
+            <a href="{{ route('ayuda') }}" class="tcse-footer__link">Ayuda</a>
             <span class="tcse-footer__dot" aria-hidden="true">·</span>
             <span class="tcse-footer__secure">
                 @svg('heroicon-m-lock-closed', 'tcse-footer__icon')

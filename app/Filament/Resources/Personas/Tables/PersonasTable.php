@@ -122,9 +122,18 @@ class PersonasTable
                 ->label('Registrar Persona'),
             ])*/
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-            ])
+                 ViewAction::make()
+                 ->label('Ver')
+                 ->iconButton()
+                  ->color('success')
+                  ->icon('heroicon-m-eye'),
+                   EditAction::make()
+                   ->label('Editar')
+                   ->iconButton()
+                    ->color('primary')
+                    ->icon('heroicon-m-pencil-square'),
+                    ])
+            
             /*->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
