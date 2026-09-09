@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             EstudioSeeder::class,
             TituloSeeder::class,
             UserSeeder::class,
+            PersonalSantiagoSeeder::class,
         ]);
     }
 }

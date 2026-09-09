@@ -7,14 +7,18 @@ use App\Models\User;
 
 class PersonaPolicy
 {
-    public function viewAny(): bool
+    public function viewAny(User $user): bool
     {
-        return true;
+        return $user->isAdmin_RRHH_Funcionario() || $user->isEmpleado();
     }
 
-    public function view(): bool
+    public function view(User $user, Persona $persona): bool
     {
-        return true;
+        if ($user->isAdmin() || $user->isRRHH()) {
+            return true;
+        }
+
+        return $user->persona_id !== null && $user->persona_id === $persona->id;
     }
 
     public function create(User $user): bool

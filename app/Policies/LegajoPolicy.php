@@ -15,12 +15,13 @@ class LegajoPolicy
         return $user->isAdmin() || $user->isRRHH() || $user->isFuncionario();
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user): bool
+    public function view(User $user, Legajo $legajo): bool
     {
-        return $user->isAdmin() || $user->isRRHH() || $user->isFuncionario()|| $user->persona_id;
+        if ($user->isAdmin() || $user->isRRHH()) {
+            return true;
+        }
+
+        return $user->persona_id !== null && $user->persona_id === $legajo->persona_id;
     }
 
     /**

@@ -19,9 +19,7 @@ class DocumentosTable
                 EditAction::make(),
             ])
             ->toolbarActions([
-                /*BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),*/
+                //
             ]);
     }
 }

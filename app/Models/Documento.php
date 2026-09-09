@@ -16,6 +16,7 @@ class Documento extends Model
     protected $casts = [
         'tipodoc' => TipodocEnum::class,
     ];
+
     protected $fillable = [
         'ruta',
         'nombre_original',
@@ -160,5 +161,19 @@ class Documento extends Model
         };
 
         return $resultado;
+    }
+    protected static function booted()
+    {
+        static::creating(function (Documento $documento) {
+            $ruta = storage_path('app/private/documentos/' . $documento->archivo);
+
+            if (file_exists($ruta)) {
+                $mime = mime_content_type($ruta);
+
+                if (! in_array($mime, ['application/pdf', 'image/jpeg'], true)) {
+                    throw new \Exception('El archivo subido no es un PDF ni una imagen JPG/JPEG válida.');
+                }
+            }
+        });
     }
 }

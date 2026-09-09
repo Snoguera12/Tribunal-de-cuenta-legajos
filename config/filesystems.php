@@ -47,9 +47,9 @@ return [
             'report' => false,
         ],
 
-        'documentos_revisar' => [
+        'documentos' => [
             'driver' => 'local',
-            'root' => storage_path('app/private/documentos_revisar'),
+            'root' => storage_path('app/private/documentos'),
             'visibility' => 'private',
             'throw' => false,
         ],

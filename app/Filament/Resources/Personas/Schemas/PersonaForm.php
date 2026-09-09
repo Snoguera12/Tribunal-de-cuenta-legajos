@@ -66,11 +66,11 @@ class PersonaForm
     {
         return self::requiereFechaFin($value);
     }
-    
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
-            ->components([
+        ->components([
             Tabs::make('Tabs_base')
             ->columns(2)
             ->columnSpanFull()
@@ -83,133 +83,140 @@ class PersonaForm
                 ->columnSpanFull()
                 ->schema([
                     TextInput::make('nombre')->label('Nombre')
-                        ->required()
-                        ->validationMessages([
-                            "required" => "Requiere introducir el Nombre.",
-                        ])
-                        ->extraInputAttributes([
-                            'oninvalid' => "this.setCustomValidity('Por favor, introducir el Nombre.')",
-                            'oninput' => "this.setCustomValidity('')",
-                        ]),
-                        TextInput::make('apellido')
-                        ->label('Apellido')
-                        ->required()
-                        ->validationMessages([
-                            "required" => "Requiere introducir el Apellido.",
-                        ])
-                        ->extraInputAttributes([
-                            'oninvalid' => "this.setCustomValidity('Por favor, introducir el Apellido.')",
-                            'oninput' => "this.setCustomValidity('')",
-                        ]),
-                        TextInput::make('dni')->label("DNI")
-                        ->unique(ignoreRecord: true) // Evita errores al editar el mismo registro
-                        ->required()
-                        ->maxLength(8)
-                        ->live(onBlur: true) 
-                        ->rules(['required', 'regex:/^[0-9]{7,8}$/'])
-                        ->validationMessages([
-                            "required" => "Requiere introducir el DNI.",
-                            "unique" => "Ya se registró el DNI.",
-                            "regex" => "El DNI debe contener entre 7 y 8 dígitos.",
-                        ])
-                        ->extraInputAttributes([
-                            'type' => 'text',
-                            'inputmode' => 'numeric',
-                            'oninvalid' => "this.setCustomValidity('Por favor, introducir el DNI.')",
-                            'oninput' => "this.setCustomValidity('')",
-                        ])
-                        ->dehydrateStateUsing(fn (string|null $state) => $state ? (int) preg_replace('/\D/', '', $state) : null)
-                        // Se ejecuta al perder el foco si el CUIL está vacío
-                        ->afterStateUpdated(function (string|null $state, Set $set, Get $get) {
-                            if (blank($state) || filled($get('cuil'))) {
+                    ->required()
+                    ->validationMessages([
+                        "required" => "Requiere introducir el Nombre.",
+                    ])
+                    ->extraInputAttributes([
+                        'oninvalid' => "this.setCustomValidity('Por favor, introducir el Nombre.')",
+                                           'oninput' => "this.setCustomValidity('')",
+                    ]),
+                    TextInput::make('apellido')
+                    ->label('Apellido')
+                    ->required()
+                    ->validationMessages([
+                        "required" => "Requiere introducir el Apellido.",
+                    ])
+                    ->extraInputAttributes([
+                        'oninvalid' => "this.setCustomValidity('Por favor, introducir el Apellido.')",
+                                           'oninput' => "this.setCustomValidity('')",
+                    ]),
+                    TextInput::make('dni')->label("DNI")
+                    ->unique(ignoreRecord: true) // Evita errores al editar el mismo registro
+                    ->required()
+                    ->maxLength(8)
+                    ->live(onBlur: true)
+                    ->rules(['required', 'regex:/^[0-9]{7,8}$/'])
+                    ->validationMessages([
+                        "required" => "Requiere introducir el DNI.",
+                        "unique" => "Ya se registró el DNI.",
+                        "regex" => "El DNI debe contener entre 7 y 8 dígitos.",
+                    ])
+                    ->extraInputAttributes([
+                        'type' => 'text',
+                        'inputmode' => 'numeric',
+                        'oninvalid' => "this.setCustomValidity('Por favor, introducir el DNI.')",
+                                           'oninput' => "this.setCustomValidity('')",
+                    ])
+                    ->dehydrateStateUsing(fn (string|null $state) => $state ? (int) preg_replace('/\D/', '', $state) : null)
+                    // Se ejecuta al perder el foco si el CUIL está vacío
+                    ->afterStateUpdated(function (string|null $state, Set $set, Get $get) {
+                        if (blank($state) || filled($get('cuil'))) {
+                            return;
+                        }
+
+                        // El DNI físico se rellena con ceros a la izquierda hasta tener 8 dígitos para armar el CUIL estándar
+                        $dniPad = str_pad(preg_replace('/\D/', '', $state), 8, '0', STR_PAD_LEFT);
+
+                        // Prefijo genérico 20 y sufijo 2 (El usuario podrá corregirlo si es mujer/empresa)
+                        $prefijo = '20';
+                        $sufijo = '2';
+
+                        $set('cuil', $prefijo . $dniPad . $sufijo);
+                    }),
+
+                    TextInput::make('cuil')->label("CUIL")
+                    ->required()
+                    ->unique(ignoreRecord: true)
+                    ->maxLength(11)
+                    // Pasamos un Closure a rules() para que Filament nos inyecte la instancia de Get correctamente
+                    ->rules(fn (Get $get): array => [
+                        'regex:/^\d{11}$/', // Formato numérico puro de 11 dígitos
+                        function (string $attribute, $value, $fail) use ($get) {
+                            $dni = preg_replace('/\D/', '', (string) $get('dni'));
+                            $cuilNumericoPuro = preg_replace('/\D/', '', (string) $value);
+
+                            if (blank($dni) || strlen($cuilNumericoPuro) !== 11) {
                                 return;
                             }
 
-                            // El DNI físico se rellena con ceros a la izquierda hasta tener 8 dígitos para armar el CUIL estándar
-                            $dniPad = str_pad(preg_replace('/\D/', '', $state), 8, '0', STR_PAD_LEFT);
-                            
-                            // Prefijo genérico 20 y sufijo 2 (El usuario podrá corregirlo si es mujer/empresa)
-                            $prefijo = '20';
-                            $sufijo = '2';
+                            // El DNI dentro del CUIL siempre ocupa 8 dígitos (de la posición 2 a la 9)
+                            $dniEnCuil = substr($cuilNumericoPuro, 2, 8);
+                            $dniConCeros = str_pad($dni, 8, '0', STR_PAD_LEFT);
 
-                            $set('cuil', $prefijo . $dniPad . $sufijo);
-                        }),
-
-                        TextInput::make('cuil')->label("CUIL")
-                        ->required()
-                        ->unique(ignoreRecord: true)
-                        ->maxLength(11)
-                        // Pasamos un Closure a rules() para que Filament nos inyecte la instancia de Get correctamente
-                        ->rules(fn (Get $get): array => [
-                            'regex:/^\d{11}$/', // Formato numérico puro de 11 dígitos
-                            function (string $attribute, $value, $fail) use ($get) {
-                                $dni = preg_replace('/\D/', '', (string) $get('dni'));
-                                $cuilNumericoPuro = preg_replace('/\D/', '', (string) $value);
-
-                                if (blank($dni) || strlen($cuilNumericoPuro) !== 11) {
-                                    return;
-                                }
-
-                                // El DNI dentro del CUIL siempre ocupa 8 dígitos (de la posición 2 a la 9)
-                                $dniEnCuil = substr($cuilNumericoPuro, 2, 8);
-                                $dniConCeros = str_pad($dni, 8, '0', STR_PAD_LEFT);
-
-                                if ($dniEnCuil !== $dniConCeros) {
-                                    $fail("El número de documento intermedio ({$dniEnCuil}) no coincide con el DNI ingresado ({$dni}).");
-                                }
-                            },
-                        ])
-                        ->validationMessages([
-                            "required" => "Requiere introducir el CUIL.",
-                            "unique" => "Ya se registró el CUIL.",
-                            "regex" => "El CUIL debe contener exactamente 11 números sin guiones.",
-                        ])
-                        ->extraInputAttributes([
-                            'type' => 'text',
-                            'inputmode' => 'numeric',
-                        ])
-                        ->dehydrateStateUsing(fn (string|null $state) => $state ? (int) preg_replace('/\D/', '', $state) : null),
-                        TextInput::make('email')->label('Correo Electróico')
-                        ->email()
-                        ->extraInputAttributes([
-                            'oninvalid' => "this.setCustomValidity('Por favor, escribir correctamente el correo electrónico.')",
-                            'oninput' => "this.setCustomValidity('')",
-                        ]),
-                        Select::make('estado_civil')->label('Estado Civil')
-                        ->options(EstadoCivilEnum::class)
-                        ->required()
-                        ->validationMessages([
-                            "required" => "Requiere selecionar el estado civil.",
-                        ])
-                        ->extraInputAttributes([
-                            'oninvalid' => "this.setCustomValidity('Por favor, selecione el género.')",
-                            'oninput' => "this.setCustomValidity('')",
-                        ]),
-                        Select::make("genero")->label("Género")
-                        ->options(GeneroEnum::class)
-                        ->required()
-                        ->validationMessages([
-                            "required" => "Requiere selecionar el género.",
-                        ])
-                        ->extraInputAttributes([
-                            'oninvalid' => "this.setCustomValidity('Por favor, selecione el género.')",
-                            'oninput' => "this.setCustoEstadoCivilEnum::classmValidity('')",
-                        ]),
-                        DatePicker::make('fecha_de_nacimiento')->label('Fecha de Nacimiento')
-                        ->maxDate(now()->subYears(18)->toDateString()) // Máximo hace 18 años
-                        ->rules(['date', 'before_or_equal:' . now()->subYears(18)->toDateString()])
-                        ->helperText('La persona tiene que ser mayor de edad.')
-                        ->required()
-                        ->validationMessages([
-                            "required" => "Requiere introducir la Fecha de nacimiento.",
-                        ])
-                        ->extraInputAttributes([
-                            'oninvalid' => "this.setCustomValidity('Por favor, ingrese la fecha de nacimiento.')",
-                            'oninput' => "this.setCustomValidity('')",
-                        ]),
-                        TextInput::make('domicilio'),
-                        TextInput::make('telefono')->label('Teléfono')->tel(),
-                        TextInput::make('telefono_emergencia')->label('Teléfono de emergencia')->tel(),
+                            if ($dniEnCuil !== $dniConCeros) {
+                                $fail("El número de documento intermedio ({$dniEnCuil}) no coincide con el DNI ingresado ({$dni}).");
+                            }
+                        },
+                    ])
+                    ->validationMessages([
+                        "required" => "Requiere introducir el CUIL.",
+                        "unique" => "Ya se registró el CUIL.",
+                        "regex" => "El CUIL debe contener exactamente 11 números sin guiones.",
+                    ])
+                    ->extraInputAttributes([
+                        'type' => 'text',
+                        'inputmode' => 'numeric',
+                    ])
+                    ->dehydrateStateUsing(fn (string|null $state) => $state ? (int) preg_replace('/\D/', '', $state) : null),
+                         TextInput::make('email')->label('Correo Electrónico')
+                         ->email()
+                         ->unique(ignoreRecord: true)
+                         ->maxLength(255)
+                         ->extraInputAttributes([
+                             'oninvalid' => "this.setCustomValidity('Por favor, escribir correctamente el correo electrónico.')",
+                                                'oninput' => "this.setCustomValidity('')",
+                         ])
+                         ->validationMessages([
+                             'unique' => 'Ya existe una persona registrada con ese correo.',
+                         ]),
+                         Select::make('estado_civil')->label('Estado Civil')
+                         ->options(EstadoCivilEnum::class)
+                         ->required()
+                         ->validationMessages([
+                             "required" => "Requiere selecionar el estado civil.",
+                         ])
+                         ->extraInputAttributes([
+                             'oninvalid' => "this.setCustomValidity('Por favor, selecione el género.')",
+                                                'oninput' => "this.setCustomValidity('')",
+                         ]),
+                         Select::make("genero")->label("Género")
+                         ->options(GeneroEnum::class)
+                         ->required()
+                         ->validationMessages([
+                             "required" => "Requiere selecionar el género.",
+                         ])
+                         ->extraInputAttributes([
+                             'oninvalid' => "this.setCustomValidity('Por favor, selecione el género.')",
+                                                'oninput' => "this.setCustoEstadoCivilEnum::classmValidity('')",
+                         ]),
+                         DatePicker::make('fecha_de_nacimiento')->label('Fecha de Nacimiento')
+                         ->maxDate(now()->subYears(18)->toDateString()) // Máximo hace 18 años
+                         ->rules(['date', 'before_or_equal:' . now()->subYears(18)->toDateString()])
+                         ->helperText('La persona tiene que ser mayor de edad.')
+                         ->required()
+                         ->validationMessages([
+                             "required" => "Requiere introducir la Fecha de nacimiento.",
+                         ])
+                         ->extraInputAttributes([
+                             'oninvalid' => "this.setCustomValidity('Por favor, ingrese la fecha de nacimiento.')",
+                                                'oninput' => "this.setCustomValidity('')",
+                         ]),
+                         TextInput::make('domicilio'),
+                         TextInput::make('telefono')->label('Teléfono')->tel()
+                         ->rules(['regex:/^[0-9+\-\s]{6,20}$/']),
+                         TextInput::make('telefono_emergencia')->label('Teléfono de emergencia')->tel()
+                         ->rules(['regex:/^[0-9+\-\s]{6,20}$/']),
                 ]),
                 Tab::make('Tab 2')
                 ->icon('heroicon-o-users')
@@ -231,11 +238,12 @@ class PersonaForm
 
                     ->schema([
                         TextInput::make('nombre')->label('Nombre')->required(),
-                        TextInput::make('apellido')->label('Apellido')->required(),
-                        TextInput::make('dni')->label('DNI')->required(),
-                        DatePicker::make('fecha_de_nacimiento')->label('Fecha Nacimiento')->required(),
-                        Select::make('parentesco')->label('Parentesco')->options(ParentescoEnum::class)->required(),
-                        Select::make('vive')->label('Estado Vital')->options(FamiliarViveEnum::class)->required(),
+                             TextInput::make('apellido')->label('Apellido')->required(),
+                             TextInput::make('dni')->label('DNI')->required()
+                             ->rules(['regex:/^[0-9]{7,8}$/']),
+                             DatePicker::make('fecha_de_nacimiento')->label('Fecha Nacimiento')->required(),
+                             Select::make('parentesco')->label('Parentesco')->options(ParentescoEnum::class)->required(),
+                             Select::make('vive')->label('Estado Vital')->options(FamiliarViveEnum::class)->required(),
                     ]),
                 ]),
                 Tab::make('Tab 3')
@@ -251,14 +259,14 @@ class PersonaForm
 
                         ->addActionLabel('Añadir otro Idioma')
                         ->addAction(
-                              fn (\Filament\Actions\Action $action) => $action
-                              ->icon('heroicon-m-plus')
-                              ->color('gray')
+                            fn (\Filament\Actions\Action $action) => $action
+                            ->icon('heroicon-m-plus')
+                            ->color('gray')
                         )
-                            
+
                         ->schema([
                             TextInput::make('idioma')->label('Idioma')->required()->maxLength(100),
-                            Select::make('nivel')->label('Nivel')->options(IdiomaNivelEnum::class)->required(),
+                                 Select::make('nivel')->label('Nivel')->options(IdiomaNivelEnum::class)->required(),
                         ]),
                     ]),
                 ]),
@@ -275,11 +283,16 @@ class PersonaForm
                     ->collapsible() // Permite encoger legajos antiguos para mantener orden visual
                     //->cloneable()
                     ->addActionLabel('Añadir un Legajo')
-                    ->itemLabel(fn (array $state): ?string => 
-                        // Muestra un título claro en cada bloque (Ej: "Legajo N° 4512")
-                        ($state['num_legajo'] ?? null) 
-                            ? "Legajo N° " . $state['num_legajo'] 
-                            : 'Nuevo Registro de Legajo'
+                    ->addAction(
+                        fn (\Filament\Actions\Action $action) => $action
+                        ->icon('heroicon-m-plus')
+                        ->color('gray')
+                    )
+                    ->itemLabel(fn (array $state): ?string =>
+                    // Muestra un título claro en cada bloque (Ej: "Legajo N° 4512")
+                    ($state['num_legajo'] ?? null)
+                    ? "Legajo N° " . $state['num_legajo']
+                    : 'Nuevo Registro de Legajo'
                     )
                     ->schema([
                         // BLOQUE 1: Datos Administrativos del Legajo
@@ -299,6 +312,11 @@ class PersonaForm
                                 'unique' => 'Este número de legajo ya está registrado.',
                                 'gt' => 'El número debe ser mayor a cero.',
                             ]),
+                            Select::make('tipo_contrato')
+                            ->label('Tipo de Contratación')
+                            ->required()
+                            ->options(TipoContratoEnum::class)
+                            ->validationMessages(['required' => 'Seleccione el tipo de contratación.']),
 
                             Select::make('tipo_contrato')
                             ->label('Tipo de Contratación')
@@ -382,21 +400,21 @@ class PersonaForm
                 ->columnSpanFull()
                 ->schema([
                     Repeater::make('Estudio')
-                    ->relationship('estudios') 
+                    ->relationship('estudios')
                     ->hiddenLabel()
                     ->columnSpanFull()
                     ->addActionLabel('Añadir otro Estudio')
                     ->addAction(
-                         fn (\Filament\Actions\Action $action) => $action
-                         ->icon('heroicon-m-plus')
-                          ->color('gray')
-                          )
+                        fn (\Filament\Actions\Action $action) => $action
+                        ->icon('heroicon-m-plus')
+                        ->color('gray')
+                    )
                     ->collapsible()
                     ->defaultItems(0)
-                    ->itemLabel(fn (array $state): ?string => 
-                        ($state['institucion'] ?? null) 
-                            ? ($state['institucion']) 
-                            : 'Nuevo Registro de Estudio'
+                    ->itemLabel(fn (array $state): ?string =>
+                    ($state['institucion'] ?? null)
+                    ? ($state['institucion'])
+                    : 'Nuevo Registro de Estudio'
                     )
                     ->schema([
                         Grid::make([
@@ -456,7 +474,7 @@ class PersonaForm
                 ]),
 
                 Tab::make('Tab 4')->label('Cursos')
-                 ->icon('heroicon-o-book-open')
+                ->icon('heroicon-o-book-open')
                 ->id('curso')
                 ->columnSpanFull()
                 ->schema([
@@ -466,19 +484,19 @@ class PersonaForm
                     ->columns(3)
                     ->addActionLabel('Agregar otro Curso')
                     ->addAction(
-                         fn (\Filament\Actions\Action $action) => $action
-                         ->icon('heroicon-m-plus')
-                         ->color('gray')
-                         )
+                        fn (\Filament\Actions\Action $action) => $action
+                        ->icon('heroicon-m-plus')
+                        ->color('gray')
+                    )
                     ->schema([
                         TextInput::make('nombre')->label('Nombre del curso')
                         ->required()
                         ->maxLength(255),
-                        TextInput::make('institucion')->label('Institución')
-                        ->maxLength(255),
-                        TextInput::make('duracion')->label('Duración'),
-                        DatePicker::make('fecha')->label('Fecha'),
-                        Checkbox::make('tiene_certificado')->label('Tiene certificado'),
+                             TextInput::make('institucion')->label('Institución')
+                             ->maxLength(255),
+                             TextInput::make('duracion')->label('Duración'),
+                             DatePicker::make('fecha')->label('Fecha'),
+                             Checkbox::make('tiene_certificado')->label('Tiene certificado'),
                     ])
                 ]),
                 Tab::make('Tab 5')
@@ -500,12 +518,12 @@ class PersonaForm
                     ->schema([
                         TextInput::make('empleador')->label('Empleador')
                         ->required(),
-                        TextInput::make('lugar_de_trabajo')->label('Lugar de trabajo')
-                        ->required(),
-                        TextInput::make('cargo')->label('Cargo'),
-                        DatePicker::make('fecha_inicio')->label('Fecha de inicio'),
-                        DatePicker::make('fecha_fin')->label('Fecha de fin'),
-                        TextInput::make('motivo_egreso')->label('Motivo de egreso'),
+                             TextInput::make('lugar_de_trabajo')->label('Lugar de trabajo')
+                             ->required(),
+                             TextInput::make('cargo')->label('Cargo'),
+                             DatePicker::make('fecha_inicio')->label('Fecha de inicio'),
+                             DatePicker::make('fecha_fin')->label('Fecha de fin'),
+                             TextInput::make('motivo_egreso')->label('Motivo de egreso'),
                     ])
                 ]),
                 Tab::make('Tab 6')
