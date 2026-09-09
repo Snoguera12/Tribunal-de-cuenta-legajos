@@ -16,12 +16,9 @@ class DatabaseSeeder extends Seeder
             CargoSeeder::class,
             CategoriaSeeder::class,
             CursoSeeder::class,
-            PersonaSeeder::class,
-            LegajoSeeder::class,
-            EstudioSeeder::class,
-            TituloSeeder::class,
             UserSeeder::class,
             PersonalSantiagoSeeder::class,
+            //LegajoSeeder::class,
         ]);
     }
 }
