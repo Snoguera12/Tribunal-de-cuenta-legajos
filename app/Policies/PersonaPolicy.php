@@ -9,7 +9,7 @@ class PersonaPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin_RRHH_Funcionario() || $user->isEmpleado();
+        return $user->isStaffRoles() || $user->isEmpleado();
     }
 
     public function view(User $user, Persona $persona): bool
