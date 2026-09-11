@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Cargos\Tables;
 
+use App\Models\Cargo;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -13,40 +14,19 @@ class CargosTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->columns([
-                TextColumn::make('nombre')
-                    ->label('Nombre del Cargo')
-                    ->sortable()
-                    ->searchable(),
-                /*TextColumn::make('cargos_count')
-                    ->label('Empleados Asociados')
-                    ->counts('legajos')
-                    //->badge() // Opcional: lo muestra dentro de una etiqueta visual limpia
-                    ->sortable(),*/
-                /*TextColumn::make('created_at')
-                    ->label('Fecha de Creación')
-                    ->dateTime('d/m/Y H:i:s')
-                    ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('updated_at')
-                    ->label('Fecha de Actualización')
-                    ->dateTime('d/m/Y H:i:s')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),*/
-            ])
+            ->columns(Cargo::getOutSchema())
             ->filters([
                 //
             ])
             ->recordActions([
                 EditAction::make()
-                    ->label('Editar')
-                    ->iconButton()
-                    ->color('primary')
-                    ->icon('heroicon-m-pencil-square'),
+                ->label('Editar')
+                ->iconButton()
+                ->color('primary')
+                ->icon('heroicon-m-pencil-square'),
             ])
             ->toolbarActions([
-                /*BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),*/
+                //
             ]);
     }
 }

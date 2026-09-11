@@ -32,7 +32,7 @@ class RevisarDocumentos extends Page implements HasTable
                 ->whereNull('legajo_id') // agregá acá otras condiciones si hay más campos incompletos
             )
             ->columns([
-                TextColumn::make('nombre_original')
+                TextColumn::make('ruta')
                 ->label('Documento')
                 ->searchable()
                 ->color('blue')

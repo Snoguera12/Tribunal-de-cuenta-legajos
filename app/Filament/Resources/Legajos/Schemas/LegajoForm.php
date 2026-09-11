@@ -28,44 +28,7 @@ class LegajoForm
     public static function configure(Schema $schema): Schema
     {
         return $schema
-        ->components([
-            Section::make()
-            ->columns(3)
-            ->columnSpanFull()
-            ->schema(Legajo::getFormSchema(true)),
-
-            Section::make('Documentación Digitalizada')
-            ->description('Cargue los archivos adjuntos y documentos que respaldan este legajo.')
-            ->icon('heroicon-o-document-arrow-up')
-            ->collapsible() // El usuario puede ocultar la zona de archivos si no la necesita en el momento
-            ->columnSpanFull()
-            ->extraAttributes([
-                // Forzamos un borde más oscuro y fondo claro para que resalte del contenedor de Legajos
-                'style' => '
-                    border: 2px solid #2e3032 !important; 
-                    border-radius: 12px !important; 
-                    background-color: #f9fafb !important;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
-                '
-            ])
-            ->schema([
-                Repeater::make('Documento')
-                ->relationship('Documentos')
-                ->hiddenLabel()
-                ->columnSpanFull()
-                ->addActionLabel('Adjuntar un Documento')
-                ->grid(3)
-                ->schema([
-                    Section::make()
-                    ->columns(1)
-                    ->schema([
-                        Grid::make(1)
-                        ->columnSpan(1)
-                        ->schema(Documento::getFromSchema(false, false)),
-                    ]),
-                ]),
-            ]),
-        ]);
+        ->components(Legajo::getFrontLegajoDocumentos('solo'));
     }
 }
 

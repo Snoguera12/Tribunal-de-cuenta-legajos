@@ -2,12 +2,8 @@
 
 namespace App\Filament\Resources\Historialbajas\Tables;
 
-use App\Models\Persona;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use App\Models\Historialbaja;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Select;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class HistorialbajasTable
@@ -15,43 +11,7 @@ class HistorialbajasTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->columns([
-                TextColumn::make('legajo.num_legajo')
-                    ->label("Número de legajo")
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('legajo.persona.nombre')
-                    ->label("Nombre")
-                    ->sortable()
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('legajo.persona.apellido')
-                    ->label("Apellido")
-                    ->sortable()
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('legajo.persona.dni')
-                    ->label("DNI")
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('motivo')
-                    ->label('Motivo de la baja')
-                    ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('fecha_baja')
-                    ->dateTime('d/m/Y H:i:s')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
-                /*
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                */
-            ])
+            ->columns(Historialbaja::getFormSchema())
             ->filters([
                 //
             ])

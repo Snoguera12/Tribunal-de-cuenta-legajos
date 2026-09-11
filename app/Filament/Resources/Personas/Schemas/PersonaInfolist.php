@@ -3,8 +3,14 @@
 namespace App\Filament\Resources\Personas\Schemas;
 
 use App\Filament\Resources\Personas\PersonaResource;
+use App\Models\AntecedenteLaboral;
+use App\Models\Curso;
+use App\Models\Documento;
+use App\Models\Familiar;
+use App\Models\Idioma;
 use App\Models\Legajo;
 use App\Models\Persona;
+use App\Models\Titulo;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -16,8 +22,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Facades\URL;
 
 class PersonaInfolist
 {
@@ -26,71 +30,44 @@ class PersonaInfolist
         return $schema
         ->components([
             Tabs::make('Tabs_base')
-            ->columns(2)
             ->columnSpanFull()
             ->tabs([
-                Tab::make('Tab 1')
+                Tab::make('Tab Persona')
                 ->label('Persona')
+                ->id('persona')
+                ->icon('heroicon-m-identification')
                 ->columns(4)
-                ->schema([
-                    TextEntry::make('nombre')->label('Nombre'),
-                         TextEntry::make('apellido')->label('Apellido'),
-                         TextEntry::make('dni')->label('DNI'),
-                         TextEntry::make('cuil')->label('CUIL'),
-                         TextEntry::make('email')
-                         ->label('Correo Electrónico')->placeholder('-'),
-                         TextEntry::make('genero')->label('Género'),
-                         TextEntry::make('estado_civil')->label('Estado Civil'),
-                         TextEntry::make('fecha_de_nacimiento')->date('d/m/Y'),
-                         TextEntry::make('domicilio')->placeholder('-'),
-                         TextEntry::make('telefono')
-                         ->label('Teléfono')->placeholder('-'),
-                         TextEntry::make('telefono_emergencia')
-                         ->label('Teléfono de Emergencia')->placeholder('-'),
-                ]),
-                Tab::make('Tab 2_')
-                ->label('Familiares')
-                ->schema([
-                    Section::make('Familiares')
-                    ->columnSpanFull()
-                    ->schema([
-                        RepeatableEntry::make('familiares')
-                        ->hiddenLabel()
-                        ->grid(2)
-                        ->columns(2)
-                        ->placeholder('No se adjuntó ningún Familiar.')
-                        ->extraAttributes([
-                            // Esto busca los elementos li internos con esa clase y les clava el borde negro grueso
-                            'style' => '--ring-color: transparent; border: 2px solid black !important; border-radius: 0.75rem;',
-                        ])
-                        ->schema([
-                            TextEntry::make('nombre')->label('Nombre'),
-                                 TextEntry::make('apellido')->label('Apellido'),
-                                 TextEntry::make('dni')->label('DNI'),
-                                 TextEntry::make('fecha_de_nacimiento')->label('Fecha de nacimiento')->date('d/m/Y'),
-                                 TextEntry::make('parentesco')->label('Parentesco'),
-                                 TextEntry::make('vive')->label('Estado Vital'),
+                ->schema(Persona::getOutSchema('list')),
 
-                        ]),
-                    ]),
+                Tab::make('Tab Familiares')
+                ->label('Familiares')
+                ->id('familiar')
+                ->icon('heroicon-m-users')
+                ->schema([
+                    RepeatableEntry::make('familiares')
+                    ->hiddenLabel()
+                    ->grid(2)
+                    ->columns(2)
+                    ->placeholder('No se adjuntó ningún Familiar.')
+                    ->schema(Familiar::getOutSchema('list')),
                 ]),
-                Tab::make('Tab 3_')
+
+                Tab::make('Tab Idiomas')
                 ->label('Idiomas')
+                ->id('idioma')
+                ->icon('heroicon-m-language')
                 ->schema([
                     Section::make('Idiomas')
-
                     ->schema([
                         RepeatableEntry::make('idiomas')
                         ->hiddenLabel()
                         ->placeholder('Sin idiomas registrados')
                         ->columns(2)
-                        ->schema([
-                            TextEntry::make('idioma')->label('Idioma'),
-                                 TextEntry::make('nivel')->label('Nivel'),
-                        ]),
+                        ->schema(Idioma::getOutSchema('list')),
                     ]),
                 ]),
-                Tab::make('Tab 2')
+
+                Tab::make('Tab Papeles')
                 ->label('Papeles')
                 ->icon('heroicon-m-folder-open')
                 ->columnSpanFull()
@@ -127,23 +104,8 @@ class PersonaInfolist
                             ->schema([
                                 Grid::make(3)
                                 ->columnSpan(1)
-                                ->schema([
-                                    TextEntry::make('num_legajo')->label('Número de legajo'),
-                                         TextEntry::make('fecha_de_ingreso')->label('Fecha de Ingreso'),
+                                ->schema(Legajo::getOutSchema('list')),
 
-                                         TextEntry::make('estado')
-                                         ->label('Estado')
-                                         ->icon(fn (Legajo $record) => $record->isAlta() ? Heroicon::CheckCircle : Heroicon::XCircle)
-                                         ->color(fn (Legajo $record) => $record->isAlta() ? 'success' : 'danger')
-                                         ->iconColor(fn (Legajo $record) => $record->isAlta() ? 'success' : 'danger')
-                                         ->placeholder('-'),
-
-                                         TextEntry::make('tipo_contrato')->label('Tipo de Contratación'),
-
-                                         TextEntry::make('area.nombre')->label('Área'),
-                                         TextEntry::make('categoria.nombre')->label('Categoría'),
-                                         TextEntry::make('cargo.nombre')->label('Cargo'),
-                                ]),
                                 Section::make('Documentos Adjuntos')
                                 ->columnSpan(1)
                                 ->extraAttributes([
@@ -163,37 +125,17 @@ class PersonaInfolist
                                     ->schema([
                                         Grid::make(2)
                                         ->columns(3)
-                                        ->schema([
-                                            TextEntry::make('descripcion')->label('Descripción'),
-                                            TextEntry::make('tipodoc')->label('Tipo'),
-                                            TextEntry::make('ruta')
-                                            ->label('Documento')
-                                            ->hiddenLabel()
-                                            ->bulleted()
-                                            ->icon('heroicon-o-document-arrow-down')
-                                            ->color('primary')
-                                            ->openUrlInNewTab()
-                                            ->url(function ($record): ?string {
-                                                if (!$record->ruta) return null;
-                                                
-                                                return URL::temporarySignedRoute(
-                                                    'documentos.ver',
-                                                    now()->addMinutes(5),
-                                                    [
-                                                        'path' => $record->ruta,
-                                                        'legajo_id' => $record->legajo_id,
-                                                    ]
-                                                );
-                                            }),
-                                        ]),
+                                        ->schema(Documento::getOutSchema('list')),
                                     ]),
                                 ])
                             ]),
                         ]),
                     ])
                 ]),
-                Tab::make('Tab 3')
-                ->label('Estudio/Título')
+                
+                Tab::make('Tab Estudio/Títulos')
+                ->label("Estudios/Títulos")
+                ->id('estudio')
                 ->icon('heroicon-m-academic-cap')
                 ->schema([
                     Section::make('Estudio Alcanzado')
@@ -214,26 +156,33 @@ class PersonaInfolist
                         }),
                     ])
                     ->schema([
-                        TextEntry::make('institucion')->label('Institución')->placeholder('-'),
-                             TextEntry::make('nivel_estudio')->label('Nivel de Estudio'),
-                             TextEntry::make('fecha_fin')->label('Fecha de Finalización')->placeholder('-')
-                             ->date('d/m/Y'),
-                             RepeatableEntry::make('titulos') // Nombre de la relación en tu modelo 'Estudio'
-                             ->label('Títulos Obtenidos')
-                             ->columnSpanFull() // Ocupa todo el ancho debajo de los campos anteriores
-                             ->placeholder('Sin títulos registrados para este estudio')
-                             ->grid(2) // Si tiene varios títulos, los muestra en 2 columnas
-                             ->schema([
-                                 TextEntry::make('nombre') // Campo 'nombre' de tu tabla de títulos
-                                 ->hiddenLabel() // Oculta la etiqueta repetitiva dentro de la cuadrícula
-                                 ->icon('heroicon-m-academic-cap') // Un ícono visual para el título
-                             ]),
+                        TextEntry::make('institucion')
+                        ->label('Institución')
+                        ->placeholder('-'),
+
+                        TextEntry::make('nivel_estudio')
+                        ->label('Nivel de Estudio'),
+
+                        TextEntry::make('fecha_fin')
+                        ->label('Fecha de Finalización')
+                        ->placeholder('-')
+                        ->date('d/m/Y'),
+                        
+                        RepeatableEntry::make('titulos') // Nombre de la relación en tu modelo 'Estudio'
+                        ->label('Títulos Obtenidos')
+                        ->columnSpanFull() // Ocupa todo el ancho debajo de los campos anteriores
+                        ->placeholder('Sin títulos registrados para este estudio')
+                        ->grid(2) // Si tiene varios títulos, los muestra en 2 columnas
+                        ->schema(Titulo::getOutSchema('list')),
 
                     ]),
 
                 ]),
-                Tab::make('Tab 4')
+
+                Tab::make('Tab Cursos')
                 ->label('Cursos')
+                ->id('curso')
+                ->icon('heroicon-m-book-open')
                 ->columnSpanFull()
                 ->schema([
                     Section::make('Cursos y Capacitaciones')
@@ -250,19 +199,14 @@ class PersonaInfolist
                         ->hiddenLabel()
                         ->placeholder('Sin cursos registrados')
                         ->columns(3)
-                        ->schema([
-                            TextEntry::make('nombre')->label('Curso'),
-                                 TextEntry::make('institucion')->label('Institución')->placeholder('-'),
-                                 TextEntry::make('duracion')->label('Duración')->placeholder('-'),
-                                 TextEntry::make('fecha')->label('Fecha')->placeholder('-')
-                                 ->date('d/m/Y'),
-                                 TextEntry::make('tiene_certificado')->label('Certificado')
-                                 ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No'),
-                        ]),
+                        ->schema(Curso::getOutSchema('list')),
                     ]),
                 ]),
-                Tab::make('Tab 5')
+
+                Tab::make('Tab Antecedentes Laborales')
                 ->label('Antecedentes Laborales')
+                ->id('antecedenteslaborales')
+                ->icon('heroicon-m-briefcase')
                 ->columnSpanFull()
                 ->schema([
                     Section::make('Antecedentes Laborales')
@@ -279,20 +223,14 @@ class PersonaInfolist
                         ->hiddenLabel()
                         ->placeholder('Sin antecedentes registrados')
                         ->columns(3)
-                        ->schema([
-                            TextEntry::make('empleador')->label('Empleador'),
-                                 TextEntry::make('lugar_de_trabajo')->label('Lugar de trabajo'),
-                                 TextEntry::make('cargo')->label('Cargo')->placeholder('-'),
-                                 TextEntry::make('fecha_inicio')->label('Fecha inicio')->placeholder('-')
-                                 ->date('d/m/Y'),
-                                 TextEntry::make('fecha_fin')->label('Fecha fin')->placeholder('-')
-                                 ->date('d/m/Y'),
-                                 TextEntry::make('motivo_egreso')->label('Motivo de egreso')->placeholder('-'),
-                        ]),
+                        ->schema(AntecedenteLaboral::getOutSchema('list')),
                     ]),
                 ]),
-                Tab::make('Tab 6')
+
+                Tab::make('Tab Usuario')
                 ->label('Usuario')
+                ->icon('heroicon-m-user-circle')
+                ->id('usuario')
                 ->columnSpanFull()
                 ->visible(auth()->user()->isAdmin_RRHH())
                 ->schema([

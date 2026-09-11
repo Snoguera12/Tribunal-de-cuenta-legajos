@@ -5,7 +5,6 @@ namespace App\Filament\Resources\Documentos\Schemas;
 use App\Models\Documento;
 use Filament\Schemas\Schema;
 
-
 class DocumentoForm
 {
     public static function configure(Schema $schema): Schema

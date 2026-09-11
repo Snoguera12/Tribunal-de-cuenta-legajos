@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 
 class Area extends Model
 {
@@ -21,8 +22,36 @@ class Area extends Model
     {
         return $this->hasMany(Legajo::class);
     }
-    public static function Opciones(): Collection
-    {
-        return self::selectRaw("id, nombre || ' ' || apellido || ' (DNI: ' || dni || ')' AS nombre_completo")->pluck('nombre_completo', 'id');
+    public static function getAreas() : array{
+        return Area::pluck('nombre', 'id')->toArray();
+    }
+    public static function getFormSchema() : array{
+        $resultado = [
+            TextInput::make('nombre')
+            ->label('Nombre del Área')
+            ->required()
+            ->validationMessages([
+                "required" => "Requiere introducir el Nombre del Área.",
+            ])
+            ->extraInputAttributes([
+                'oninvalid' => "this.setCustomValidity('Requiere introducir el Nombre del Área.')",
+                'oninput' => "this.setCustomValidity('')",
+            ]),
+        ];
+        return $resultado;
+    }
+    public static function getOutSchema() : array{
+        $resultado = [
+            TextColumn::make('nombre')
+            ->label('Nombre del Área')
+            ->sortable()
+            ->searchable(),
+
+            TextColumn::make('legajos_count')
+            ->label('Empleados Asociados')
+            ->counts('legajos')
+            ->sortable(),
+        ];
+        return $resultado;
     }
 }

@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Hash;
 use Database\Factories\UserFactory;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Columns\TextColumn;
-use Hash;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -29,8 +30,8 @@ class User extends Authenticatable
         'rol',
         'persona_id',
     ];
-    public function persona(){
-        return $this->belongsTo(Persona::class, 'persona_id');
+    public function persona() : HasOne{
+        return $this->hasOne(Persona::class, 'persona_id');
     }
     /**
      * The attributes that should be hidden for serialization.

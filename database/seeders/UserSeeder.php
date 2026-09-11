@@ -51,13 +51,5 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
             'persona_id' => NULL,
         ]);
-        User::factory()->create([
-            'name' => 'Mario',
-            'email' => 'mariosantos1@gmail.com',
-            'password' => Hash::make('123456'),
-            'rol' => 'empleado',
-            'email_verified_at' => now(),
-            'persona_id' => 15,
-        ]);
     }
 }

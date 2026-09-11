@@ -43,8 +43,8 @@ class CargoResource extends Resource
     {
         return [
             'index' => ListCargos::route('/'),
-            'create' => CreateCargo::route('/create'),
-            'edit' => EditCargo::route('/{record}/edit'),
+            //'create' => CreateCargo::route('/crear'),
+            //'edit' => EditCargo::route('/{record}/editar'),
         ];
     }
 }

@@ -43,8 +43,8 @@ class TituloResource extends Resource
     {
         return [
             'index' => ListTitulos::route('/'),
-            'create' => CreateTitulo::route('/create'),
-            'edit' => EditTitulo::route('/{record}/edit'),
+            //'create' => CreateTitulo::route('/crear'),
+            //'edit' => EditTitulo::route('/{record}/editar'),
         ];
     }
 }

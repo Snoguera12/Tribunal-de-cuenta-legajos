@@ -44,8 +44,8 @@ class AreaResource extends Resource
     {
         return [
             'index' => ListAreas::route('/'),
-            'create' => CreateArea::route('/añadir'),
-            'edit' => EditArea::route('/{record}/editar'),
+            //'create' => CreateArea::route('/añadir'),
+            //'edit' => EditArea::route('/{record}/editar'),
         ];
     }
 }

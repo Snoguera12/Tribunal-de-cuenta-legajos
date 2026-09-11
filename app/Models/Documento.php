@@ -6,6 +6,7 @@ use App\Enums\TipodocEnum;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
@@ -157,23 +158,35 @@ class Documento extends Model
                 ->openUrlInNewTab()
                 ->toggleable(isToggledHiddenByDefault: false),
             ],
-            'folist' => [],
+            'list' => [
+                TextEntry::make('descripcion')
+                ->label('Descripción'),
+
+                TextEntry::make('tipodoc')
+                ->label('Tipo'),
+
+                TextEntry::make('ruta')
+                ->label('Documento')
+                ->hiddenLabel()
+                ->bulleted()
+                ->icon('heroicon-o-document-arrow-down')
+                ->color('primary')
+                ->openUrlInNewTab()
+                ->url(function ($record): ?string {
+                    if (!$record->ruta) return null;
+                    
+                    return URL::temporarySignedRoute(
+                        'documentos.ver',
+                        now()->addMinutes(5),
+                        [
+                            'path' => $record->ruta,
+                            'legajo_id' => $record->legajo_id,
+                        ]
+                    );
+                }),
+            ],
         };
 
         return $resultado;
-    }
-    protected static function booted()
-    {
-        static::creating(function (Documento $documento) {
-            $ruta = storage_path('app/private/documentos/' . $documento->archivo);
-
-            if (file_exists($ruta)) {
-                $mime = mime_content_type($ruta);
-
-                if (! in_array($mime, ['application/pdf', 'image/jpeg'], true)) {
-                    throw new \Exception('El archivo subido no es un PDF ni una imagen JPG/JPEG válida.');
-                }
-            }
-        });
     }
 }

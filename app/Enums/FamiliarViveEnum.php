@@ -6,14 +6,14 @@ use Filament\Support\Contracts\HasLabel;
 
 enum FamiliarViveEnum: int implements HasLabel
 {
-    case Fallecido = 0;
-    case Vivo = 1;
+    case Vivo = 0;
+    case Fallecido = 1;
 
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::Fallecido => 'Fallecido',
             self::Vivo => 'Vivo',
+            self::Fallecido => 'Fallecido',
         };
     }
 }

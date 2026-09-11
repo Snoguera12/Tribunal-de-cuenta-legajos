@@ -10,7 +10,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Enums\RecordActionsPosition;
@@ -21,73 +20,7 @@ class LegajosTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->columns([
-                TextColumn::make('num_legajo')->label('Número')
-                ->sortable()
-                ->searchable()
-                ->toggleable(isToggledHiddenByDefault: false),
-
-                TextColumn::make('persona.nombre')->label("Nombre")
-                ->sortable()
-                ->searchable()
-                ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('persona.apellido')->label("Apellido")
-                ->sortable()
-                ->searchable()
-                ->toggleable(isToggledHiddenByDefault: false),
-
-                TextColumn::make('persona.dni')->label("DNI")
-                ->sortable()
-                ->searchable()
-                ->toggleable(isToggledHiddenByDefault: false),
-
-                TextColumn::make('persona.nivel_estudio') // O el campo exacto donde guardes el título
-                    ->label('Títulos / Estudios')
-                    ->sortable()
-                    ->searchable()
-                    ->placeholder('Sin registrar') // Si está vacío, muestra esto de forma prolija
-                    ->toggleable(isToggledHiddenByDefault: false),
-
-                TextColumn::make('estado')
-                ->icon(fn (Legajo $legajo) => $legajo->getIcon())
-                ->color(fn (Legajo $legajo) => $legajo->getColor())
-                ->iconColor(fn (Legajo $legajo) => $legajo->getColor())
-                ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('tipo_contrato')->label('Tipo de Contratación')
-                ->toggleable(isToggledHiddenByDefault: false),
-
-                TextColumn::make('area.nombre')->label("Área")
-                ->sortable()
-                ->toggleable(isToggledHiddenByDefault: false),
-
-                TextColumn::make('cargo.nombre')
-                ->sortable()
-                ->toggleable(isToggledHiddenByDefault: false),
-
-                TextColumn::make('categoria.id')
-                ->label("Categoría")
-                ->sortable()
-                ->formatStateUsing(fn ($record) => $record->categoria ? "{$record->categoria->nombre} {$record->categoria->descripcion}" : 'Sin asignar')
-                ->toggleable(isToggledHiddenByDefault: false),
-
-                TextColumn::make('fecha_de_ingreso')
-                ->dateTime('d/m/Y H:i:s')
-                ->sortable()
-                ->toggleable(isToggledHiddenByDefault: true),
-
-                /*TextColumn::make('created_at')
-                ->label("Fecha de Creación")
-                ->dateTime('d/m/Y H:i:s')
-                ->sortable()
-                ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('updated_at')->label("Fecha de Actualizado")
-                ->dateTime('d/m/Y H:i:s')
-                ->sortable()
-                ->toggleable(isToggledHiddenByDefault: true),*/
-            ])
+            ->columns(Legajo::getOutSchema('table'))
             ->filters([
                 Filter::make('fecha_de_ingreso')
                 ->form([
@@ -107,33 +40,38 @@ class LegajosTable
                         );
                     }
                 ),
-                SelectFilter::make('cargo_id')->label('Cargo')
-                ->options(Cargo::all()->pluck('nombre', 'id')),
-                SelectFilter::make('estado')->label('Estado')
+                
+                SelectFilter::make('cargo_id')
+                ->label('Cargo')
+                ->options(Cargo::getCargos()),
+                
+                SelectFilter::make('estado')
+                ->label('Estado')
                 ->options(EstadoLegajoEnum::class)
                 ->default(true),
             ])
             ->recordActions([
                 // Botón "Ver"
                 ViewAction::make()
-                    ->label('Ver')
-                    ->iconButton()
-                    ->color('success')
-                    ->icon('heroicon-m-eye'),
+                ->label('Ver')
+                ->iconButton()
+                ->color('success')
+                ->icon('heroicon-m-eye'),
 
                 // Botón "Editar"
                 EditAction::make()
-                    ->label('Editar')
-                    ->iconButton()
-                    ->color('primary')
-                    ->icon('heroicon-m-pencil-square'),
+                ->label('Editar')
+                ->iconButton()
+                ->color('primary')
+                ->icon('heroicon-m-pencil-square'),
 
                 // Tu botón personalizado de baja se mantiene igual
                 MotivoBajaAction::make()
-                    ->label('Dar de Baja')
-                    ->iconButton()
-                    ->color('danger')
-                    ->icon('heroicon-m-trash'),
-            ], position: RecordActionsPosition::AfterColumns);
+                ->label('Dar de Baja')
+                ->iconButton()
+                ->color('danger')
+                ->icon('heroicon-m-arrow-down'),
+            ], position: RecordActionsPosition::AfterColumns
+            );
     }
 }
