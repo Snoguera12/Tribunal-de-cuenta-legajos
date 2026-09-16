@@ -58,5 +58,3 @@ Nuestro aporte incluye:
 - Adjuntar archivos PDF/JPG.  
 - Buscar legajos por atributos (Nº, Nombre, DNI, cargo).  
 
-
-
