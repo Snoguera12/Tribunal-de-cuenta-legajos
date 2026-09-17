@@ -39,7 +39,7 @@ class Documento extends Model
             ->label('Número de legajo')
             ->searchable()
             ->columns(1)
-            ->options(Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')->selectRaw("legajos.id, CONCAT('Legajo: ', ' ',legajos.num_legajo, ' (', personas.nombre, ' ', personas.apellido, ' - DNI: ', personas.dni, ')') as nombre_completo")->pluck('nombre_completo', 'id'))
+            ->options(Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')->selectRaw("legajos.id, 'Legajo: ' || legajos.num_legajo || ' (' || personas.nombre || ' ' || personas.apellido || ' - DNI: ' || personas.dni || ')' as nombre_completo")->pluck('nombre_completo', 'id'))
             ->validationMessages([
                 'required' => 'Requiere asociar a un Legajo.',
             ])
@@ -87,7 +87,7 @@ class Documento extends Model
                 ->label('Número de legajo')
                 ->visible($adjunto_legajo)
                 ->searchable()
-                ->options(Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')->selectRaw("legajos.id, CONCAT('Legajo: ', ' ',legajos.num_legajo, ' (', personas.nombre, ' ', personas.apellido, ' - DNI: ', personas.dni, ')') as nombre_completo")->pluck('nombre_completo', 'id'))
+                ->options(Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')->selectRaw("legajos.id, 'Legajo: ' || legajos.num_legajo || ' (' || personas.nombre || ' ' || personas.apellido || ' - DNI: ' || personas.dni || ')' as nombre_completo")->pluck('nombre_completo', 'id'))
                 ->validationMessages([
                     'required' => 'Requiere asociar a un Legajo.',
                 ])

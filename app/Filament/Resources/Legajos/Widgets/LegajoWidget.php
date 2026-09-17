@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Legajos\Widgets;
 
 use App\Models\Legajo;
+use App\Models\Documento;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -18,6 +19,7 @@ class LegajoWidget extends StatsOverviewWidget
         $total = Legajo::query()->count();
         $alta = Legajo::query()->where('estado', true)->count();
         $baja = Legajo::query()->where('estado', false)->count();
+        $documentosPendientes = Documento::query()->whereNull('legajo_id')->count();
 
         $porcentajeAltas = $total > 0 ? round(($alta / $total) * 100) : 0;
         $porcentajeBajas = $total > 0 ? round(($baja / $total) * 100) : 0;
@@ -35,7 +37,13 @@ class LegajoWidget extends StatsOverviewWidget
             Stat::make('De Baja', $baja)
             ->description("Legajos de baja. {$porcentajeBajas}% del total.")
             ->descriptionIcon('heroicon-m-x-circle')
-            ->color('danger')
+            ->color('danger'),
+
+            Stat::make('Documentos Pendientes', $documentosPendientes)
+            ->description('Documentos subidos sin asignar a un legajo.')
+            ->descriptionIcon('heroicon-m-document-magnifying-glass')
+            ->color($documentosPendientes > 0 ? 'warning' : 'success')
+            ->url(route('filament.legajos.resources.documentos.revisar')),
         ];
     }
 }
