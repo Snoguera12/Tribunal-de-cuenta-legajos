@@ -139,7 +139,7 @@ class LegajoFormPortAction extends Action
                             ->directory('documentos')
                             ->visibility('private')
                             ->acceptedFileTypes(['application/pdf', 'image/jpeg'])
-                            ->rules(['mimes:pdf,jpg,jpeg'])
+                            ->rules([new \App\Rules\ArchivoPdfOJpeg()])
                             ->maxSize(10240)
                             ->required(),
                         ]),

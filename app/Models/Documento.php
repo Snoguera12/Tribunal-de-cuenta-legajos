@@ -77,7 +77,7 @@ class Documento extends Model
                 ->maxSize(10240)
                 ->openable()
                 ->acceptedFileTypes(['application/pdf', 'image/jpeg'])
-                ->rules(['mimes:pdf,jpg,jpeg'])
+                ->rules([new \App\Rules\ArchivoPdfOJpeg()])
                 ->validationMessages(['required' => 'Debe subir un archivo válido.'])
                 ->required(),
             ];
@@ -116,7 +116,7 @@ class Documento extends Model
                 ->directory('documentos/')
                 ->maxSize(10240)
                 ->acceptedFileTypes(['application/pdf', 'image/jpeg'])
-                ->rules(['mimes:pdf,jpg,jpeg'])
+                ->rules([new \App\Rules\ArchivoPdfOJpeg()])
                 ->validationMessages(['required' => 'Debe subir un archivo válido.'])
                 ->required()
                 ->deletable(false),

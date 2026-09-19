@@ -43,6 +43,13 @@ class SubirDocumentos extends Page implements HasForms
                 ->directory('documentos') // subdirectorio dentro del disk
                 ->disk('local') // o el disk que uses
                 ->visibility('private')
+                ->maxSize(10240)
+                ->acceptedFileTypes(['application/pdf', 'image/jpeg'])
+                ->rules([new \App\Rules\ArchivoPdfOJpeg()])
+                ->validationMessages([
+                    'mimes' => 'Solo se permiten archivos PDF, JPG o JPEG.',
+                    'max' => 'El archivo no puede superar los 10 MB.',
+                ])
                 //->preserveFilenames()
                 ->required(),
             ])

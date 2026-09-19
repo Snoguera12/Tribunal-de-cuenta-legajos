@@ -135,10 +135,11 @@ class LegajoFormPortAction extends Action
                                         Grid::make(1)
                                             ->schema([
                                                 FileUpload::make('archivo')->label('Documento Adjunto')
-                                                    ->disk('public')
+                                                    ->disk('local')
                                                     ->directory('documentos/')
-                                                    ->visibility('public')
-                                                    ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                                    ->visibility('private')
+                                                    ->acceptedFileTypes(['application/pdf', 'image/jpeg'])
+                                                    ->rules([new \App\Rules\ArchivoPdfOJpeg()])
                                                     ->maxSize(10240)
                                                     ->required(),
                                             ]),
