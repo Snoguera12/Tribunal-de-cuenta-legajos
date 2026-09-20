@@ -6,12 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Algunas instalaciones del proyecto tienen la tabla "documentos" creada
-     * sin la columna "ruta" (quedó desincronizada respecto de la migración
-     * original create_documentos_table). Esta migración la agrega si falta,
-     * sin tocar ni borrar ninguna otra columna ni ningún otro dato.
-     */
+    // agrega la columna ruta si no esta (en algunas bases faltaba)
     public function up(): void
     {
         if (!Schema::hasColumn('documentos', 'ruta')) {

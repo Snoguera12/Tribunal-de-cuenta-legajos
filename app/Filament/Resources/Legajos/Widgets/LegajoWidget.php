@@ -19,7 +19,9 @@ class LegajoWidget extends StatsOverviewWidget
         $total = Legajo::query()->count();
         $alta = Legajo::query()->where('estado', true)->count();
         $baja = Legajo::query()->where('estado', false)->count();
+        // cuenta documentos que no tienen legajo asignado todavia
         $documentosPendientes = Documento::query()->whereNull('legajo_id')->count();
+
 
         $porcentajeAltas = $total > 0 ? round(($alta / $total) * 100) : 0;
         $porcentajeBajas = $total > 0 ? round(($baja / $total) * 100) : 0;

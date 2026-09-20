@@ -1,5 +1,4 @@
 <?php
-use App\Models\Legajo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -23,20 +22,11 @@ Route::get('/{path}', function (Request $request, string $path) {
         abort(403, 'El enlace sea ha expirado.');
     }
 
-    $legajoId = $request->route('legajo_id') ?? $request->query('legajo_id');
-    $legajo = Legajo::select('id', 'persona_id')->find($legajoId);
     $usuario = auth()->user();
-    if (!$usuario->isStaffRoles()){
-        // Si NO es staff, obligatoriamente ambos deben tener una persona asignada (no ser null) 
-        // Y además, esa persona_id debe coincidir exactamente.
-        $tieneMismaPersona = 
-        !is_null($usuario->persona_id) 
-        && !is_null($legajo->persona_id) 
-        && $usuario->persona_id === $legajo->persona_id;
-        
-        if (!$tieneMismaPersona) {
-            abort(403, 'No tienes autorización para ver este documento de esta persona.');
-        }
+
+    // el empleado ve que existe el doc pero no lo puede bajar
+    if ($usuario->isEmpleado()) {
+        abort(403, 'Tu rol no tiene permitido descargar documentos. Contactá a RRHH.');
     }
 
     if (!Storage::disk('local')->exists($path)) {

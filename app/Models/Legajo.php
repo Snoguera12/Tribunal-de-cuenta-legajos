@@ -16,10 +16,26 @@ use Filament\Schemas\Components\Section;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 
 class Legajo extends Model
 {
+    use SoftDeletes; // borrado suave
+    use LogsActivity; // registro de cambios
+
+    // que campos guarda en el historial
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['num_legajo', 'estado', 'fecha_de_ingreso', 'tipo_contrato', 'categoria_id', 'cargo_id', 'area_id'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('legajos');
+    }
+
     protected $attributes = [
         "estado" => true,
     ];

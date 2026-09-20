@@ -12,10 +12,26 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Persona extends Model
 {
+    use SoftDeletes; // no borra de verdad, solo marca
+    use LogsActivity; // guarda quien cambio que
+
+    // que campos guarda en el historial
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['nombre', 'apellido', 'dni', 'cuil', 'email', 'domicilio', 'telefono', 'telefono_emergencia', 'estado_civil'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('personas');
+    }
+
     protected $casts = [
         'genero' => GeneroEnum::class,
         'estado_civil' => EstadoCivilEnum::class,

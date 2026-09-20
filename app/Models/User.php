@@ -143,6 +143,8 @@ class User extends Authenticatable
                 'funcionario' => 'Funcionario',
                 'rrhh' => 'RRHH (Recursos Humanos)',
             ])
+            // -mejor seguridad- nunca se puede mandar "administrador" aca
+            ->rule('in:empleado,funcionario,rrhh')
             ->required(),
 
             Select::make("persona_id")->label("Persona")

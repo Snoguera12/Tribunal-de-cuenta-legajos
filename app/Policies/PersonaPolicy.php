@@ -14,7 +14,7 @@ class PersonaPolicy
 
     public function view(User $user, Persona $persona): bool
     {
-        if ($user->isAdmin() || $user->isRRHH()) {
+        if ($user->isAdmin() || $user->isRRHH() || $user->isFuncionario()) {
             return true;
         }
 

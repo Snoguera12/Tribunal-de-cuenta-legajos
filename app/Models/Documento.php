@@ -10,10 +10,25 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\URL;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Documento extends Model
 {
+    use SoftDeletes;
+    use LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['descripcion', 'tipodoc', 'legajo_id'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('documentos');
+    }
+
     protected $casts = [
         'tipodoc' => TipodocEnum::class,
     ];
@@ -82,12 +97,30 @@ class Documento extends Model
                 ->required(),
             ];
         } else{
+            $esEmpleado = auth()->user()?->isEmpleado() ?? false;
+
             $resultado = [
                 Select::make('legajo_id')
                 ->label('Número de legajo')
                 ->visible($adjunto_legajo)
-                ->searchable()
-                ->options(Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')->selectRaw("legajos.id, 'Legajo: ' || legajos.num_legajo || ' (' || personas.nombre || ' ' || personas.apellido || ' - DNI: ' || personas.dni || ')' as nombre_completo")->pluck('nombre_completo', 'id'))
+                // el empleado solo ve su legajo, los demas ven todos
+                ->options(function () use ($esEmpleado) {
+                    $query = Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')
+                        ->selectRaw("legajos.id, 'Legajo: ' || legajos.num_legajo || ' (' || personas.nombre || ' ' || personas.apellido || ' - DNI: ' || personas.dni || ')' as nombre_completo");
+
+                    if ($esEmpleado) {
+                        $query->where('legajos.persona_id', auth()->user()->persona_id);
+                    }
+
+                    return $query->pluck('nombre_completo', 'id');
+                })
+                ->default(fn () => $esEmpleado
+                    ? Legajo::where('persona_id', auth()->user()->persona_id)->value('id')
+                    : null)
+                ->disabled($esEmpleado)
+                // dehydrated para que mande el valor aunque este disabled
+                ->dehydrated(true)
+                ->searchable(! $esEmpleado)
                 ->validationMessages([
                     'required' => 'Requiere asociar a un Legajo.',
                 ])
@@ -136,8 +169,14 @@ class Documento extends Model
 
                 TextColumn::make('ruta')
                 ->label('Documento')
-                //->formatStateUsing(fn () => 'Abrir Archivo')
+                ->formatStateUsing(fn ($record) => auth()->user()->isEmpleado()
+                    ? 'Documento cargado (sin acceso de descarga)'
+                    : 'Abrir archivo')
                 ->url(function ($record): ?string {
+                    // el empleado ve que existe pero no lo puede bajar
+                    if (auth()->user()->isEmpleado()) {
+                        return null;
+                    }
                     if (!$record->ruta) return null;
                     
                     return URL::temporarySignedRoute(
@@ -171,8 +210,14 @@ class Documento extends Model
                 ->bulleted()
                 ->icon('heroicon-o-document-arrow-down')
                 ->color('primary')
+                ->formatStateUsing(fn ($record) => auth()->user()->isEmpleado()
+                    ? 'Documento cargado (sin acceso de descarga)'
+                    : ($record->ruta ?? '—'))
                 ->openUrlInNewTab()
                 ->url(function ($record): ?string {
+                    if (auth()->user()->isEmpleado()) {
+                        return null;
+                    }
                     if (!$record->ruta) return null;
                     
                     return URL::temporarySignedRoute(

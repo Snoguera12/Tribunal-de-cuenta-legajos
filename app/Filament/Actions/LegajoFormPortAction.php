@@ -134,6 +134,7 @@ class LegajoFormPortAction extends Action
                                             ]),
                                         Grid::make(1)
                                             ->schema([
+                                                // solo pdf o jpg, y privado (no publico)
                                                 FileUpload::make('archivo')->label('Documento Adjunto')
                                                     ->disk('local')
                                                     ->directory('documentos/')
@@ -142,6 +143,7 @@ class LegajoFormPortAction extends Action
                                                     ->rules([new \App\Rules\ArchivoPdfOJpeg()])
                                                     ->maxSize(10240)
                                                     ->required(),
+
                                             ]),
                                     ])
                             ]),

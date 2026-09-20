@@ -14,9 +14,7 @@ class PersonaTotalWidget extends StatsOverviewWidget
     }
     protected function getStats(): array
     {
-        // Agrupamos por mes en PHP (no en SQL) para que funcione igual en
-        // SQLite, MySQL o cualquier otro motor. DATE_FORMAT() es exclusivo
-        // de MySQL/MariaDB y rompe en SQLite con "no such function".
+        // agrupa por mes en php, asi funciona en sqlite y mysql
         $porMes = Persona::query()
             ->whereYear('created_at', now()->year)
             ->pluck('created_at')

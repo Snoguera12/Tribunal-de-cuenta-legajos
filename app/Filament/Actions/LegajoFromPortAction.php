@@ -134,6 +134,7 @@ class LegajoFormPortAction extends Action
                         ]),
                         Grid::make(1)
                         ->schema([
+                            // solo pdf o jpg, privado
                             FileUpload::make('archivo')->label('Documento Adjunto')
                             ->disk('documentos_privado')
                             ->directory('documentos')

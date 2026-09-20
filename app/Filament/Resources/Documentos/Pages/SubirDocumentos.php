@@ -45,7 +45,7 @@ class SubirDocumentos extends Page implements HasForms
                 ->visibility('private')
                 ->maxSize(10240)
                 ->acceptedFileTypes(['application/pdf', 'image/jpeg'])
-                ->rules([new \App\Rules\ArchivoPdfOJpeg()])
+                ->rules([new \App\Rules\ArchivoPdfOJpeg()]) // chequea que sea pdf o jpg de verdad
                 ->validationMessages([
                     'mimes' => 'Solo se permiten archivos PDF, JPG o JPEG.',
                     'max' => 'El archivo no puede superar los 10 MB.',

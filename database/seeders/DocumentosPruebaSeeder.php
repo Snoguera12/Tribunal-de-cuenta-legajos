@@ -8,26 +8,8 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-/**
- * Carga, para CADA legajo existente, los 5 documentos de prueba generados
- * (DNI, Licencia por enfermedad, Historial laboral, Título de carrera y un
- * documento de texto libre), tomando para cada uno al azar UNO de los 3
- * formatos disponibles (PDF, JPG o JPEG).
- *
- * El documento "texto libre" no representa un tipo fijo del ABM: se le
- * asigna al azar uno de los tipos restantes (Acta de Nacimiento, Cursos,
- * Certificado de Escolaridad, Certificado de Defunción, Certificado de
- * Casamiento, Sumario, Resolución, Foto de Perfil u Otro), para dejar
- * cargada variedad de tipos de documento en el sistema.
- *
- * Requiere que los 15 archivos de plantilla (5 documentos x 3 formatos)
- * estén dentro de database/seeders/documentos_prueba/.
- *
- * Los archivos quedan guardados físicamente en storage/app/private/documentos/
- * (el mismo disco/carpeta que usa el formulario real de subida), así que se
- * pueden abrir y descargar desde el panel exactamente igual que un archivo
- * subido a mano.
- */
+// le pone 5 documentos de prueba a cada legajo (dni, licencia, historial, titulo y uno de texto)
+// los archivos deben estar en database/seeders/documentos_prueba/
 class DocumentosPruebaSeeder extends Seeder
 {
     private string $origenDir;
@@ -46,7 +28,7 @@ class DocumentosPruebaSeeder extends Seeder
 
         $formatos = ['pdf', 'jpg', 'jpeg'];
 
-        // [nombre_base_del_archivo, tipodoc_fijo (null = aleatorio), descripción]
+        // nombre archivo, tipo fijo (null es al azar), descripcion
         $plantillas = [
             ['01_dni_prueba', 0, 'DNI (documento de prueba)'],
             ['02_licencia_por_enfermedad', 3, 'Licencia por enfermedad (documento de prueba)'],
@@ -55,8 +37,9 @@ class DocumentosPruebaSeeder extends Seeder
             ['05_documento_texto_libre', null, 'Documento de prueba'],
         ];
 
-        // Tipos "restantes" del ABM (sin contar DNI, Título, Licencia y Curriculum,
-        // ya usados arriba) para repartir entre el documento de texto libre.
+        // los otros tipos que quedan, para el doc de texto libre
+
+
         $tiposRestantes = [
             2 => 'Cursos', 4 => 'Acta de Nacimiento', 5 => 'Certificado de Escolaridad',
             6 => 'Certificado Defunción', 7 => 'Certificado de Casamiento', 8 => 'Sumario',
