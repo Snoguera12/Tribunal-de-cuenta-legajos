@@ -51,6 +51,7 @@ class PersonaForm
                     ->collapsible()
                     ->grid(2)
                     ->itemLabel("Añadir un Familar")
+                    ->defaultItems(0)
                     ->addActionLabel('Agregar otro Familiar')
                     ->addAction(
                         fn (Action $action) => $action
@@ -75,6 +76,7 @@ class PersonaForm
                     ->columnSpanFull()
                     ->addActionLabel('Añadir otro Idioma')
                     ->itemLabel('Idioma Adjuntado')
+                    ->defaultItems(0)
                     ->collapsible()
                     ->grid(3) // Mantiene tus dos columnas de documentos lado a lado
                     ->schema([
@@ -95,6 +97,7 @@ class PersonaForm
                     ->hiddenLabel()
                     ->columnSpanFull()
                     ->collapsible() // Permite encoger legajos antiguos para mantener orden visual
+                    ->defaultItems(0)
                     ->addActionLabel('Añadir un Legajo')
                     ->itemLabel(
                         fn (array $state): ?string => ($state['num_legajo'] ?? null) ? "Legajo N° " . $state['num_legajo']: 'Nuevo Registro de Legajo' 
@@ -136,25 +139,26 @@ class PersonaForm
 
                         Section::make('Títulos Obtenidos')
                         ->compact()
+                        ->collapsible()
                         ->visible(fn (Get $get) => Estudio::requiereTitulo($get('nivel_estudio')))
                         ->extraAttributes([
-                                // Forzamos un borde más oscuro y fondo claro para que resalte del contenedor de Legajos
-                                'style' => '
-                                    border: 2px solid #b4b4b4 !important; 
-                                    border-radius: 12px !important; 
-                                    background-color: #f9fafb !important;
-                                    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
-                                '
-                            ])
+                            // Forzamos un borde más oscuro y fondo claro para que resalte del contenedor de Legajos
+                            'style' => '
+                                border: 2px solid #b4b4b4 !important; 
+                                border-radius: 12px !important; 
+                                background-color: #f9fafb !important;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+                            '
+                        ])
                         ->schema([
                             Repeater::make('titulos')
                             ->relationship('titulos') 
                             ->addActionLabel('Añadir un Título')
-                            ->hiddenLabel()
                             ->itemLabel('Nuevo Registro de Título')
+                            ->hiddenLabel()
                             ->collapsible()
                             ->grid(3)
-                            ->schema(Titulo::getFormSchema(false))
+                            ->schema(Titulo::getFormSchema('list'))
                         ])
                     ]),
                 ]),
@@ -169,6 +173,7 @@ class PersonaForm
                     ->hiddenLabel()
                     ->columnSpanFull()
                     ->columns(3)
+                    ->defaultItems(0)
                     ->addActionLabel('Agregar otro Curso')
                     ->addAction(
                         fn (Action $action) => $action
@@ -187,6 +192,7 @@ class PersonaForm
                     Repeater::make('Laboral')->relationship('antecedentesLaborales')
                     ->hiddenLabel()
                     ->columnSpanFull()
+                    ->defaultItems(0)
                     ->addActionLabel('Añadir antecedente laboral')
                     ->addAction(
                         fn (Action $action) => $action
@@ -204,14 +210,8 @@ class PersonaForm
                 ->columnSpanFull()
                 ->visible(auth()->user()->isAdmin_RRHH())
                 ->schema([
-                    Section::make('Usuario')
-                    ->columnSpanFull()
-                    ->relationship('Usuario')
-                    ->columns(2)
-                    ->schema([
-                        // Esos tres puntos se llama operador de propagación (spread operator)
-                        ...User::getFormSchema(false)
-                    ]), 
+                    // Esos tres puntos se llama operador de propagación (spread operator)
+                    ...User::getFormSchema(false)
                 ]),
 
             ]),

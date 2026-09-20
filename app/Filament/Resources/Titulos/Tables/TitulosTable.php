@@ -16,12 +16,13 @@ class TitulosTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                ->iconButton()
+                ->color('primary')
+                ->icon('heroicon-m-pencil-square'),
             ])
             ->toolbarActions([
-                /*BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),*/
+                //
             ]);
     }
 }

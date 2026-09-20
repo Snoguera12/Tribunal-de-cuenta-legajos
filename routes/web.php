@@ -5,13 +5,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 
-Route::get('/', function () {
-    return redirect('legajos');
-});
+Route::get('/', fn () => redirect('legajos'));
 
-Route::get('/login', function () {
-    return redirect()->to('/legajos/login');
-})->name('login');
+Route::get('/login', fn () => redirect()->to('/legajos/login'))->name('login');
 
 // Dirección de documentos
 Route::get('/{path}', function (Request $request, string $path) {
@@ -30,9 +26,9 @@ Route::get('/{path}', function (Request $request, string $path) {
         // Si NO es staff, obligatoriamente ambos deben tener una persona asignada (no ser null) 
         // Y además, esa persona_id debe coincidir exactamente.
         $tieneMismaPersona = 
-        !is_null($usuario->persona_id) 
-        && !is_null($legajo->persona_id) 
-        && $usuario->persona_id === $legajo->persona_id;
+        isset($usuario->persona_id) &&
+        isset($legajo->persona_id) &&
+        $usuario->persona_id === $legajo->persona_id;
         
         if (!$tieneMismaPersona) {
             abort(403, 'No tienes autorización para ver este documento de esta persona.');

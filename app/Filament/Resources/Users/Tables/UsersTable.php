@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Users\Tables;
 
 use App\Models\User;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
 
@@ -15,12 +16,15 @@ class UsersTable
             ->filters([
                 //
             ])
+            ->actions([
+                
+            ])
             ->recordActions([
                 EditAction::make()
-                    ->label('Editar')
-                    ->iconButton()
-                    ->color('primary')
-                    ->icon('heroicon-m-pencil-square'),
+                ->label('Editar')
+                ->iconButton()
+                ->color('primary')
+                ->icon('heroicon-m-pencil-square'),
             ])
             ->toolbarActions([
                 /*BulkActionGroup::make([

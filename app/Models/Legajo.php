@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\EstadoLegajoEnum;
 use App\Enums\TipoContratoEnum;
+use App\Models\Helpers\PersonaHelper;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
@@ -76,7 +77,7 @@ class Legajo extends Model
             ->required()
             ->searchable()
             ->visible($visible_persona_id)
-            ->options(Persona::getPersonas())
+            ->options(PersonaHelper::getPersonas())
             ->default(fn () => request()->query('persona_id'))
             ->disabled(fn () => request()->has('persona_id')) // Opcional: deshabilita el campo si ya viene en la URL
             ->dehydrated() // Obligatorio si usas disabled(), para que guarde el valor en la base de datos
@@ -288,12 +289,14 @@ class Legajo extends Model
             ])
             ->schema([
                 Repeater::make('Documento')
+                ->label('Documentos')
                 ->relationship('Documentos')
+                ->addActionLabel('Adjuntar un Documento')
+                ->itemLabel('Nuevo Documento')
                 ->hiddenLabel()
                 ->columnSpanFull()
                 ->collapsible()
-                ->addActionLabel('Adjuntar un Documento')
-                ->itemLabel('Nuevo Documento')
+                ->defaultItems(0)
                 ->grid(3) // Mantiene tus dos columnas de documentos lado a lado
                 ->schema([
                     // SOLUCIÓN NATIVA: Usamos un Fieldset o una Section interna. 

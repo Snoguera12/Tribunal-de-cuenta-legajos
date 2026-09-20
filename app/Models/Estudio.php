@@ -16,13 +16,18 @@ class Estudio extends Model
         'nivel_estudio' => NivelEstudioEnum::class,
     ];
     protected $fillable = [
-        'institucion',
         'nivel_estudio',
         'fecha_fin',
         'persona_id',
+        'institucion_id',
+        'titulo_id',
     ];
     public function persona(){
         return $this->belongsTo(Persona::class, 'persona_id');
+    }
+    public function instituciones()
+    {
+        return $this->hasMany(Institucion::class);
     }
     public function titulos()
     {

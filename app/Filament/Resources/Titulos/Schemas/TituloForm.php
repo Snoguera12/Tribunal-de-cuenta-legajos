@@ -9,6 +9,6 @@ class TituloForm
 {
     public static function configure(Schema $schema): Schema
     {
-        return $schema->components(Titulo::getFormSchema(true));
+        return $schema->components(Titulo::getFormSchema('table'));
     }
 }

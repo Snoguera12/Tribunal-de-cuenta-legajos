@@ -74,16 +74,6 @@ class Persona extends Model
     {
         return $this->hasOne(User::class);
     }
-
-    public static function getPersonas(): array
-    {
-        return self::query()
-        ->get(['id', 'nombre', 'apellido', 'dni'])
-        ->mapWithKeys(fn ($item) => [
-            $item->id => "{$item->nombre} {$item->apellido} (DNI: {$item->dni})"
-        ])
-        ->toArray();
-    }
     public static function getFormSchema(): array{
         $resultado = [
             TextInput::make('nombre')->label('Nombre')

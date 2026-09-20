@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Imports;
+namespace App\Services;
 
 use App\Models\Persona;
 use App\Models\User;
