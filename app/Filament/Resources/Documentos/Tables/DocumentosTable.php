@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Documentos\Tables;
 use App\Models\Documento;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class DocumentosTable
 {
@@ -12,6 +13,12 @@ class DocumentosTable
     {
         return $table
             ->columns(Documento::getOutSchema('table'))
+            ->modifyQueryUsing(function (Builder $query) {
+                // Filtrado personalizado directo a la consulta de Eloquent
+                return $query->whereNull('descripcion')
+                    ->orWhereNull('tipodoc')
+                    ->orWhereNull('legajo_id');
+            })
             ->filters([
                 //
             ])

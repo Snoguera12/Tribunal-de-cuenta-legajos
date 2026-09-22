@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Enums\EstadoLegajoEnum;
 use App\Enums\TipoContratoEnum;
 use Carbon\Carbon;
-use Filament\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;

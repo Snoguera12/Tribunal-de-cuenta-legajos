@@ -6,6 +6,7 @@ use App\Models\Persona;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
+
 class PersonaTotalWidget extends StatsOverviewWidget
 {
     public static function canView(): bool
@@ -16,15 +17,6 @@ class PersonaTotalWidget extends StatsOverviewWidget
     {
         return [
             Stat::make('Personas Registradas', Persona::count())
-            //->description("Personas Registradas.")
-            ->chart(
-                Persona::selectRaw("DATE_FORMAT(created_at, '%m') as month, COUNT(*) as count")
-                    ->whereYear("created_at", now()->year)
-                    ->groupBy("month")
-                    ->orderBy("month")
-                    ->pluck("count")
-                    ->toArray()
-            )
             ->descriptionColor("success")
             ->color("primary")
         ];

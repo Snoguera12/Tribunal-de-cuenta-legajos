@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\URL;
 
 class Documento extends Model
 {
+    private static $TIEMPO_ACCESO = 30;
     protected $casts = [
         'tipodoc' => TipodocEnum::class,
     ];
@@ -28,6 +29,18 @@ class Documento extends Model
 
     public function legajo(){
         return $this->belongsTo(Legajo::class, 'legajo_id');
+    }
+    public static function abrirDocumento($record): ?string{
+        if (!$record->ruta) return null;
+        
+        return URL::temporarySignedRoute(
+            'documentos.ver',
+            now()->addMinutes(self::$TIEMPO_ACCESO),
+            [
+                'path' => $record->ruta,
+                'legajo_id' => $record->legajo_id
+            ]
+        );
     }
     public static function getFromSchemaRevisar() : array{
         $resultado = [
@@ -129,34 +142,11 @@ class Documento extends Model
     public static function getOutSchema(string $mode_out) : array{
         $resultado = match($mode_out){
             'table' => [
-                TextColumn::make('legajo.num_legajo')
-                ->label("Número de legajo")
-                ->sortable()
-                ->toggleable(isToggledHiddenByDefault: false),
-
                 TextColumn::make('ruta')
                 ->label('Documento')
-                //->formatStateUsing(fn () => 'Abrir Archivo')
-                ->url(function ($record): ?string {
-                    if (!$record->ruta) return null;
-                    
-                    return URL::temporarySignedRoute(
-                        'documentos.ver',
-                        now()->addMinutes(5),
-                        [
-                            'path' => $record->ruta,
-                            'legajo_id' => $record->legajo_id
-                        ]
-                    );
-                })
-                ->openUrlInNewTab()
-                ->toggleable(isToggledHiddenByDefault: false),
+                ->url(self::abrirDocumento(...))
+                ->openUrlInNewTab(),
 
-                TextColumn::make('tipodoc')
-                ->label('Tipo de Documento')
-                ->sortable()
-                ->openUrlInNewTab()
-                ->toggleable(isToggledHiddenByDefault: false),
             ],
             'list' => [
                 TextEntry::make('descripcion')
@@ -172,18 +162,7 @@ class Documento extends Model
                 ->icon('heroicon-o-document-arrow-down')
                 ->color('primary')
                 ->openUrlInNewTab()
-                ->url(function ($record): ?string {
-                    if (!$record->ruta) return null;
-                    
-                    return URL::temporarySignedRoute(
-                        'documentos.ver',
-                        now()->addMinutes(5),
-                        [
-                            'path' => $record->ruta,
-                            'legajo_id' => $record->legajo_id,
-                        ]
-                    );
-                }),
+                ->url(self::abrirDocumento(...)),
             ],
         };
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\Login;
+use App\Filament\Resources\Documentos\Widgets\DocumentosPendientesWidget;
 use App\Filament\Resources\Legajos\Widgets\LegajoWidget;
 use App\Filament\Resources\Personas\Widgets\GeneroWidget;
 use App\Filament\Resources\Personas\Widgets\PersonaTotalWidget;
@@ -139,6 +140,7 @@ class LegajosPanelProvider extends PanelProvider
             )
             ->widgets([
                 AccountWidget::class,
+                DocumentosPendientesWidget::class,
                 LegajoWidget::class,
                 PersonaTotalWidget::class,
                 GeneroWidget::class,

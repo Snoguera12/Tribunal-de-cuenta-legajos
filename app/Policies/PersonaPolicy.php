@@ -14,8 +14,8 @@ class PersonaPolicy
 
     public function view(User $user, Persona $persona): bool
     {
-        if ($user->isAdmin() || $user->isRRHH()) {
-            return true;
+        if ($user->isStaffRoles()) {
+            return $user->isStaffRoles();
         }
 
         return $user->persona_id !== null && $user->persona_id === $persona->id;

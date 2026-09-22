@@ -3,9 +3,7 @@
 namespace App\Filament\Resources\Documentos;
 
 use App\Filament\Resources\Documentos\Pages\CreateDocumento;
-use App\Filament\Resources\Documentos\Pages\EditDocumento;
 use App\Filament\Resources\Documentos\Pages\ListDocumentos;
-use App\Filament\Resources\Documentos\Pages\RevisarDocumentos;
 use App\Filament\Resources\Documentos\Pages\SubirDocumentos;
 use App\Filament\Resources\Documentos\Schemas\DocumentoForm;
 use App\Filament\Resources\Documentos\Tables\DocumentosTable;
@@ -34,7 +32,6 @@ class DocumentoResource extends Resource
         return DocumentosTable::configure($table);
     }
 
-    // <-- El método va aquí afuera, respetando el nivel de la clase
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
@@ -53,14 +50,18 @@ class DocumentoResource extends Resource
             //
         ];
     }
-
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::whereNull('descripcion')
+                ->orWhereNull('tipodoc')
+                ->orWhereNull('legajo_id')->count();
+    }
     public static function getPages(): array
     {
         return [
             'index' => ListDocumentos::route('/'),
             'create' => CreateDocumento::route('/crear'),
             //'edit' => EditDocumento::route('/{record}/editar'),
-            'revisar' => RevisarDocumentos::route('/revisar'),
             'subir' => SubirDocumentos::route('/subir'),
         ];
     }
