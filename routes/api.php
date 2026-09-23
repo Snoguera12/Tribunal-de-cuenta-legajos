@@ -7,10 +7,15 @@ use App\Models\ApiClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum:api')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('/areas', [AreaController::class, 'index']);
+    Route::get('/areas/{id}', [AreaController::class, 'show']);
+
     Route::get('/categorias', [CategoriaController::class, 'index']);
+    Route::get('/categorias', [CategoriaController::class, 'show']);
+
     Route::get('/legajos', [LegajoController::class, 'index']);
+    Route::get('/legajos', [LegajoController::class, 'show']);
 
     Route::get('/datos-compartidos', function (Request $request) {
         // El "user()" de Sanctum ahora devolverá una instancia de tu modelo ApiClient

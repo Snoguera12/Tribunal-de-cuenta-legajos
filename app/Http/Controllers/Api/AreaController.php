@@ -20,5 +20,24 @@ class AreaController extends Controller
         }
 
         return response()->json($areas, 200);
-    } 
+    }
+
+    public function show($id){
+        $area = Area::find($id);
+
+        if(!$area){
+            $data = [
+                'message' => 'Área no encontrado.',
+                'status' => 404
+            ];
+            return response()->json($data, 404);
+        }
+
+        $data = [
+            'area' => $area,
+            'status' => 200
+        ];
+
+        return response()->json($data, 200);
+    }
 }

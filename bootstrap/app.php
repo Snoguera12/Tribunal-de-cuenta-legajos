@@ -16,11 +16,5 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // 🔴 AÑADE ESTO: Si la ruta empieza con api/, responder siempre con JSON en caso de error
-        $exceptions->shouldRenderJsonWhen(function (Request $request, Throwable $e) {
-            if ($request->is('api/*')) {
-                return true;
-            }
-            return $request->expectsJson();
-        });
+        //
     })->create();
