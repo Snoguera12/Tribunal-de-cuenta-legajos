@@ -11,14 +11,13 @@ use App\Models\Documento;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 class DocumentoResource extends Resource
 {
     protected static ?string $model = Documento::class;
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPaperClip;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
     protected static ?int $navigationSort = 5;
 

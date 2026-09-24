@@ -14,6 +14,7 @@ class MisDatosPersonales extends Page
 
     protected static ?string $navigationLabel = 'Mis Datos Personales';
     protected ?string $heading = 'Mis Datos Personales';
+    protected static ?int $navigationSort = 1;
     public static function canAccess(): bool
     {
         // Return true if the user is authorized, or use a Spatie permission check

@@ -22,7 +22,7 @@ class AreaController extends Controller
         return response()->json($areas, 200);
     }
 
-    public function show($id){
+    public function show_id($id){
         $area = Area::find($id);
 
         if(!$area){
@@ -33,11 +33,6 @@ class AreaController extends Controller
             return response()->json($data, 404);
         }
 
-        $data = [
-            'area' => $area,
-            'status' => 200
-        ];
-
-        return response()->json($data, 200);
+        return response()->json($area, 200);
     }
 }

@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('api_clients', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->boolean('is_active')->default(true);
+            $table->string('nombre');
+            $table->boolean('is_active')->default(false);
+            $table->boolean('is_token')->default(false);
             $table->timestamps();
         });
     }

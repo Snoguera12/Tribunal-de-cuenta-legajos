@@ -23,7 +23,8 @@ class DocumentosTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                ->label('Adjuntar'),
             ])
             ->toolbarActions([
                 //

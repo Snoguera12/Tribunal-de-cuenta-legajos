@@ -7,22 +7,18 @@ use App\Filament\Resources\Legajos\Pages\EditLegajo;
 use App\Filament\Resources\Legajos\Pages\ListLegajos;
 use App\Filament\Resources\Legajos\Schemas\LegajoForm;
 use App\Filament\Resources\Legajos\Tables\LegajosTable;
-use App\Models\Historialbaja;
 use App\Models\Legajo;
 use BackedEnum;
-use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 class LegajoResource extends Resource
 {
     protected static ?string $model = Legajo::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFolder;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-square-3-stack-3d';
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
 
     protected static ?int $navigationSort = 1;

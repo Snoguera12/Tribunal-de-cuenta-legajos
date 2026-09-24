@@ -39,7 +39,7 @@ class PersonalSantiagoSeeder extends Seeder
                 'nombre' => 'María marta Eugenia',
                 'apellido' => 'Ledesma',
                 'dni' => 22456700,
-                'cuil' => 27224567818,
+                'cuil' => 27224567008,
                 'email' => 'mariamarta.ledesma@tribunalsgo.gob.ar',
                 'genero' => 0,
                 'estado_civil' => 1,
