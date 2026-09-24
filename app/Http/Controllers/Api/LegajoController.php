@@ -87,6 +87,7 @@ class LegajoController extends Controller
         }
 
         $legajos = Legajo::where('persona_id', $persona->id)
+        ->where('estado', 1)
         ->with(['categoria', 'cargo', 'area'])
         ->get();
 
