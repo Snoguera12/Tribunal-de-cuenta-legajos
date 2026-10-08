@@ -33,30 +33,4 @@ class PersonaController extends Controller
         ];
         return response()->json($data, 200);
     }
-
-    public function show_id(Persona $persona){
-
-        if(!$persona){
-            $data = [
-                'message' => 'Persona no encontrado por ID.',
-                'status' => 404
-            ];
-            return response()->json($data, 404);
-        }
-
-        return response()->json(['data' => $persona], 200);
-    }
-
-    public function show_dni(Persona $persona){
-
-        if(!$persona){
-            $data = [
-                'message' => 'Persona no encontrado por DNI.',
-                'status' => 404
-            ];
-            return response()->json($data, 404);
-        }
-
-        return response()->json(['data' => $persona], 200);
-    }
 }
