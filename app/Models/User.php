@@ -3,6 +3,7 @@
 namespace App\Models;
 
 
+use Filament\Models\Contracts\FilamentUser;
 use Filament\Schemas\Components\Utilities\Get;
 use Hash;
 use App\Models\Helpers\UserHelper;
@@ -17,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
@@ -79,6 +80,10 @@ class User extends Authenticatable
     public function isStaffRoles(): bool
     {
         return $this->isAdmin() || $this->isRRHH() || $this->isFuncionario();
+    }
+    public function canAccessPanel(\Filament\Panel $panel): bool
+    {
+        return $this->isAdmin() || $this->isRRHH() || $this->isFuncionario() || $this->isEmpleado();
     }
     public static function getFormSchema(bool $visible_persona_id): array
     {
