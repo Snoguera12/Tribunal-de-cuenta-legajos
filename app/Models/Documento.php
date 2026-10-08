@@ -37,7 +37,7 @@ class Documento extends Model
             'documentos.ver',
             now()->addMinutes(self::$TIEMPO_ACCESO),
             [
-                'path' => $record->ruta,
+                'fallbackPlaceholder' => $record->ruta,
                 'legajo_id' => $record->legajo_id
             ]
         );
