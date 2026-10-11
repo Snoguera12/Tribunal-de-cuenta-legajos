@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use DB;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
@@ -11,13 +12,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Titulo extends Model
 {
-    private const OTRO = 'otro';
     protected $fillable = [
         'nombre',
-        'nombre_otro',
     ];
-    public function estudios(){
-        return $this->hasMany(Estudio::class);
+    public function estudioTitulos() {
+        return $this->hasMany(EstudioTitulo::class);
+    }
+    public function estudios() {
+        return $this->belongsToMany(Estudio::class, 'estudio_titulo')->withTimestamps();
     }
 
     public static function getOpcionesNombre(): array {
@@ -79,11 +81,18 @@ class Titulo extends Model
                 ->searchable()
                 ->toggleable(isToggledHiddenByDefault: false),
 
-                TextColumn::make('nombre_otro')
-                ->label('Especificado de Nombre del Título')
+                TextColumn::make('estudioTitulos.titulo_otro')
+                ->label('Especificó un Nombre')
+                ->placeholder('-')
                 ->sortable()
                 ->searchable()
                 ->toggleable(isToggledHiddenByDefault: false),
+
+                /*TextColumn::make('estudio_titulos_count')
+                ->counts('estudioTitulos')
+                ->label('Usos')
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: false),*/
 
                 TextColumn::make('created_at')
                 ->label('Fecha de Creación')
@@ -104,5 +113,18 @@ class Titulo extends Model
             ],
         };
         return $resultado;
+    }
+    public function fusionarEn(Titulo $destino): void
+    {
+        DB::transaction(function () use ($destino) {
+            $this->estudioTitulos()->get()->each(function (EstudioTitulo $et) use ($destino) {
+                EstudioTitulo::where(
+                    'estudio_id', $et->estudio_id)->where('titulo_id', $destino->id)->exists()
+                    ? $et->delete()
+                    : $et->update(['titulo_id' => $destino->id]);
+            });
+
+            $this->delete();
+        });
     }
 }

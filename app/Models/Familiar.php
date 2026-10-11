@@ -4,10 +4,13 @@ namespace App\Models;
 
 use App\Enums\FamiliarViveEnum;
 use App\Enums\ParentescoEnum;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Grid;
 use Illuminate\Database\Eloquent\Model;
 
 class Familiar extends Model
@@ -43,7 +46,7 @@ class Familiar extends Model
             TextInput::make('dni')
             ->label('DNI')
             ->required()
-            ->rules(['regex:/^[0-9]{7,8}$/']),
+            ->rules(['regex:/^[0-9]{7,9}$/']),
 
             DatePicker::make('fecha_de_nacimiento')
             ->label('Fecha Nacimiento')
@@ -90,5 +93,29 @@ class Familiar extends Model
         };
 
         return $resultado;
+    }
+
+    public static function getRepeaterSchema(): array{
+        return [
+            Repeater::make('familiares')
+            ->relationship('familiares')
+            ->hiddenLabel()
+            ->columnSpanFull()
+            ->collapsible()
+            ->grid(2)
+            ->itemLabel("Añadir un Familar")
+            ->defaultItems(0)
+            ->addActionLabel('Agregar un Familiar')
+            ->addAction(
+                fn (Action $action) => $action
+                ->icon('heroicon-m-plus')
+                ->color('gray')
+            )
+            ->schema([
+                Grid::make(2)
+                ->columnSpan(1)
+                ->schema(Familiar::getFormSchema())
+            ]),
+        ];
     }
 }

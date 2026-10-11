@@ -13,7 +13,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -34,8 +34,9 @@ class User extends Authenticatable
         'rol',
         'persona_id',
     ];
-    public function persona() : HasOne{
-        return $this->hasOne(Persona::class, 'persona_id');
+    public function persona(): BelongsTo
+    {
+        return $this->belongsTo(Persona::class, 'persona_id');
     }
     /**
      * The attributes that should be hidden for serialization.
@@ -82,7 +83,6 @@ class User extends Authenticatable
     }
     public static function getFormSchema(bool $visible_persona_id): array
     {
-
         $array_personas = fn ($record) => PersonaHelper::getPersonasUsuario($record?->persona_id);
 
         $resultado = [
@@ -94,57 +94,17 @@ class User extends Authenticatable
             ->label('Correo Electrónico')
             ->required()
             ->email()
-            ->default(function () {
-                // Captura el 'persona_id' enviado desde la URL
-                $personaId = request()->query('persona_id');
-                
-                if ($personaId) {
-                    // Busca la persona y retorna su correo
-                    return Persona::find($personaId)?->email;
-                }
-                
-                return null;
-            }),
+            ->unique(ignoreRecord: true),
 
             TextInput::make('password')
             ->label('Contraseña')
             ->password()
-            ->required(function (string $context, $record): bool {
-                // 1. En contexto de creación general, siempre es obligatoria
-                if ($context === 'create') {
-                    return true;
-                }
-
-                // 2. En contexto de edición, evaluamos según el modelo que disparó el formulario
-                if ($context === 'edit' && $record) {
-                    
-                    // Si viene desde PersonaResource (se está editando una Persona para adjuntarle un Usuario)
-                    if ($record instanceof Persona) {
-                        return !$record->Usuario()->exists(); // Obligatoria si la persona no tiene usuario aún
-                    }
-                    
-                    // Si viene desde UserResource (se está editando el Usuario directamente)
-                    if ($record instanceof self) { // 'self' hace referencia al modelo User actual
-                        return false; // Al editar un usuario directo, ya tiene contraseña (es opcional)
-                    }
-                }
-
-                return false;
-            })
-            // Si el campo está vacío al guardar, no lo incluye en el Query de actualización
+            ->required(fn ($record): bool => ! $record?->exists)
             ->dehydrated(fn (?string $state) => filled($state))
-            // Encripta la contraseña automáticamente antes de guardarla (si se modificó)
-            ->mutateDehydratedStateUsing(fn (string $state) => Hash::make($state))
-            ->helperText(function (string $context, $record) {
-                // Ajustamos el texto de ayuda según el modelo actual
-                if ($context === 'edit' && $record) {
-                    if ($record instanceof Persona && !$record->Usuario()->exists()) {
-                        return 'Defina una contraseña para el nuevo usuario.';
-                    }
-                    return 'Deje este campo en blanco si no desea cambiar la contraseña.';
-                }
-                return null;
-            }),
+            // quitá mutateDehydratedStateUsing: el cast 'hashed' del modelo ya hashea
+            ->helperText(fn ($record) => $record?->exists
+                ? 'Deje este campo en blanco si no desea cambiar la contraseña.'
+            : null),
 
             Select::make('rol')
             ->label('Rol del Usuario')

@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('titulos', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 100);
-            $table->string('nombre_otro', 100)->nullable();
             $table->timestamps();
         });
     }

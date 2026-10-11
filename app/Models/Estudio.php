@@ -3,12 +3,17 @@
 namespace App\Models;
 
 use App\Enums\NivelEstudioEnum;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Database\Eloquent\Model;
+use Str;
 
 class Estudio extends Model
 {
@@ -29,9 +34,11 @@ class Estudio extends Model
     {
         return $this->hasMany(Institucion::class);
     }
-    public function titulos()
-    {
-        return $this->hasMany(Titulo::class);
+    public function titulos() {
+        return $this->belongsToMany(Titulo::class, 'estudio_titulo')->withTimestamps();
+    }
+    public function estudioTitulos() {
+        return $this->hasMany(EstudioTitulo::class);
     }
     protected static function tieneEstudiosActivos($value): bool{
         if ($value === null) return false;
@@ -107,5 +114,38 @@ class Estudio extends Model
             ],
         };
         return $resultado;
+    }
+    public static function getRepeaterSchema(): array
+    {
+        return [
+            Repeater::make('estudios')
+            ->relationship('estudios')
+            ->hiddenLabel()
+            ->columnSpanFull()
+            ->addActionLabel('Agregar un Estudio')
+            ->addAction(fn (Action $action) => $action->icon('heroicon-m-plus')->color('gray'))
+            ->collapsible()
+            ->defaultItems(0)
+            ->itemLabel(fn (array $state): ?string => ($state['institucion'] ?? null) ?: 'Nuevo Registro de Estudio')
+            ->schema([
+                Grid::make(['default' => 1, 'sm' => 3])->schema(Estudio::getFormSchema()),
+
+                Section::make('Títulos Obtenidos')
+                ->compact()
+                ->collapsible()
+                ->visible(fn (Get $get) => Estudio::requiereTitulo($get('nivel_estudio')))
+                ->extraAttributes([ /* tu style igual */ ])
+                ->schema([
+                    Repeater::make('titulos')
+                    ->relationship('estudioTitulos')
+                    ->addActionLabel('Agregar un Título')
+                    ->itemLabel('Nuevo Registro de Título')
+                    ->hiddenLabel()
+                    ->collapsible()
+                    ->grid(3)
+                    ->schema(EstudioTitulo::getFormSchema()),
+                ]),
+            ]),
+        ];
     }
 }

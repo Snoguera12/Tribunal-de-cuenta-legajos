@@ -309,4 +309,26 @@ class Legajo extends Model
         ];
         return $resutlado;
     }
+
+    public static function getRepeaterSchema(): array{
+        return [
+            Repeater::make('Legajo')
+            ->relationship('legajos')
+            ->hiddenLabel()
+            ->columnSpanFull()
+            ->collapsible() // Permite encoger legajos antiguos para mantener orden visual
+            ->defaultItems(0)
+            ->addActionLabel('Agregar un Legajo')
+            ->itemLabel(
+                fn (array $state): ?string => ($state['num_legajo'] ?? null) ? "Legajo N° " . $state['num_legajo']: 'Nuevo Registro de Legajo' 
+            ) // Muestra un título claro en cada bloque (Ej: "Legajo N° 4512")
+            ->addAction(
+                fn (Action $action) => $action
+                ->icon('heroicon-m-plus')
+                ->color('gray')
+            )
+            ->schema(Legajo::getFrontLegajoDocumentos('mul')),
+        ];
+    }
+    
 }

@@ -6,6 +6,7 @@ use App\Filament\Resources\Personas\PersonaResource;
 use App\Models\AntecedenteLaboral;
 use App\Models\Curso;
 use App\Models\Documento;
+use App\Models\EstudioTitulo;
 use App\Models\Familiar;
 use App\Models\Idioma;
 use App\Models\Legajo;
@@ -137,46 +138,16 @@ class PersonaInfolist
                 ->label("Estudios/Títulos")
                 ->id('estudio')
                 ->icon('heroicon-m-academic-cap')
-                ->schema([
-                    Section::make('Estudio Alcanzado')
-                    ->columnSpanFull()
-                    ->columns(3)
-                    ->relationship('estudioPrioritario')
-                    ->headerActions([
-                        Action::make('editar')
-                        ->label('Añadir Estudio/Título')
-                        ->icon('heroicon-m-pencil-square')
-                        ->color('warning')
-                        ->visible(auth()->user()->isAdmin_RRHH())
-                        ->url(function (Component $component): string {
-                            // Navega hacia arriba en el árbol de componentes para obtener la Persona real
-                            $persona = $component->getLivewire()->getRecord();
-
-                            return PersonaResource::getUrl('edit', ['record' => $persona]) . '?tab=estudio';
-                        }),
-                    ])
+                ->schema([RepeatableEntry::make('estudioTitulos')
+                    ->label('Títulos Obtenidos')
                     ->schema([
-                        TextEntry::make('institucion')
-                        ->label('Institución')
-                        ->placeholder('-'),
-
-                        TextEntry::make('nivel_estudio')
-                        ->label('Nivel de Estudio'),
-
-                        TextEntry::make('fecha_fin')
-                        ->label('Fecha de Finalización')
-                        ->placeholder('-')
-                        ->date('d/m/Y'),
-                        
-                        RepeatableEntry::make('titulos') // Nombre de la relación en tu modelo 'Estudio'
-                        ->label('Títulos Obtenidos')
-                        ->columnSpanFull() // Ocupa todo el ancho debajo de los campos anteriores
-                        ->placeholder('Sin títulos registrados para este estudio')
-                        ->grid(2) // Si tiene varios títulos, los muestra en 2 columnas
-                        ->schema(Titulo::getOutSchema('list')),
-
+                        TextEntry::make('nombre_mostrado')
+                        ->hiddenLabel()
+                        ->icon('heroicon-m-academic-cap')
+                        ->badge(fn (EstudioTitulo $record) => $record->titulo_id === null)
+                        ->color(fn (EstudioTitulo $record) => $record->titulo_id === null ? 'warning' : 'gray')
+                        ->helperText(fn (EstudioTitulo $record) => $record->titulo_id === null ? 'Pendiente de revisión' : null),
                     ]),
-
                 ]),
 
                 Tab::make('Tab Cursos')
@@ -235,26 +206,14 @@ class PersonaInfolist
                 ->visible(auth()->user()->isAdmin_RRHH())
                 ->schema([
                     Section::make('Usuario')
+                    ->relationship('usuario')
                     ->columnSpanFull()
-                    ->relationship('Usuario')
                     ->headerActions([
                         EditAction::make('editar')
-                        ->label(function ($component): string {
-                            $persona = $component->getRecord();
-                            return $persona?->Usuario ? 'Editar Usuario Adjunto' : 'Adjuntar Usuario';
-                        })
-                        ->icon(function ($component): string {
-                            $persona = $component->getRecord();
-                            return $persona?->Usuario ? 'heroicon-m-pencil-square' : 'heroicon-m-plus';
-                        })
-                        ->color(function ($component): string {
-                            $persona = $component->getRecord();
-                            return $persona?->Usuario ? 'warning' : 'primary';
-                        })
-                        ->url(function($component) : string{
-                            $persona = $component->getRecord();
-                            return PersonaResource::getUrl('edit', ['record' => $persona->id]) . '?tab=usuario';
-                        }),
+                        ->label(fn ($livewire): string => $livewire->getRecord()->usuario ? 'Editar Usuario Adjunto' : 'Adjuntar Usuario')
+                        ->icon(fn ($livewire): string => $livewire->getRecord()->usuario ? 'heroicon-m-pencil-square' : 'heroicon-m-plus')
+                        ->color(fn ($livewire): string => $livewire->getRecord()->usuario ? 'warning' : 'primary')
+                        ->url(fn ($livewire): string => PersonaResource::getUrl('edit', ['record' => $livewire->getRecord()]) . '?tab=usuario'),
                     ])
                     ->schema(User::getOutSchema('folist')),
                 ]),

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('rol')->default('empleado');
-            $table->foreignId("persona_id")->nullable(true);
+            $table->foreignId("persona_id")->unique()->nullable(true);
             $table->rememberToken();
             $table->timestamps();
         });

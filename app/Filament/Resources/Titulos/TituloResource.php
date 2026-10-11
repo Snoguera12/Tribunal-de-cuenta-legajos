@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Titulos;
 use App\Filament\Resources\Titulos\Pages\CreateTitulo;
 use App\Filament\Resources\Titulos\Pages\EditTitulo;
 use App\Filament\Resources\Titulos\Pages\ListTitulos;
+use App\Filament\Resources\Titulos\Pages\TituloPendiente;
 use App\Filament\Resources\Titulos\Schemas\TituloForm;
 use App\Filament\Resources\Titulos\Tables\TitulosTable;
 use App\Models\Titulo;
