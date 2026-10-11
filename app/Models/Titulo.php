@@ -81,19 +81,6 @@ class Titulo extends Model
                 ->searchable()
                 ->toggleable(isToggledHiddenByDefault: false),
 
-                TextColumn::make('estudioTitulos.titulo_otro')
-                ->label('Especificó un Nombre')
-                ->placeholder('-')
-                ->sortable()
-                ->searchable()
-                ->toggleable(isToggledHiddenByDefault: false),
-
-                /*TextColumn::make('estudio_titulos_count')
-                ->counts('estudioTitulos')
-                ->label('Usos')
-                ->sortable()
-                ->toggleable(isToggledHiddenByDefault: false),*/
-
                 TextColumn::make('created_at')
                 ->label('Fecha de Creación')
                 ->dateTime('d/m/Y H:i:s')
@@ -104,11 +91,6 @@ class Titulo extends Model
                 TextEntry::make('nombre')
                 ->hiddenLabel()
                 ->visible(fn ($record) => $record->nombre != 'otro')
-                ->icon('heroicon-m-academic-cap'),
-                
-                TextEntry::make('nombre_otro')
-                ->hiddenLabel()
-                ->visible(fn ($record) => $record->nombre == 'otro')
                 ->icon('heroicon-m-academic-cap'),
             ],
         };

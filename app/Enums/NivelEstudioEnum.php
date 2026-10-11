@@ -31,4 +31,13 @@ enum NivelEstudioEnum: int implements HasLabel
             self::Maestria => 'Maestría',
         };
     }
+    public static function terminados(): array
+    {
+        return [self::Primario->value, self::Secundario->value, self::Terciario->value,
+                self::Universitario->value, self::Doctorado->value, self::Maestria->value];
+    }
+    public static function conTitulo(): array
+    {
+        return [self::Terciario->value, self::Universitario->value, self::Doctorado->value, self::Maestria->value];
+    }
 }

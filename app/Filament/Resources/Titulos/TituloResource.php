@@ -5,9 +5,11 @@ namespace App\Filament\Resources\Titulos;
 use App\Filament\Resources\Titulos\Pages\CreateTitulo;
 use App\Filament\Resources\Titulos\Pages\EditTitulo;
 use App\Filament\Resources\Titulos\Pages\ListTitulos;
+use App\Filament\Resources\Titulos\Pages\PendientesTitulos;
 use App\Filament\Resources\Titulos\Pages\TituloPendiente;
 use App\Filament\Resources\Titulos\Schemas\TituloForm;
 use App\Filament\Resources\Titulos\Tables\TitulosTable;
+use App\Models\EstudioTitulo;
 use App\Models\Titulo;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -32,7 +34,11 @@ class TituloResource extends Resource
     {
         return TitulosTable::configure($table);
     }
-
+    public static function getNavigationBadge(): ?string
+    {
+        // Retorna el conteo total de la base de datos
+        return EstudioTitulo::pendientes()->count();
+    }
     public static function getRelations(): array
     {
         return [
@@ -44,6 +50,7 @@ class TituloResource extends Resource
     {
         return [
             'index' => ListTitulos::route('/'),
+            'pendientes' => PendientesTitulos::route('/pendientes'),
             //'create' => CreateTitulo::route('/crear'),
             //'edit' => EditTitulo::route('/{record}/editar'),
         ];

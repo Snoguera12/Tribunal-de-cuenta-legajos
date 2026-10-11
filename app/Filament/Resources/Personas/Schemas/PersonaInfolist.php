@@ -6,6 +6,7 @@ use App\Filament\Resources\Personas\PersonaResource;
 use App\Models\AntecedenteLaboral;
 use App\Models\Curso;
 use App\Models\Documento;
+use App\Models\Estudio;
 use App\Models\EstudioTitulo;
 use App\Models\Familiar;
 use App\Models\Idioma;
@@ -58,14 +59,11 @@ class PersonaInfolist
                 ->id('idioma')
                 ->icon('heroicon-m-language')
                 ->schema([
-                    Section::make('Idiomas')
-                    ->schema([
-                        RepeatableEntry::make('idiomas')
-                        ->hiddenLabel()
-                        ->placeholder('Sin idiomas registrados')
-                        ->columns(2)
-                        ->schema(Idioma::getOutSchema('list')),
-                    ]),
+                    RepeatableEntry::make('idiomas')
+                    ->hiddenLabel()
+                    ->placeholder('Sin idiomas registrados')
+                    ->columns(2)
+                    ->schema(Idioma::getOutSchema('list')),
                 ]),
 
                 Tab::make('Tab Papeles')
@@ -73,80 +71,79 @@ class PersonaInfolist
                 ->icon('heroicon-m-folder-open')
                 ->columnSpanFull()
                 ->schema([
-                    Section::make('Legajos de la Persona')
-                    ->columnSpanFull()
-                    ->headerActions([
-                        EditAction::make('editar')
-                        ->label('Añadir legajos')
-                        ->icon('heroicon-m-pencil-square')
-                        ->color('warning')
-                        ->url(fn (Persona $record): string => PersonaResource::getUrl('edit', ['record' => $record]) . '?tab=legajo'),
-                    ])
+                    RepeatableEntry::make('legajos')
+                    ->hiddenLabel()
+                    ->placeholder('Sin legajo')
+                    ->columns(1)
                     ->schema([
-                        RepeatableEntry::make('legajos')
-                        ->hiddenLabel()
-                        ->placeholder('Sin legajo')
-                        ->columns(1)
+                        Grid::make(2)
                         ->schema([
-                            Grid::make(2)
-                            ->schema([
-                                Action::make('editar_legajo')
-                                ->label('Editar')
-                                ->icon('heroicon-m-pencil-square')
-                                ->color('warning')
-                                ->url(function (Component $component): string {
-                                    $persona = $component->getLivewire()->getRecord();
+                            Action::make('editar_legajo')
+                            ->label('Editar este Legajo')
+                            ->icon('heroicon-m-pencil-square')
+                            ->color('warning')
+                            ->url(function (Component $component): string {
+                                $persona = $component->getLivewire()->getRecord();
 
-                                    return PersonaResource::getUrl('edit', ['record' => $persona]) . '?tab=legajo';
-                                })
-                                ->visible(auth()->user()->isAdmin_RRHH()),
-                            ]),
-                            Grid::make(2)
-                            ->schema([
-                                Grid::make(3)
-                                ->columnSpan(1)
-                                ->schema(Legajo::getOutSchema('list')),
+                                return PersonaResource::getUrl('edit', ['record' => $persona]) . '?tab=legajo';
+                            })
+                            ->visible(auth()->user()->isAdmin_RRHH()),
+                        ]),
+                        Grid::make(2)
+                        ->schema([
+                            Grid::make(3)
+                            ->columnSpan(1)
+                            ->schema(Legajo::getOutSchema('list')),
 
-                                Section::make('Documentos Adjuntos')
-                                ->columnSpan(1)
+                            Section::make('Documentos Adjuntos')
+                            ->columnSpan(1)
+                            ->extraAttributes([
+                                'style' => 'max-height: 300px; overflow-y: auto;',
+                            ])
+                            ->schema([
+                                RepeatableEntry::make('documentos')
+                                ->label('Archivos Adjuntos')
+                                ->hiddenLabel()
+                                ->placeholder('Sin documentos')
+                                ->contained(false) // Quita el recuadro gris individual por documento
+                                ->grid(1)
                                 ->extraAttributes([
-                                    'style' => 'max-height: 300px; overflow-y: auto;',
+                                    // Clases de Tailwind para aplicar un borde gris sutil, fondo blanco y separación inferior
+                                    'class' => '[&>div]:border [&>div]:border-gray-200 [&>div]:bg-white [&>div]:shadow-sm [&>div]:mb-3 last:[&>div]:mb-0'
                                 ])
                                 ->schema([
-                                    RepeatableEntry::make('documentos')
-                                    ->label('Archivos Adjuntos')
-                                    ->hiddenLabel()
-                                    ->placeholder('Sin documentos')
-                                    ->contained(false) // Quita el recuadro gris individual por documento
-                                    ->grid(1)
-                                    ->extraAttributes([
-                                        // Clases de Tailwind para aplicar un borde gris sutil, fondo blanco y separación inferior
-                                        'class' => '[&>div]:border [&>div]:border-gray-200 [&>div]:bg-white [&>div]:shadow-sm [&>div]:mb-3 last:[&>div]:mb-0'
-                                    ])
-                                    ->schema([
-                                        Grid::make(2)
-                                        ->columns(3)
-                                        ->schema(Documento::getOutSchema('list')),
-                                    ]),
-                                ])
-                            ]),
+                                    Grid::make(2)
+                                    ->columns(3)
+                                    ->schema(Documento::getOutSchema('list')),
+                                ]),
+                            ])
                         ]),
-                    ])
+                    ]),
                 ]),
                 
                 Tab::make('Tab Estudio/Títulos')
-                ->label("Estudios/Títulos")
+                ->label('Estudios/Títulos')
                 ->id('estudio')
                 ->icon('heroicon-m-academic-cap')
-                ->schema([RepeatableEntry::make('estudioTitulos')
-                    ->label('Títulos Obtenidos')
+                ->schema([
+                    RepeatableEntry::make('estudiosPrincipal')
+                    ->hiddenLabel()
+                    ->placeholder('Sin estudios terminados registrados')
+                    ->contained(false)
+                    ->columns(3)
+                    ->schema(Estudio::getOutSchema('list')),
+
+                    Section::make()
+                    ->heading(fn ($record) => 'Mostrar más estudios (' . $record->estudiosAnteriores()->count() . ')')
+                    ->collapsible()
+                    ->collapsed()
+                    ->visible(fn ($record) => $record->estudiosAnteriores()->exists())
                     ->schema([
-                        TextEntry::make('nombre_mostrado')
+                        RepeatableEntry::make('estudiosAnteriores')
                         ->hiddenLabel()
-                        ->icon('heroicon-m-academic-cap')
-                        ->badge(fn (EstudioTitulo $record) => $record->titulo_id === null)
-                        ->color(fn (EstudioTitulo $record) => $record->titulo_id === null ? 'warning' : 'gray')
-                        ->helperText(fn (EstudioTitulo $record) => $record->titulo_id === null ? 'Pendiente de revisión' : null),
+                        ->contained(false)
+                        ->columns(3)
+                        ->schema(Estudio::getOutSchema('list')),
                     ]),
                 ]),
 
@@ -156,22 +153,11 @@ class PersonaInfolist
                 ->icon('heroicon-m-book-open')
                 ->columnSpanFull()
                 ->schema([
-                    Section::make('Cursos y Capacitaciones')
-                    ->columnSpanFull()
-                    ->headerActions([
-                        EditAction::make('editar')
-                        ->label('Añadir Cursos')
-                        ->icon('heroicon-m-pencil-square')
-                        ->color('warning')
-                        ->url(fn (Persona $record): string => PersonaResource::getUrl('edit', ['record' => $record]) . '?tab=curso'),
-                    ])
-                    ->schema([
-                        RepeatableEntry::make('cursos')
-                        ->hiddenLabel()
-                        ->placeholder('Sin cursos registrados')
-                        ->columns(3)
-                        ->schema(Curso::getOutSchema('list')),
-                    ]),
+                    RepeatableEntry::make('cursos')
+                    ->hiddenLabel()
+                    ->placeholder('Sin cursos registrados')
+                    ->columns(3)
+                    ->schema(Curso::getOutSchema('list')),
                 ]),
 
                 Tab::make('Tab Antecedentes Laborales')
@@ -180,22 +166,11 @@ class PersonaInfolist
                 ->icon('heroicon-m-briefcase')
                 ->columnSpanFull()
                 ->schema([
-                    Section::make('Antecedentes Laborales')
-                    ->columnSpanFull()
-                    ->headerActions([
-                        EditAction::make('editar')
-                        ->label('Añadir Antecedentes Laborales')
-                        ->icon('heroicon-m-pencil-square')
-                        ->color('warning')
-                        ->url(fn (Persona $record): string => PersonaResource::getUrl('edit', ['record' => $record]) . '?tab=antecedenteslaborales'),
-                    ])
-                    ->schema([
-                        RepeatableEntry::make('antecedentesLaborales')
-                        ->hiddenLabel()
-                        ->placeholder('Sin antecedentes registrados')
-                        ->columns(3)
-                        ->schema(AntecedenteLaboral::getOutSchema('list')),
-                    ]),
+                    RepeatableEntry::make('antecedentesLaborales')
+                    ->hiddenLabel()
+                    ->placeholder('Sin antecedentes registrados')
+                    ->columns(3)
+                    ->schema(AntecedenteLaboral::getOutSchema('list')),
                 ]),
 
                 Tab::make('Tab Usuario')

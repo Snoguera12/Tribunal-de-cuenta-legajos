@@ -21,10 +21,9 @@ class EstudioTitulo extends Model
     public function titulo()  {
         return $this->belongsTo(Titulo::class, 'titulo_id');
     }
-
     public function getNombreMostradoAttribute(): string
     {
-        return $this->titulo?->nombre ?? '-';
+        return $this->titulo?->nombre ?? $this->titulo_otro ?? '-';
     }
     public function scopePendientes($query)
     {
