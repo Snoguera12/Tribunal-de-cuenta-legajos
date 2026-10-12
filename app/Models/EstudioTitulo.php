@@ -13,7 +13,11 @@ class EstudioTitulo extends Model
 {
     private const OTRO = '__otro__';
     protected $table = 'estudio_titulos';
-    protected $fillable = ['estudio_id', 'titulo_id', 'titulo_otro'];
+    protected $fillable = [
+        'estudio_id',
+        'titulo_id',
+        'titulo_otro'
+    ];
 
     public function estudio() {
         return $this->belongsTo(Estudio::class, 'estudio_id');

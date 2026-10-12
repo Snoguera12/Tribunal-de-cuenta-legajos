@@ -12,16 +12,26 @@ class Curso extends Model
 {
     protected $fillable = [
         'persona_id',
+        'institucion_id',
+        'institucion_otro',
         'nombre',
-        'institucion',
         'duracion',
         'fecha',
         'tiene_certificado',
     ];
+    public function institucion() { return $this->belongsTo(Institucion::class); }
 
+    public function getInstitucionMostradaAttribute(): ?string
+    {
+        return $this->institucion?->nombre ?? $this->institucion_otro;
+    }
     public function persona()
     {
         return $this->belongsTo(Persona::class);
+    }
+    public function scopePendientes($query)
+    {
+        return $query->whereNull('institucion_id')->whereNotNull('institucion_otro');
     }
     public static function getFromSchema() : array{
         $resultado = [
@@ -30,9 +40,7 @@ class Curso extends Model
             ->required()
             ->maxLength(255),
 
-            TextInput::make('institucion')
-            ->label('Institución')
-            ->maxLength(255),
+            ...Institucion::getFormSchema(),
 
             TextInput::make('duracion')
             ->label('Duración'),
@@ -54,9 +62,11 @@ class Curso extends Model
                 TextEntry::make('nombre')
                 ->label('Curso'),
 
-                TextEntry::make('institucion')
+                TextEntry::make('institucion_mostrada')
                 ->label('Institución')
-                ->placeholder('-'),
+                ->placeholder('-')
+                ->formatStateUsing(fn ($state, $record) => ($state && !$record->institucion_id) ? "{$state} (pendiente de revisión)" : $state)
+                ->color(fn ($record) => (!$record->institucion_id && $record->institucion_otro) ? 'warning' : null),
 
                 TextEntry::make('duracion')
                 ->label('Duración')

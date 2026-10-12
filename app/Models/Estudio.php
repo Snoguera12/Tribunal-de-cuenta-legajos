@@ -7,7 +7,6 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
@@ -15,7 +14,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Str;
 
 class Estudio extends Model
 {
@@ -27,21 +25,13 @@ class Estudio extends Model
         'fecha_fin',
         'persona_id',
         'institucion_id',
-        'titulo_id',
+        'institucion_otro'
     ];
-    public function persona(){
-        return $this->belongsTo(Persona::class, 'persona_id');
-    }
-    public function instituciones()
-    {
-        return $this->hasMany(Institucion::class);
-    }
-    public function titulos() {
-        return $this->belongsToMany(Titulo::class, 'estudio_titulo')->withTimestamps();
-    }
-    public function estudioTitulos() {
-        return $this->hasMany(EstudioTitulo::class);
-    }
+    public function persona(){ return $this->belongsTo(Persona::class, 'persona_id'); }
+    public function instituciones() { return $this->hasMany(Institucion::class); }
+    public function titulos() { return $this->belongsToMany(Titulo::class, 'estudio_titulo')->withTimestamps(); }
+    public function estudioTitulos() { return $this->hasMany(EstudioTitulo::class); }
+    public function institucion() { return $this->belongsTo(Institucion::class); }
     protected static function tieneEstudiosActivos($value): bool{
         if ($value === null) return false;
 
@@ -72,6 +62,10 @@ class Estudio extends Model
     {
         return self::requiereFechaFin($value);
     }
+    public function getInstitucionMostradaAttribute(): ?string
+    {
+        return $this->institucion?->nombre ?? $this->institucion_otro;
+    }
     public function scopeConTitulo(Builder $query): Builder
     {
         return $query->whereIn('estudios.nivel_estudio', NivelEstudioEnum::conTitulo());
@@ -87,21 +81,24 @@ class Estudio extends Model
     public function scopeOtrosNiveles(Builder $query): Builder
     {
         return $query->conTitulo()
-            ->where('estudios.id', '<>', self::subconsultaMayor())
-            ->orderByDesc('estudios.nivel_estudio')
-            ->orderByDesc('estudios.fecha_fin');
+        ->where('estudios.id', '<>', self::subconsultaMayor())
+        ->orderByDesc('estudios.nivel_estudio')
+        ->orderByDesc('estudios.fecha_fin');
     }
-
+    public function scopePendientes($query)
+    {
+        return $query->whereNull('institucion_id')->whereNotNull('institucion_otro');
+    }
     private static function subconsultaMayor(): \Closure
     {
         return fn ($q) => $q->select('e2.id')
-            ->from('estudios as e2')
-            ->whereColumn('e2.persona_id', 'estudios.persona_id')
-            ->whereIn('e2.nivel_estudio', NivelEstudioEnum::conTitulo())
-            ->orderByDesc('e2.nivel_estudio')
-            ->orderByDesc('e2.fecha_fin')
-            ->orderByDesc('e2.id')
-            ->limit(1);
+        ->from('estudios as e2')
+        ->whereColumn('e2.persona_id', 'estudios.persona_id')
+        ->whereIn('e2.nivel_estudio', NivelEstudioEnum::conTitulo())
+        ->orderByDesc('e2.nivel_estudio')
+        ->orderByDesc('e2.fecha_fin')
+        ->orderByDesc('e2.id')
+        ->limit(1);
     }
     public static function getInstitucion() : array{
         return self::query()
@@ -121,12 +118,10 @@ class Estudio extends Model
             ->native(true) // Al usar el select nativo, el navegador evita que el scroll corte la lista
             ->validationMessages(['required' => 'Debe seleccionar el nivel de estudio.']),
 
-            TextInput::make('institucion')
-            ->label('Institución')
-            ->placeholder('Ej. Universidad Nacional')
-            ->required(fn (Get $get) => self::tieneEstudiosActivos($get('nivel_estudio')))
-            ->hidden(fn (Get $get) => !self::tieneEstudiosActivos($get('nivel_estudio')))
-            ->validationMessages(['required' => 'Ingrese el nombre de la institución.']),
+            ...Institucion::getFormSchema(
+                required: fn (Get $get) => self::tieneEstudiosActivos($get('nivel_estudio')),
+                hidden: fn (Get $get) => ! self::tieneEstudiosActivos($get('nivel_estudio')),
+            ),
 
             DatePicker::make('fecha_fin')
             ->label('Fecha de Finalización')
@@ -143,7 +138,12 @@ class Estudio extends Model
                 
             ],
             'list' => [
-                TextEntry::make('institucion')->label('Institución')->placeholder('-'),
+                TextEntry::make('institucion_mostrada')
+                ->label('Institución')
+                ->placeholder('-')
+                ->formatStateUsing(fn ($state, $record) => ($state && !$record->institucion_id) ? "{$state} (pendiente de revisión)" : $state)
+                ->color(fn ($record) => (!$record->institucion_id && $record->institucion_otro) ? 'warning' : null),
+
                 TextEntry::make('nivel_estudio')->label('Nivel de Estudio'),
                 TextEntry::make('fecha_fin')->label('Fecha de Finalización')->placeholder('-')->date('d/m/Y'),
 
