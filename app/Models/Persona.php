@@ -36,59 +36,15 @@ class Persona extends Model
         'borrar_logico',
     ];
     
-    public function legajos()
-    {
-        return $this->hasMany(Legajo::class)->where('estado', 1);
-    }
-    public function estudios()
-    {
-        return $this->hasMany(Estudio::class);
-    }
-    public function estudiosPrincipal()
-    {
-        return $this->hasMany(Estudio::class)->mayorNivel()->with('estudioTitulos.titulo');
-    }
-
-    public function estudiosAnteriores()
-    {
-        return $this->hasMany(Estudio::class)->otrosNiveles()->with('estudioTitulos.titulo');
-    }
-    public function familiares()
-    {
-        return $this->hasMany(Familiar::class);
-    }
-    public function cursos()
-    {
-        return $this->hasMany(Curso::class);
-    }
-    public function idiomas()
-    {
-        return $this->hasMany(Idioma::class);
-    }
-    public function antecedentesLaborales()
-    {
-        return $this->hasMany(AntecedenteLaboral::class);
-    }
-    public function estudiosConTitulo()
-    {
-        return $this->hasMany(Estudio::class)
-            ->whereIn('nivel_estudio', NivelEstudioEnum::conTitulo())
-            ->orderByRaw('CASE nivel_estudio WHEN 8 THEN 1 WHEN 9 THEN 2 WHEN 7 THEN 3 WHEN 6 THEN 4 END')
-            ->orderByDesc('fecha_fin')
-            ->with('estudioTitulos.titulo');
-    }
-    public function usuario()
-    {
-        return $this->hasOne(User::class);
-    }
-    public function estudiosTerminados()
-    {
-        return $this->hasMany(Estudio::class)
-        ->whereIn('nivel_estudio', NivelEstudioEnum::terminados())
-        ->orderByRaw('CASE nivel_estudio WHEN 8 THEN 1 WHEN 9 THEN 2 WHEN 7 THEN 3 WHEN 6 THEN 4 WHEN 4 THEN 5 WHEN 2 THEN 6 END')
-        ->orderByDesc('fecha_fin')
-        ->with('estudioTitulos.titulo');
-    }
+    public function legajos() { return $this->hasMany(Legajo::class)->where('estado', 1); }
+    public function estudios() { return $this->hasMany(Estudio::class); }
+    public function estudiosPrincipal() { return $this->hasMany(Estudio::class)->mayorNivel()->with('estudioTitulos.titulo'); }
+    public function estudiosAnteriores() { return $this->hasMany(Estudio::class)->otrosNiveles()->with('estudioTitulos.titulo');}
+    public function familiares() { return $this->hasMany(Familiar::class); }
+    public function cursos() { return $this->hasMany(Curso::class); }
+    public function idiomas() { return $this->hasMany(Idioma::class); }
+    public function antecedentesLaborales() { return $this->hasMany(AntecedenteLaboral::class); }
+    public function usuario() { return $this->hasOne(User::class); }
     public static function getFormSchema(): array{
         $resultado = [
             TextInput::make('nombre')->label('Nombre')

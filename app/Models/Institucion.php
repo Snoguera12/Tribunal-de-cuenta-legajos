@@ -1,15 +1,14 @@
 <?php
-
 namespace App\Models;
 
-use DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Str;
 
 class Institucion extends Model
 {
@@ -28,22 +27,17 @@ class Institucion extends Model
     {
         // id único: pares para estudios, impares para cursos
         $estudios = DB::table('estudios')
-            ->join('personas', 'personas.id', '=', 'estudios.persona_id')
-            ->whereNull('estudios.institucion_id')
-            ->whereNotNull('estudios.institucion_otro')
-            ->selectRaw("estudios.id * 2 as id, 'Estudio' as origen, estudios.id as registro_id,
-                estudios.institucion_otro, estudios.nivel_estudio, NULL as curso,
-                personas.apellido, personas.nombre as nombre_persona, estudios.created_at");
+            ->whereNull('institucion_id')
+            ->whereNotNull('institucion_otro')
+            ->selectRaw("id * 2 as id, 'Estudio' as origen, id as registro_id,
+                institucion_otro, nivel_estudio, NULL as curso, created_at");
 
         $cursos = DB::table('cursos')
-            ->join('personas', 'personas.id', '=', 'cursos.persona_id')
-            ->whereNull('cursos.institucion_id')
-            ->whereNotNull('cursos.institucion_otro')
-            ->selectRaw("cursos.id * 2 + 1 as id, 'Curso' as origen, cursos.id as registro_id,
-                cursos.institucion_otro, NULL as nivel_estudio, cursos.nombre as curso,
-                personas.apellido, personas.nombre as nombre_persona, cursos.created_at");
+            ->whereNull('institucion_id')
+            ->whereNotNull('institucion_otro')
+            ->selectRaw("id * 2 + 1 as id, 'Curso' as origen, id as registro_id,
+                institucion_otro, NULL as nivel_estudio, nombre as curso, created_at");
 
-        // el alias coincide con la tabla del modelo para que Filament califique bien las columnas
         return static::query()->fromSub($estudios->unionAll($cursos), (new static)->getTable());
     }
 

@@ -20,6 +20,7 @@ class InstitucionResource extends Resource
     protected static ?string $navigationLabel = 'Institución';
     protected static ?string $modelLabel = 'Institución';
     protected static ?string $pluralModelLabel = 'Institución';
+    protected static string|\UnitEnum|null $navigationGroup = "Departamento";
     protected static ?string $model = Institucion::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;

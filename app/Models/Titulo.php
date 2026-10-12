@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use DB;
-use Filament\Forms\Components\Select;
+use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,56 +16,17 @@ class Titulo extends Model
     public function estudioTitulos() {
         return $this->hasMany(EstudioTitulo::class);
     }
-    public function estudios() {
-        return $this->belongsToMany(Estudio::class, 'estudio_titulo')->withTimestamps();
-    }
-
-    public static function getOpcionesNombre(): array {
-        static $opciones = null;
-        return $opciones ??= static::query()
-        ->whereNotNull('nombre')
-        ->where('nombre', '!=', 'otro')
-        ->distinct()
-        ->orderBy('nombre')
-        ->pluck('nombre')
-        ->mapWithKeys(fn (string $nombre): array => [$nombre => $nombre])
-        ->all();
-    }
 
     public static function getFormSchema(string $modeForm): array{
         $resultado = match($modeForm){
             'table' => [
                 TextInput::make('nombre')
                 ->label('Nombre del Título')
+                ->maxLength(100)
+                ->unique(ignoreRecord: true)
                 ->required(),
             ],
-            'list' => [
-                Select::make('nombre')
-                ->label('Nombre del Título')
-                ->required()
-                ->searchable()
-                ->native(false)
-                ->live()
-                ->options(
-                    fn (): array => [static::OTRO => 'Otro (Especificar)'] + static::getOpcionesNombre()
-                ),
-                /*->dehydrateStateUsing(fn (?string $state, Get $get): ?string => $state === static::OTRO 
-                    ? (trim((string) $get('nombre_otro')) ?: null)
-                    : $state
-                )*/
-
-                TextInput::make('nombre_otro')
-                ->label('Introduccir el Nombre del Título')
-                ->required()
-                ->visible(fn (GET $get): bool => $get('nombre') === static::OTRO)
-                ->validationMessages([
-                    "required" => "Requiere introducir el Nombre del Título.",
-                ])
-                ->extraInputAttributes([
-                    'oninvalid' => "this.setCustomValidity('Requiere introducir el Nombre del Título.')",
-                    'oninput' => "this.setCustomValidity('')",
-                ]),
-            ],
+            'list' => [],
         };
 
         return $resultado;

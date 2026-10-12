@@ -43,10 +43,13 @@ class Curso extends Model
             ...Institucion::getFormSchema(),
 
             TextInput::make('duracion')
-            ->label('Duración'),
+            ->label('Duración')
+            ->required(),
 
             DatePicker::make('fecha')
-            ->label('Fecha'),
+            ->label('Fecha')
+            ->maxDate(now())
+            ->required(),
 
             Checkbox::make('tiene_certificado')
             ->label('Tiene certificado'),

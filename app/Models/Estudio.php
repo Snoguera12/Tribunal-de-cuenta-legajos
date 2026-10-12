@@ -28,8 +28,6 @@ class Estudio extends Model
         'institucion_otro'
     ];
     public function persona(){ return $this->belongsTo(Persona::class, 'persona_id'); }
-    public function instituciones() { return $this->hasMany(Institucion::class); }
-    public function titulos() { return $this->belongsToMany(Titulo::class, 'estudio_titulo')->withTimestamps(); }
     public function estudioTitulos() { return $this->hasMany(EstudioTitulo::class); }
     public function institucion() { return $this->belongsTo(Institucion::class); }
     protected static function tieneEstudiosActivos($value): bool{
@@ -100,14 +98,6 @@ class Estudio extends Model
         ->orderByDesc('e2.id')
         ->limit(1);
     }
-    public static function getInstitucion() : array{
-        return self::query()
-        ->get(['id', 'institucion'])
-        ->mapWithKeys(fn ($item) => [
-            $item->id => "{$item->institucion}"
-        ])
-        ->toArray();
-    }
     public static function getFormSchema() : array{
         $resultado = [
             Select::make('nivel_estudio')
@@ -176,7 +166,7 @@ class Estudio extends Model
             ->addAction(fn (Action $action) => $action->icon('heroicon-m-plus')->color('gray'))
             ->collapsible()
             ->defaultItems(0)
-            ->itemLabel(fn (array $state): ?string => ($state['institucion'] ?? null) ?: 'Nuevo Registro de Estudio')
+              ->itemLabel(fn (array $state): ?string => ($state['institucion_otro'] ?? null) ?: (Institucion::find($state['institucion_id'] ?? null)?->nombre ?? 'Nuevo Registro de Estudio'))
             ->schema([
                 Grid::make(['default' => 1, 'sm' => 3])->schema(Estudio::getFormSchema()),
 
@@ -184,7 +174,7 @@ class Estudio extends Model
                 ->compact()
                 ->collapsible()
                 ->visible(fn (Get $get) => Estudio::requiereTitulo($get('nivel_estudio')))
-                ->extraAttributes([ /* tu style igual */ ])
+                ->extraAttributes([ 'style' => '...' ])
                 ->schema([
                     Repeater::make('titulos')
                     ->relationship('estudioTitulos')
@@ -193,7 +183,20 @@ class Estudio extends Model
                     ->hiddenLabel()
                     ->collapsible()
                     ->grid(3)
-                    ->schema(EstudioTitulo::getFormSchema()),
+                    ->schema(EstudioTitulo::getFormSchema())
+                    ->rule(fn () => function (string $attribute, $value, \Closure $fail) {
+                        $ids = collect($value)->pluck('titulo_id')
+                        ->filter(fn ($id) => filled($id) && $id !== EstudioTitulo::OTRO);
+
+                        $textos = collect($value)
+                        ->filter(fn ($item) => ($item['titulo_id'] ?? null) === EstudioTitulo::OTRO)
+                        ->map(fn ($item) => mb_strtolower(\Illuminate\Support\Str::squish((string) ($item['titulo_otro'] ?? ''))))
+                        ->filter();
+
+                        if ($ids->count() !== $ids->unique()->count() || $textos->count() !== $textos->unique()->count()) {
+                            $fail('No puede repetir el mismo título en un estudio.');
+                        }
+                    }),
                 ]),
             ]),
         ];

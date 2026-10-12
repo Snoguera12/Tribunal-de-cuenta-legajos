@@ -1,17 +1,17 @@
 <?php
 namespace App\Models;
 
-use DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 class EstudioTitulo extends Model
 {
-    private const OTRO = '__otro__';
+    public const OTRO = '__otro__';
     protected $table = 'estudio_titulos';
     protected $fillable = [
         'estudio_id',

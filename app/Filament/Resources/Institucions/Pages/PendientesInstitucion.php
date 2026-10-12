@@ -3,8 +3,6 @@
 namespace App\Filament\Resources\Institucions\Pages;
 
 use App\Filament\Resources\Institucions\InstitucionResource;
-use App\Models\Curso;
-use App\Models\Estudio;
 use App\Models\Institucion;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
