@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Legajos\Tables;
 
 use App\Enums\EstadoLegajoEnum;
 use App\Filament\Actions\MotivoBajaAction;
+use App\Filament\Resources\Legajos\LegajoResource;
 use App\Models\Cargo;
 use App\Models\Legajo;
 use Filament\Actions\EditAction;
@@ -40,23 +41,24 @@ class LegajosTable
                         );
                     }
                 ),
-                
+
                 SelectFilter::make('cargo_id')
                 ->label('Cargo')
                 ->options(Cargo::getCargos()),
-                
+
                 SelectFilter::make('estado')
                 ->label('Estado')
                 ->options(EstadoLegajoEnum::class)
                 ->default(true),
             ])
             ->recordActions([
-                // Botón "Ver"
+                // Botón "Ver": abre la página de vista del legajo (con sus licencias)
                 ViewAction::make()
                 ->label('Ver')
                 ->iconButton()
                 ->color('success')
-                ->icon('heroicon-m-eye'),
+                ->icon('heroicon-m-eye')
+                ->url(fn (Legajo $record): string => LegajoResource::getUrl('view', ['record' => $record])),
 
                 // Botón "Editar"
                 EditAction::make()
@@ -72,6 +74,11 @@ class LegajosTable
                 ->color('danger')
                 ->icon('heroicon-m-arrow-down'),
             ], position: RecordActionsPosition::AfterColumns
-            );
+            )
+            // Clic en la fila: va a la vista (solo lectura), no a la edición.
+            // Si el usuario no puede ver ese legajo, la fila no es clicable.
+            ->recordUrl(fn (Legajo $record): ?string => auth()->user()?->can('view', $record)
+                ? LegajoResource::getUrl('view', ['record' => $record])
+                : null);
     }
 }

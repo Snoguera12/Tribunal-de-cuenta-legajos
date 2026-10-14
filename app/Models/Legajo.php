@@ -55,6 +55,10 @@ class Legajo extends Model
     {
         return $this->hasMany(Documento::class);
     }
+    public function licencias()
+    {
+        return $this->hasMany(Licencia::class);
+    }
     public function isAlta()
     {
         return $this->estado == EstadoLegajoEnum::Alta;

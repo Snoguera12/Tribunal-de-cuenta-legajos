@@ -5,7 +5,10 @@ namespace App\Filament\Resources\Legajos;
 use App\Filament\Resources\Legajos\Pages\CreateLegajo;
 use App\Filament\Resources\Legajos\Pages\EditLegajo;
 use App\Filament\Resources\Legajos\Pages\ListLegajos;
+use App\Filament\Resources\Legajos\Pages\ViewLegajo;
+use App\Filament\Resources\Legajos\RelationManagers\LicenciasRelationManager;
 use App\Filament\Resources\Legajos\Schemas\LegajoForm;
+use App\Filament\Resources\Legajos\Schemas\LegajoInfolist;
 use App\Filament\Resources\Legajos\Tables\LegajosTable;
 use App\Models\Legajo;
 use BackedEnum;
@@ -36,6 +39,11 @@ class LegajoResource extends Resource
         return LegajoForm::configure($schema);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return LegajoInfolist::configure($schema);
+    }
+
     public static function table(Table $table): Table
     {
         return LegajosTable::configure($table);
@@ -57,7 +65,7 @@ class LegajoResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            LicenciasRelationManager::class,
         ];
     }
 
@@ -66,6 +74,7 @@ class LegajoResource extends Resource
         return [
             'index' => ListLegajos::route('/'),
             'create' => CreateLegajo::route('/crear'),
+            'view' => ViewLegajo::route('/{record}'),
             'edit' => EditLegajo::route('/{record}/editar'),
         ];
     }
