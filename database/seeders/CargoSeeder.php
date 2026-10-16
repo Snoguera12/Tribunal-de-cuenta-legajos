@@ -8,9 +8,6 @@ use Illuminate\Database\Seeder;
 
 class CargoSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         Cargo::create(['nombre' => 'Administrativo']);

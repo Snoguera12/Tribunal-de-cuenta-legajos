@@ -23,10 +23,8 @@ class SubirDocumentos extends Page implements HasForms
     protected static ?int $navigationSort = 6;
     public ?array $data = [];
     public static function canAccess(array $parameters = []): bool{
-        if(!auth()->user()->isAdmin_RRHH()){
-            abort(403, 'No tienes acceso a esta función');
-        }
-        return true;
+        // devuelve bool: si tira abort aca se rompe el menu de los otros roles
+        return auth()->user()?->isAdmin_RRHH() ?? false;
     }
     public function mount(): void
     {
@@ -43,6 +41,14 @@ class SubirDocumentos extends Page implements HasForms
                 ->directory('documentos') // subdirectorio dentro del disk
                 ->disk('local') // o el disk que uses
                 ->visibility('private')
+                ->maxSize(10240)
+                ->acceptedFileTypes(['application/pdf', 'image/jpeg'])
+                ->rules([new \App\Rules\ArchivoPdfOJpeg()])
+                ->saveUploadedFileUsing(fn ($file) => \App\Services\ArchivoSeguro::guardar($file, 'documentos'))
+                ->validationMessages([
+                    'mimes' => 'Solo se permiten archivos PDF, JPG o JPEG.',
+                    'max' => 'El archivo no puede superar los 10 MB.',
+                ])
                 //->preserveFilenames()
                 ->required(),
             ])

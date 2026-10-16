@@ -50,7 +50,8 @@ return [
     |
     */
 
-    'expiration' => null,
+    // minutos que dura un token de la API (por defecto 1 año). Si vence hay que generar otro
+    'expiration' => env('SANCTUM_EXPIRATION', 525600),
 
     /*
     |--------------------------------------------------------------------------

@@ -13,13 +13,15 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
     protected static ?string $modelLabel = "Usuario";
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 1;
     public static function form(Schema $schema): Schema
     {
         return UserForm::configure($schema);
@@ -28,6 +30,19 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return UsersTable::configure($table);
+    }
+
+    // rrhh no puede ver al administrador en la lista, solo el mismo admin lo ve
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        if (!$user->isAdmin()) {
+            return $query->where('rol', '!=', 'administrador');
+        }
+
+        return $query;
     }
 
     public static function getRelations(): array

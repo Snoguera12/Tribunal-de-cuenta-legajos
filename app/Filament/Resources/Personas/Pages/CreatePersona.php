@@ -5,10 +5,16 @@ namespace App\Filament\Resources\Personas\Pages;
 use App\Filament\Resources\Personas\PersonaResource;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
+use Livewire\Attributes\Url;
 
 class CreatePersona extends CreateRecord
 {
     protected static string $resource = PersonaResource::class;
+
+    // viene en 1 solo cuando el usuario entra desde "Mis datos personales"
+    #[Url]
+    public bool $propia = false;
+
     public function getTitle(): string
     {
         return 'Registrar Persona';
@@ -38,9 +44,9 @@ class CreatePersona extends CreateRecord
     {
         $user = auth()->user();
 
-        // Solo se auto-asigna si el usuario actual NO tiene una persona vinculada
-        // Esto evita que Administradores o RRHH se adueñen del registro al crear otras personas
-        if (!$user->persona_id) {
+        // solo se vincula si es SU persona (entro desde "Mis datos personales") y no tiene otra
+        // si no, el admin/RRHH quedaria dueño de la primera persona que cargue
+        if ($this->propia && ! $user->persona_id) {
             $user->update([
                 'persona_id' => $this->record->id,
             ]);

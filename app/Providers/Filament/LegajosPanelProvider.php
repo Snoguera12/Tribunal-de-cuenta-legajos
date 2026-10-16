@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\Login;
+use App\Http\Middleware\ControlarSesionUnica;
+use App\Http\Middleware\ForzarCambioClave;
+use App\Http\Middleware\RegistrarNavegacion;
 use App\Filament\Resources\Documentos\Widgets\DocumentosPendientesWidget;
 use App\Filament\Resources\Legajos\Widgets\LegajoWidget;
 use App\Filament\Resources\Personas\Widgets\GeneroWidget;
@@ -30,14 +33,7 @@ class LegajosPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        // ─────────────────────────────────────────────────────────────
-        // ELIMINADO: FilamentView::registerRenderHook('panels::body.start', …)
-        //
-        // Ese hook corría en TODAS las páginas del panel, no sólo en el
-        // login, e inyectaba un </div> sin apertura que rompía el DOM.
-        // El bloque institucional ahora vive en la vista del login:
-        // resources/views/filament/pages/auth/login.blade.php
-        // ─────────────────────────────────────────────────────────────
+        // el bloque del login esta en la vista auth/login.blade.php
 
         return $panel
             ->default()
@@ -48,23 +44,7 @@ class LegajosPanelProvider extends PanelProvider
             ->login(Login::class)
             ->databaseNotifications()
 
-            // Paleta institucional en un solo lugar. Esto reemplaza los
-            // `background-color: #2563eb !important` de theme.css.
-            //
-            // Filament v4 exige OKLCH cuando se pasa un arreglo de tonos.
-            // El hex al costado de cada línea es sólo referencia para leer
-            // el archivo; el valor que Filament interpreta es el oklch().
-            //
-            // NO se usa Color::hex(): ese helper toma el tono del hex pero
-            // normaliza la luminosidad a los niveles estándar de la rampa,
-            // así que un navy oscuro termina produciendo un azul común.
-            //
-            // La rampa de primary está corrida un casillero respecto de la
-            // versión anterior: el navy #1e4270 pasó de 600 a 700. Motivo:
-            // v4 elige el tono en runtime según contraste WCAG y usa el 600
-            // como fondo del botón sólido en AMBOS modos. Ese navy daba
-            // 1.43:1 contra el panel oscuro — el botón desaparecía. Ahora
-            // el 600 es #2f5b8c: 7:1 con texto blanco en los dos modos.
+            // colores institucionales (filament v4 pide oklch; el hex de al lado es solo para leer)
             ->colors([
                 'primary' => [
                     50  => 'oklch(0.972 0.008 253.9)',   // #f2f6fb
@@ -80,16 +60,7 @@ class LegajosPanelProvider extends PanelProvider
                     950 => 'oklch(0.215 0.041 254.0)',   // #0b1a2c
                 ],
 
-                // Reemplaza Color::Slate. En Filament el gris no es sólo el
-                // gris de los textos: define el fondo del panel entero en
-                // ambos modos. Slate daba fondo #020617 y paneles #0f172a,
-                // apenas 1.13:1 entre sí. Ese era el "todo negro, apenas se
-                // nota algo".
-                //
-                // Jerarquía en oscuro: 950 fondo, 900 paneles, 800 inputs,
-                // 700 bordes. El 700 importa más de lo que parece: v4 lo
-                // usa como superficie de referencia para calcular el
-                // contraste de íconos y textos secundarios en oscuro.
+                // gris propio: define el fondo del panel (slate quedaba casi negro)
                 'gray' => [
                     50  => 'oklch(0.975 0.005 258.3)',   // #f5f7fa
                     100 => 'oklch(0.947 0.011 252.1)',   // #e8eef5
@@ -122,6 +93,7 @@ class LegajosPanelProvider extends PanelProvider
                 'Papeles',
                 'Institución',
                 'Departamento',
+                'Seguridad',
             ])
             ->discoverResources(
                 in: app_path('Filament/Resources'),
@@ -158,6 +130,9 @@ class LegajosPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                ControlarSesionUnica::class,
+                ForzarCambioClave::class,
+                RegistrarNavegacion::class,
             ]);
     }
 }

@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
+use App\Services\HabilitacionUsuarios;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\EstadoCivilEnum;
 use App\Enums\GeneroEnum;
 use Filament\Forms\Components\DatePicker;
@@ -16,6 +19,9 @@ use Illuminate\Support\Collection;
 
 class Persona extends Model
 {
+    use RegistraAuditoria;
+    use SoftDeletes;
+
     protected $casts = [
         'genero' => GeneroEnum::class,
         'estado_civil' => EstadoCivilEnum::class,
@@ -70,6 +76,23 @@ class Persona extends Model
                 ELSE 5 
             END")->latestOfMany(); // Garantiza que devuelva un solo registro compatible con Section::relationship
     }
+    // si se elimina la persona, su usuario tampoco puede entrar (y vuelve si se restaura)
+    protected static function booted(): void
+    {
+        static::deleted(function (Persona $persona) {
+            if (! $persona->isForceDeleting() && $persona->usuario) {
+                HabilitacionUsuarios::deshabilitar($persona->usuario, 'persona_eliminada');
+            }
+        });
+
+        static::restored(function (Persona $persona) {
+            if ($persona->usuario) {
+                HabilitacionUsuarios::habilitar($persona->usuario, ['persona_eliminada']);
+            }
+        });
+    }
+
+
     public function usuario()
     {
         return $this->hasOne(User::class);
@@ -125,16 +148,16 @@ class Persona extends Model
                 'oninput' => "this.setCustomValidity('')",
             ])
             ->dehydrateStateUsing(fn (string|null $state) => $state ? (int) preg_replace('/\D/', '', $state) : null)
-            // Se ejecuta al perder el foco si el CUIL está vacío
+            // al salir del campo, si el cuil esta vacio se arma con el dni
             ->afterStateUpdated(function (string|null $state, Set $set, Get $get) {
                 if (blank($state) || filled($get('cuil'))) {
                     return;
                 }
 
-                // El DNI físico se rellena con ceros a la izquierda hasta tener 8 dígitos para armar el CUIL estándar
+                // el dni se completa con ceros hasta 8 digitos
                 $dniPad = str_pad(preg_replace('/\D/', '', $state), 8, '0', STR_PAD_LEFT);
 
-                // Prefijo genérico 20 y sufijo 2 (El usuario podrá corregirlo si es mujer/empresa)
+                // prefijo 20 y sufijo 2 genericos (se pueden corregir)
                 $prefijo = '20';
                 $sufijo = '2';
 
@@ -145,9 +168,9 @@ class Persona extends Model
             ->required()
             ->unique(ignoreRecord: true)
             ->maxLength(11)
-            // Pasamos un Closure a rules() para que Filament nos inyecte la instancia de Get correctamente
+            // closure para que filament inyecte Get
             ->rules(fn (Get $get): array => [
-                'regex:/^\d{11}$/', // Formato numérico puro de 11 dígitos
+                'regex:/^\d{11}$/',
                 function (string $attribute, $value, $fail) use ($get) {
                     $dni = preg_replace('/\D/', '', (string) $get('dni'));
                     $cuilNumericoPuro = preg_replace('/\D/', '', (string) $value);
@@ -156,7 +179,7 @@ class Persona extends Model
                         return;
                     }
 
-                    // El DNI dentro del CUIL siempre ocupa 8 dígitos (de la posición 2 a la 9)
+                    // el dni va en las posiciones 2 a 9 del cuil
                     $dniEnCuil = substr($cuilNumericoPuro, 2, 8);
                     $dniConCeros = str_pad($dni, 8, '0', STR_PAD_LEFT);
 

@@ -15,17 +15,6 @@ class HistorialbajaForm
     {
         return $schema
         ->components([
-            /*Select::make('legajo_id')
-             *                    ->label('Número de legajo')
-             *                    ->searchable()
-             *                    ->required()
-             *                    ->options(Legajo::all()->pluck("num_legajo", "id"))
-             *                    ->validationMessages([
-             *                        "required" => "Requiere asociar un legajo.",
-        ])->extraInputAttributes([
-        'oninvalid' => "this.setCustomValidity('Requiere asociar a un legajo.')",
-                     'oninput' => "this.setCustomValidity('')",
-        ]),*/
             Select::make('motivo')
             ->label('Motivo de Legajo')
             ->searchable()

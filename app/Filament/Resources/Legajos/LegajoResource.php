@@ -23,9 +23,6 @@ class LegajoResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    /*public static function getNavigationBadge(): ?string{
-     *       return Legajo::count();
-}*/
 
     public static function getNavigationBadgeColor(): string|array|null{
         return "succes";

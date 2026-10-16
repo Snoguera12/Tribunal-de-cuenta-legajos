@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ApiClients\Tables;
 
 use App\Models\ApiClient;
+use App\Models\Auditoria;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -12,7 +13,6 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
-use Hamcrest\Core\Set;
 use Illuminate\Support\HtmlString;
 
 class ApiClientsTable
@@ -50,15 +50,12 @@ class ApiClientsTable
             ->filters([
                 //
             ])
-            ->recordActions([
-                EditAction::make(),
-            ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
             ])
-            ->actions([
+            ->recordActions([
             EditAction::make(),
             
             // Acción personalizada para generar el token
@@ -80,8 +77,16 @@ class ApiClientsTable
                 ]);
 
                 // 2. Generamos el token usando Sanctum
-                $tokenName = 'Token-' . $record->name . '-' . now()->format('YmdHis');
+                $tokenName = 'Token-' . $record->nombre . '-' . now()->format('YmdHis');
                 $token = $record->createToken($tokenName)->plainTextToken;
+
+                // en la auditoria solo va el nombre, el token nunca
+                Auditoria::registrar(
+                    evento: 'token_generado',
+                    descripcion: 'Generó un token para el cliente API ' . $record->nombre,
+                    modelo: $record,
+                    extra: ['nombre_token' => $tokenName],
+                );
 
                 // 3. Enviamos la notificación persistente con el token
                 Notification::make()
@@ -103,14 +108,22 @@ class ApiClientsTable
             ->color('danger')
             ->requiresConfirmation()
             ->modalHeading('¿Borrar / Revocar Token?')
-            ->modalDescription('Esto eliminará de forma permanente cualquier token de Sanctum asociado. El cliente se desactivará de inmediato.')
+            ->modalDescription('Esto elimina los tokens de este cliente y lo desactiva de inmediato. Después se puede generar uno nuevo.')
+            ->visible(fn (ApiClient $record): bool => $record->is_token)
             ->action(function (ApiClient $record) {
                 $record->tokens()->delete();
 
-                $record->forceDelete();
+                // queda desactivado y se puede generar otro token
+                $record->update(['is_active' => false, 'is_token' => false]);
+
+                Auditoria::registrar(
+                    evento: 'token_eliminado',
+                    descripcion: 'Revocó los tokens del cliente API ' . $record->nombre,
+                    modelo: $record,
+                );
 
                 Notification::make()
-                    ->title('Token borrado con éxito')
+                    ->title('Token revocado y cliente desactivado')
                     ->success()
                     ->send();
             }),

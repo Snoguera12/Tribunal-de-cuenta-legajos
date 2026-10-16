@@ -13,12 +13,8 @@ class DocumentosTable
     {
         return $table
             ->columns(Documento::getOutSchema('table'))
-            ->modifyQueryUsing(function (Builder $query) {
-                // Filtrado personalizado directo a la consulta de Eloquent
-                return $query->whereNull('descripcion')
-                    ->orWhereNull('tipodoc')
-                    ->orWhereNull('legajo_id');
-            })
+            // esta lista muestra solo los pendientes de completar
+            ->modifyQueryUsing(fn (Builder $query) => $query->pendientes())
             ->filters([
                 //
             ])

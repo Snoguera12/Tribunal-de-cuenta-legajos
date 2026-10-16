@@ -44,6 +44,21 @@ return [
             'transaction_mode' => 'DEFERRED',
         ],
 
+        // base aparte: historicos + auditoria (si no se configura usa un sqlite propio)
+        'historico' => [
+            'driver' => env('HIST_DB_CONNECTION', 'sqlite'),
+            'database' => env('HIST_DB_DATABASE', database_path('historico.sqlite')),
+            'host' => env('HIST_DB_HOST', '127.0.0.1'),
+            'port' => env('HIST_DB_PORT', '3306'),
+            'username' => env('HIST_DB_USERNAME', 'root'),
+            'password' => env('HIST_DB_PASSWORD', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'foreign_key_constraints' => false,
+        ],
+
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),

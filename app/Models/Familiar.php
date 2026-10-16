@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\FamiliarViveEnum;
 use App\Enums\ParentescoEnum;
 use Filament\Forms\Components\DatePicker;
@@ -12,6 +14,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Familiar extends Model
 {
+    use RegistraAuditoria;
+    use SoftDeletes;
+
     protected $casts = [
         'parentesco' => ParentescoEnum::class,
         'vive' => FamiliarViveEnum::class,

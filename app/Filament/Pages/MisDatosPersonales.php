@@ -17,24 +17,24 @@ class MisDatosPersonales extends Page
     protected static ?int $navigationSort = 1;
     public static function canAccess(): bool
     {
-        // Return true if the user is authorized, or use a Spatie permission check
+        // todos los roles pueden entrar a esta pagina
         return true;
     }
     public static function shouldRegisterNavigation(): bool
     {
-        // Solo se muestra el acceso al recurso completo en la barra lateral a Administrador, RRHH y el Empleado mientras tenga adjunto a una persona.
+        // en el menu para administrador, RRHH y empleados con persona
         return auth()->user()->isAdmin_RRHH() || auth()->user()->persona_id != NULL;
     }
     public static function getNavigationUrl(): string
     {
         $usuario = auth()->user();
 
-        // Si el usuario no tiene una persona vinculada (es null o está vacío), va a la creación
+        // sin persona vinculada: va a crearla
         if (!$usuario || ! $usuario->persona_id) {
-            return PersonaResource::getUrl('create');
+            return PersonaResource::getUrl('create', ['propia' => 1]);
         }
 
-        // Si ya la tiene, va a la vista de lectura
+        // con persona: va a verla
         return PersonaResource::getUrl('view', ['record' => $usuario->persona_id]);
     }
 

@@ -19,9 +19,6 @@ class HistorialbajasTable
                 EditAction::make(),
             ])
             ->toolbarActions([
-                /*BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),*/
             ]);
             
     }

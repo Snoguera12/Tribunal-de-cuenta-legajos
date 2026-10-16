@@ -51,9 +51,7 @@ class DocumentoResource extends Resource
     }
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::whereNull('descripcion')
-                ->orWhereNull('tipodoc')
-                ->orWhereNull('legajo_id')->count();
+        return static::getModel()::pendientes()->count();
     }
     public static function getPages(): array
     {

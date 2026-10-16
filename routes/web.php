@@ -1,9 +1,11 @@
 <?php
-use App\Models\Legajo;
+
+use App\Models\Auditoria;
+use App\Models\Documento;
+use App\Services\ArchivoSeguro;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Response;
 
 Route::get('/', function () {
     return redirect('legajos');
@@ -13,41 +15,68 @@ Route::get('/login', function () {
     return redirect()->to('/legajos/login');
 })->name('login');
 
-// Dirección de documentos
+
+// documentos (link firmado). Solo matchea rutas que empiezan con documentos/
 Route::get('/{path}', function (Request $request, string $path) {
-    if (!auth()->check()) {
-        abort(401); // Usuario no autorizado.
-    }
-    
-    if (!$request->hasValidSignature()) {
-        abort(403, 'El enlace sea ha expirado.');
+
+    if (! auth()->check()) {
+        abort(401);
     }
 
-    $legajoId = $request->route('legajo_id') ?? $request->query('legajo_id');
-    $legajo = Legajo::select('id', 'persona_id')->find($legajoId);
-    $usuario = auth()->user();
-    if (!$usuario->isStaffRoles()){
-        // Si NO es staff, obligatoriamente ambos deben tener una persona asignada (no ser null) 
-        // Y además, esa persona_id debe coincidir exactamente.
-        $tieneMismaPersona = 
-        !is_null($usuario->persona_id) 
-        && !is_null($legajo->persona_id) 
-        && $usuario->persona_id === $legajo->persona_id;
-        
-        if (!$tieneMismaPersona) {
-            abort(403, 'No tienes autorización para ver este documento de esta persona.');
-        }
+    if (! $request->hasValidSignature()) {
+        abort(403, 'El enlace ha expirado.');
     }
 
-    if (!Storage::disk('local')->exists($path)) {
+    if (str_contains($path, '..')) {
         abort(404);
     }
 
-    // Obtiene la ruta física real del archivo privado de forma segura
-    $realPath = Storage::disk('local')->path($path);
+    $documento = Documento::withTrashed()->where('ruta', $path)->first();
 
-    // Retorna el archivo directamente (el navegador intentará renderizarlo si es PDF/imagen)
-    return Response::file($realPath);
+    // el empleado ve que existe pero no lo abre
+    if (auth()->user()->isEmpleado()) {
+        Auditoria::registrar(
+            evento: 'acceso_denegado',
+            descripcion: 'Un empleado intentó abrir un documento',
+            modelo: $documento,
+            extra: ['archivo' => $path],
+        );
+
+        abort(403, 'Tu rol no tiene permitido descargar documentos. Contactá a RRHH.');
+    }
+
+    if (! Storage::disk('local')->exists($path)) {
+        abort(404);
+    }
+
+    // el archivo esta cifrado, se desencripta antes de mostrarlo
+    $contenido = ArchivoSeguro::leer($path);
+
+    if ($contenido === null) {
+        Auditoria::registrar(
+            evento: 'archivo_ilegible',
+            descripcion: 'No se pudo desencriptar el documento ' . basename($path),
+            modelo: $documento,
+            extra: ['archivo' => $path],
+        );
+
+        abort(404, 'No se pudo abrir el archivo.');
+    }
+
+    Auditoria::registrar(
+        evento: 'ver_documento',
+        descripcion: 'Abrió el documento ' . basename($path),
+        modelo: $documento,
+        extra: ['archivo' => $path, 'legajo_id' => $documento?->legajo_id],
+    );
+
+    return response($contenido, 200, [
+        'Content-Type' => ArchivoSeguro::tipoMime($path),
+        'Content-Disposition' => 'inline; filename="' . basename($path) . '"',
+        // el documento no puede ejecutar nada ni cargar nada, y no se guarda en cache
+        'Content-Security-Policy' => "default-src 'none'; sandbox",
+        'Cache-Control' => 'private, no-store',
+    ]);
 })
-->where('path', '.*',)
+->where('path', 'documentos/.*')
 ->name('documentos.ver');

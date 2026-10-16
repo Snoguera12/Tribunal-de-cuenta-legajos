@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 
 class Area extends Model
 {
+    use RegistraAuditoria;
+
     protected $fillable = [
         "nombre",
         'descripcion',

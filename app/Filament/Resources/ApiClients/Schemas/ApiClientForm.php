@@ -18,9 +18,6 @@ class ApiClientForm
                 ->label("Nombre")
                 ->required(),
 
-                /*Toggle::make('is_active')
-                ->label('Estado')
-                ->visible(fn (?ApiClient $record) => $record?->is_token)*/
                 
             ]);
     }

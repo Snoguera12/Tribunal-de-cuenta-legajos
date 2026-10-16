@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
@@ -10,6 +12,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Titulo extends Model
 {
+    use RegistraAuditoria;
+    use SoftDeletes;
+
     protected $fillable = [
         'nombre',
         'estudio_id',
