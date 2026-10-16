@@ -20,8 +20,8 @@ class ListInstitucions extends ListRecords
             ->label('Instituciones pendientes')
             ->icon('heroicon-m-exclamation-triangle')
             ->color('warning')
-            ->badge(fn () => (Estudio::pendientes()->count() + Curso::pendientes()->count()) ?: null)
-            ->url(fn () => InstitucionResource::getUrl('pendientes')),
+            ->badge((Estudio::pendientes()->count() + Curso::pendientes()->count()) ?: null)
+            ->url(InstitucionResource::getUrl('pendientes')),
             
             CreateAction::make(),
         ];

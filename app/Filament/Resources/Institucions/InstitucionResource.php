@@ -8,6 +8,8 @@ use App\Filament\Resources\Institucions\Pages\ListInstitucions;
 use App\Filament\Resources\Institucions\Pages\PendientesInstitucion;
 use App\Filament\Resources\Institucions\Schemas\InstitucionForm;
 use App\Filament\Resources\Institucions\Tables\InstitucionsTable;
+use App\Models\Curso;
+use App\Models\Estudio;
 use App\Models\Institucion;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -34,7 +36,11 @@ class InstitucionResource extends Resource
     {
         return InstitucionsTable::configure($table);
     }
-
+    public static function getNavigationBadge(): ?string
+    {
+        // Retorna el conteo total de la base de datos
+        return Estudio::pendientes()->count() + Curso::pendientes()->count();
+    }
     public static function getRelations(): array
     {
         return [
