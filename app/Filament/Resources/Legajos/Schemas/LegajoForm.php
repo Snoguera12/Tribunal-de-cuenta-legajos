@@ -31,6 +31,7 @@ class LegajoForm
         ->components(Legajo::getFrontLegajoDocumentos('solo'));
     }
 }
+<<<<<<< HEAD
 
 /*
 Tabs::make('Tabs_Base')
@@ -181,3 +182,5 @@ Tabs::make('Tabs_Base')
 
             ]),
 */
+=======
+>>>>>>> version2-20261014_210855

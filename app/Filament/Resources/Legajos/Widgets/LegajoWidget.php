@@ -19,10 +19,13 @@ class LegajoWidget extends StatsOverviewWidget
         $total = Legajo::query()->count();
         $alta = Legajo::query()->where('estado', true)->count();
         $baja = Legajo::query()->where('estado', false)->count();
+<<<<<<< HEAD
         // cuenta documentos que no tienen legajo asignado todavia
         $documentosPendientes = Documento::query()->whereNull('legajo_id')->count();
 
 
+=======
+>>>>>>> version2-20261014_210855
         $porcentajeAltas = $total > 0 ? round(($alta / $total) * 100) : 0;
         $porcentajeBajas = $total > 0 ? round(($baja / $total) * 100) : 0;
 
@@ -41,11 +44,14 @@ class LegajoWidget extends StatsOverviewWidget
             ->descriptionIcon('heroicon-m-x-circle')
             ->color('danger'),
 
+<<<<<<< HEAD
             Stat::make('Documentos Pendientes', $documentosPendientes)
             ->description('Documentos subidos sin asignar a un legajo.')
             ->descriptionIcon('heroicon-m-document-magnifying-glass')
             ->color($documentosPendientes > 0 ? 'warning' : 'success')
             ->url(route('filament.legajos.resources.documentos.revisar')),
+=======
+>>>>>>> version2-20261014_210855
         ];
     }
 }

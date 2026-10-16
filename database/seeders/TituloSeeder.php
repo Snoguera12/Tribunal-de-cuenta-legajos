@@ -7,9 +7,6 @@ use Illuminate\Database\Seeder;
 
 class TituloSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         Titulo::create([

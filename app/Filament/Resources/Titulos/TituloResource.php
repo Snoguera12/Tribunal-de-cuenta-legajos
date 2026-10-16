@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Titulos;
 
-use App\Filament\Resources\Titulos\Pages\CreateTitulo;
-use App\Filament\Resources\Titulos\Pages\EditTitulo;
 use App\Filament\Resources\Titulos\Pages\ListTitulos;
 use App\Filament\Resources\Titulos\Schemas\TituloForm;
 use App\Filament\Resources\Titulos\Tables\TitulosTable;
@@ -18,8 +16,8 @@ class TituloResource extends Resource
 {
     protected static ?string $model = Titulo::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-    protected static string|\UnitEnum|null $navigationGroup = "Agentes";
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-identification';
+    protected static string|\UnitEnum|null $navigationGroup = "Papeles";
     protected static ?string $modelLabel = "Títulos";
     protected static ?int $navigationSort = 20;
     public static function form(Schema $schema): Schema

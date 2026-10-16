@@ -42,6 +42,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        
+        'api' => [
+            'driver' => 'sanctum',
+            'provider' => 'api_clients',
+        ],
     ],
 
     /*
@@ -65,6 +70,10 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
+        ],
+        'api_clients' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\ApiClient::class,
         ],
 
         // 'users' => [

@@ -8,9 +8,6 @@ use Illuminate\Database\Seeder;
 
 class LegajoSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         Legajo::create(

@@ -8,7 +8,11 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+<<<<<<< HEAD
 // le pone 5 documentos de prueba a cada legajo (dni, licencia, historial, titulo y uno de texto)
+=======
+// 5 documentos de prueba por legajo
+>>>>>>> version2-20261014_210855
 // los archivos deben estar en database/seeders/documentos_prueba/
 class DocumentosPruebaSeeder extends Seeder
 {

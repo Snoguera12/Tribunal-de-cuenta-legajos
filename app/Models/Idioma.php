@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\IdiomaNivelEnum;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -10,6 +12,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Idioma extends Model
 {
+    use RegistraAuditoria;
+    use SoftDeletes;
+
     protected $casts = [
         'nivel' => IdiomaNivelEnum::class,
     ];

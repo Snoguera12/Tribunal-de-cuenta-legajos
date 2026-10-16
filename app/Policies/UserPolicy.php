@@ -37,6 +37,13 @@ class UserPolicy
 
     public function delete(User $user, User $model): bool
     {
+<<<<<<< HEAD
+=======
+        if ($user->id === $model->id) {
+            return false;
+        }
+
+>>>>>>> version2-20261014_210855
         if ($model->rol === 'administrador' && !$user->isAdmin()) {
             return false;
         }
@@ -55,6 +62,13 @@ class UserPolicy
 
     public function forceDelete(User $user, User $model): bool
     {
+<<<<<<< HEAD
+=======
+        if ($user->id === $model->id) {
+            return false;
+        }
+
+>>>>>>> version2-20261014_210855
         if ($model->rol === 'administrador' && !$user->isAdmin()) {
             return false;
         }

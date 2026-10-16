@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TipodocEnum;
+use App\Models\Concerns\RegistraAuditoria;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -18,6 +19,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Documento extends Model
 {
     use SoftDeletes;
+<<<<<<< HEAD
     use LogsActivity;
 
     public function getActivitylogOptions(): LogOptions
@@ -28,6 +30,9 @@ class Documento extends Model
             ->dontSubmitEmptyLogs()
             ->useLogName('documentos');
     }
+=======
+    use RegistraAuditoria;
+>>>>>>> version2-20261014_210855
 
     protected $casts = [
         'tipodoc' => TipodocEnum::class,
@@ -54,7 +59,11 @@ class Documento extends Model
             ->label('Número de legajo')
             ->searchable()
             ->columns(1)
+<<<<<<< HEAD
             ->options(Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')->selectRaw("legajos.id, 'Legajo: ' || legajos.num_legajo || ' (' || personas.nombre || ' ' || personas.apellido || ' - DNI: ' || personas.dni || ')' as nombre_completo")->pluck('nombre_completo', 'id'))
+=======
+            ->options(Legajo::opcionesConPersona())
+>>>>>>> version2-20261014_210855
             ->validationMessages([
                 'required' => 'Requiere asociar a un Legajo.',
             ])
@@ -90,9 +99,12 @@ class Documento extends Model
                 ->visibility('private')
                 ->directory('documentos/')
                 ->maxSize(10240)
-                ->openable()
                 ->acceptedFileTypes(['application/pdf', 'image/jpeg'])
                 ->rules([new \App\Rules\ArchivoPdfOJpeg()])
+<<<<<<< HEAD
+=======
+                ->saveUploadedFileUsing(fn ($file) => \App\Services\ArchivoSeguro::guardar($file, 'documentos'))
+>>>>>>> version2-20261014_210855
                 ->validationMessages(['required' => 'Debe subir un archivo válido.'])
                 ->required(),
             ];
@@ -103,6 +115,7 @@ class Documento extends Model
                 Select::make('legajo_id')
                 ->label('Número de legajo')
                 ->visible($adjunto_legajo)
+<<<<<<< HEAD
                 // el empleado solo ve su legajo, los demas ven todos
                 ->options(function () use ($esEmpleado) {
                     $query = Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')
@@ -114,11 +127,19 @@ class Documento extends Model
 
                     return $query->pluck('nombre_completo', 'id');
                 })
+=======
+                // el empleado solo ve su legajo
+                ->options(fn () => Legajo::opcionesConPersona($esEmpleado ? auth()->user()->persona_id : null))
+>>>>>>> version2-20261014_210855
                 ->default(fn () => $esEmpleado
                     ? Legajo::where('persona_id', auth()->user()->persona_id)->value('id')
                     : null)
                 ->disabled($esEmpleado)
+<<<<<<< HEAD
                 // dehydrated para que mande el valor aunque este disabled
+=======
+                // disabled no envia el valor, por eso dehydrated(true)
+>>>>>>> version2-20261014_210855
                 ->dehydrated(true)
                 ->searchable(! $esEmpleado)
                 ->validationMessages([
@@ -150,6 +171,10 @@ class Documento extends Model
                 ->maxSize(10240)
                 ->acceptedFileTypes(['application/pdf', 'image/jpeg'])
                 ->rules([new \App\Rules\ArchivoPdfOJpeg()])
+<<<<<<< HEAD
+=======
+                ->saveUploadedFileUsing(fn ($file) => \App\Services\ArchivoSeguro::guardar($file, 'documentos'))
+>>>>>>> version2-20261014_210855
                 ->validationMessages(['required' => 'Debe subir un archivo válido.'])
                 ->required()
                 ->deletable(false),
@@ -173,7 +198,11 @@ class Documento extends Model
                     ? 'Documento cargado (sin acceso de descarga)'
                     : 'Abrir archivo')
                 ->url(function ($record): ?string {
+<<<<<<< HEAD
                     // el empleado ve que existe pero no lo puede bajar
+=======
+                    // el empleado no tiene link
+>>>>>>> version2-20261014_210855
                     if (auth()->user()->isEmpleado()) {
                         return null;
                     }
@@ -233,5 +262,14 @@ class Documento extends Model
         };
 
         return $resultado;
+    }
+
+
+    // pendiente = le falta la descripcion, el tipo o el legajo
+    public function scopePendientes($consulta)
+    {
+        return $consulta->where(fn ($q) => $q->whereNull('descripcion')
+            ->orWhereNull('tipodoc')
+            ->orWhereNull('legajo_id'));
     }
 }

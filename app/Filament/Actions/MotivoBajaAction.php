@@ -4,6 +4,7 @@ namespace App\Filament\Actions;
 
 
 use App\Enums\MotivoBajaEnum;
+use App\Models\Auditoria;
 use App\Models\Historialbaja;
 use App\Models\Legajo;
 use App\Models\User;
@@ -18,7 +19,7 @@ class MotivoBajaAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make('Motivo')
-            ->visible(fn (Legajo $legajo) => $legajo->isAlta() && auth()->user()->isAdmin_RRHH() /*|| auth()->user()->isAdmin()*/)
+            ->visible(fn (Legajo $legajo) => auth()->user()->isAdmin_RRHH())
             ->label(fn (Legajo $legajo) => $legajo->isAlta() ? 'Dar de Baja' : 'Dar de Alta')
             ->icon(fn (Legajo $legajo) => $legajo->isAlta() ? 'heroicon-m-arrow-down' : 'heroicon-m-arrow-up')
             ->color(fn (Legajo $legajo) => $legajo->isAlta() ? 'danger' : 'success')
@@ -46,6 +47,8 @@ class MotivoBajaAction extends Action
             })
             
             ->action(function (array $data, Legajo $legajo, Model $record): void {
+                $eraAlta = $legajo->isAlta();
+
                 if ($legajo->isAlta()) {
                     Historialbaja::create([
                         'legajo_id' => $record->id,
@@ -56,10 +59,19 @@ class MotivoBajaAction extends Action
                 }
 
                 $record->update([
-                    'estado' => $legajo->isAlta() ? false : true,
+                    'estado' => ! $eraAlta,
                 ]);
                 
-                $mensaje = $legajo->isAlta()
+                Auditoria::registrar(
+                    evento: $eraAlta ? 'baja' : 'alta',
+                    descripcion: ($eraAlta ? 'Dio de baja' : 'Dio de alta') . ' el legajo ' . $record->num_legajo,
+                    modelo: $record,
+                    extra: [
+                        'motivo' => $eraAlta ? MotivoBajaEnum::tryFrom((int) $data['select_motivo'])?->getLabel() : null,
+                    ],
+                );
+
+                $mensaje = ! $eraAlta
                     ? 'El legajo ha sido dado de ALTA correctamente.' 
                     : 'El legajo ha sido dado de BAJA correctamente.';
 

@@ -41,25 +41,10 @@ class PersonasTable
                         );
                     }
                 ),
-                /*Filter::make('fecha_de_nacimiento')
-                ->label("Fecha de Nacimiento")
-                ->schema([
-                    DatePicker::make('fecha_de_nacimiento')
-                    ->label("Fecha de Nacimiento")
-                ])
-                ->query(function($query, $data){
-                    return $query->when($data['fecha_de_nacimiento'], function($q, $date){
-                        $q->whereDate('fecha_de_nacimiento', $date);
-                    });
-                }),*/
                 SelectFilter::make('genero')
                 ->label("Género")
                 ->options(GeneroEnum::class)
             ])
-            /*->headerActions([
-            CreateAction::make()
-                ->label('Registrar Persona'),
-            ])*/
             ->recordActions([
                 ViewAction::make()
                 ->label('Ver')
@@ -74,10 +59,6 @@ class PersonasTable
                 ->icon('heroicon-m-pencil-square'),
             ])
             
-            /*->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ])*/;
+;
     }
 }

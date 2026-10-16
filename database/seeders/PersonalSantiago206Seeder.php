@@ -24,7 +24,12 @@ use Illuminate\Support\Str;
 // los datos son inventados pero con formato real (dni, cuil, etc)
 class PersonalSantiago206Seeder extends Seeder
 {
+<<<<<<< HEAD
     private string $passwordDemo = 'Legajo2026!';
+=======
+    // la clave demo sale del .env o es al azar (se muestra al terminar)
+    private string $passwordDemo = '';
+>>>>>>> version2-20261014_210855
     private string $dominio = '@tribunalsgo.gob.ar';
 
     // para que no se repitan
@@ -68,6 +73,12 @@ class PersonalSantiago206Seeder extends Seeder
 
     public function run(): void
     {
+<<<<<<< HEAD
+=======
+        $this->passwordDemo = env('SEED_DEMO_PASSWORD') ?: Str::random(16);
+        $this->command?->warn('Clave de los usuarios demo: ' . $this->passwordDemo);
+
+>>>>>>> version2-20261014_210855
         $areaIds = Area::pluck('id', 'nombre');
         $cargoIds = Cargo::pluck('id', 'nombre');
         $categoriaIds = Categoria::pluck('id', 'nombre');

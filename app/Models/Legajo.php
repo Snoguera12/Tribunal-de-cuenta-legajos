@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
+use App\Services\HabilitacionUsuarios;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\EstadoLegajoEnum;
 use App\Enums\TipoContratoEnum;
 use Carbon\Carbon;
-use Filament\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -23,6 +25,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Legajo extends Model
 {
+<<<<<<< HEAD
     use SoftDeletes; // borrado suave
     use LogsActivity; // registro de cambios
 
@@ -35,6 +38,10 @@ class Legajo extends Model
             ->dontSubmitEmptyLogs()
             ->useLogName('legajos');
     }
+=======
+    use RegistraAuditoria;
+    use SoftDeletes;
+>>>>>>> version2-20261014_210855
 
     protected $attributes = [
         "estado" => true,
@@ -53,6 +60,27 @@ class Legajo extends Model
         "cargo_id",
         "area_id",
     ];
+    // al cambiar el estado de un legajo se revisa si el usuario sigue habilitado
+    protected static function booted(): void
+    {
+        static::saved(function (Legajo $legajo) {
+
+            if ($legajo->wasRecentlyCreated || $legajo->wasChanged(['estado', 'persona_id'])) {
+
+                HabilitacionUsuarios::sincronizar(Persona::find($legajo->persona_id));
+
+                // si lo pasaron a otra persona, tambien se revisa la anterior
+                if ($legajo->wasChanged('persona_id')) {
+                    HabilitacionUsuarios::sincronizar(Persona::find($legajo->getOriginal('persona_id')), forzar: true);
+                }
+            }
+        });
+
+        static::deleted(fn (Legajo $legajo) => HabilitacionUsuarios::sincronizar(Persona::find($legajo->persona_id)));
+        static::restored(fn (Legajo $legajo) => HabilitacionUsuarios::sincronizar(Persona::find($legajo->persona_id)));
+    }
+
+
     public function historial(){
         return $this->hasMany(Historialbaja::class);
     }
@@ -267,7 +295,7 @@ class Legajo extends Model
     }
 
     public static function getFrontLegajoDocumentos(string $formmode) : array{
-        // BLOQUE 1: Datos Administrativos del Legajo
+        // datos del legajo
         $resutlado = match ($formmode) {
             'mul' => [
                 Grid::make([
@@ -287,14 +315,14 @@ class Legajo extends Model
         $resutlado = [
             ...$resutlado, // Esos tres puntos en la variable $resultado es un "operador de propagación" (spread operator)
 
-            // BLOQUE 2: Sección Integrada de Documentos Adjuntos
+            // documentos adjuntos
             Section::make('Documentación Digitalizada')
             ->description('Cargue los archivos adjuntos y documentos que respaldan este legajo.')
             ->icon('heroicon-o-document-arrow-up')
-            ->collapsible() // El usuario puede ocultar la zona de archivos si no la necesita en el momento
+            ->collapsible()
             ->columnSpanFull()
             ->extraAttributes([
-                // Forzamos un borde más oscuro y fondo claro para que resalte del contenedor de Legajos
+                // borde oscuro y fondo claro para que se note
                 'style' => '
                     border: 2px solid #b4b4b4 !important; 
                     border-radius: 12px !important; 
@@ -310,10 +338,9 @@ class Legajo extends Model
                 ->collapsible()
                 ->addActionLabel('Adjuntar un Documento')
                 ->itemLabel('Nuevo Documento')
-                ->grid(3) // Mantiene tus dos columnas de documentos lado a lado
+                ->grid(3)
                 ->schema([
-                    // SOLUCIÓN NATIVA: Usamos un Fieldset o una Section interna. 
-                    // Cada vez que se crea un documento, Filament genera este recuadro contenedor.
+                    // recuadro que filament arma por cada documento
                     Grid::make(1)
                     ->columnSpan(1)
                     ->schema(Documento::getFromSchema(false, false)),
@@ -321,5 +348,19 @@ class Legajo extends Model
             ]),
         ];
         return $resutlado;
+    }
+
+
+    // opciones para los select: "Legajo: 12 (Ana Lopez - DNI: 123)"
+    public static function opcionesConPersona(?int $personaId = null): array
+    {
+        return static::with('persona')
+            ->when($personaId, fn ($q) => $q->where('persona_id', $personaId))
+            ->get()
+            ->filter(fn ($legajo) => $legajo->persona)
+            ->mapWithKeys(fn ($legajo) => [
+                $legajo->id => 'Legajo: ' . $legajo->num_legajo . ' (' . $legajo->persona->nombre . ' ' . $legajo->persona->apellido . ' - DNI: ' . $legajo->persona->dni . ')',
+            ])
+            ->all();
     }
 }
