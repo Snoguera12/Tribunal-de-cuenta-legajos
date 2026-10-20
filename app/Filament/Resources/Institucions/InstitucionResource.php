@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Institucions;
 
-use App\Filament\Resources\Institucions\Pages\CreateInstitucion;
-use App\Filament\Resources\Institucions\Pages\EditInstitucion;
 use App\Filament\Resources\Institucions\Pages\ListInstitucions;
 use App\Filament\Resources\Institucions\Pages\PendientesInstitucion;
 use App\Filament\Resources\Institucions\Schemas\InstitucionForm;
@@ -14,18 +12,17 @@ use App\Models\Institucion;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class InstitucionResource extends Resource
 {
-    protected static ?string $navigationLabel = 'Institución';
+    protected static ?string $navigationLabel = 'Instituciones';
     protected static ?string $modelLabel = 'Institución';
-    protected static ?string $pluralModelLabel = 'Institución';
+    protected static ?string $pluralModelLabel = 'Instituciones';
     protected static string|\UnitEnum|null $navigationGroup = "Departamento";
     protected static ?string $model = Institucion::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-academic-cap';
+    protected static ?int $navigationSort = 3;
 
     public static function form(Schema $schema): Schema
     {

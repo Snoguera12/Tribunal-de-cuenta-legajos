@@ -38,41 +38,17 @@ class Legajo extends Model
         "cargo_id",
         "area_id",
     ];
-    public function historial(){
-        return $this->hasMany(Historialbaja::class);
-    }
-    public function persona(){
-        return $this->belongsTo(Persona::class, 'persona_id');
-    }
-    public function categoria(){
-        return $this->belongsTo(Categoria::class, 'categoria_id');
-    }
-    public function cargo(){
-        return $this->belongsTo(Cargo::class, 'cargo_id');
-    }
-    public function area(){
-        return $this->belongsTo(Area::class, 'area_id');
-    }
-    public function documentos()
-    {
-        return $this->hasMany(Documento::class);
-    }
-    public function licencias()
-    {
-        return $this->hasMany(Licencia::class);
-    }
-    public function isAlta()
-    {
-        return $this->estado == EstadoLegajoEnum::Alta;
-    }
-    public function getIcon()
-    {
-        return $this->isAlta() ? Heroicon::CheckCircle : Heroicon::XCircle;
-    }
-    public function getColor()
-    {
-        return $this->isAlta() ? 'success' : 'danger';
-    }
+    
+    public function historial(){ return $this->hasMany(Historialbaja::class); }
+    public function persona(){ return $this->belongsTo(Persona::class, 'persona_id'); }
+    public function categoria(){ return $this->belongsTo(Categoria::class, 'categoria_id'); }
+    public function cargo(){ return $this->belongsTo(Cargo::class, 'cargo_id'); }
+    public function area(){ return $this->belongsTo(Area::class, 'area_id'); }
+    public function documentos(){ return $this->hasMany(Documento::class); }
+    public function licencias(){ return $this->hasMany(Licencia::class); }
+    public function isAlta(){ return $this->estado == EstadoLegajoEnum::Alta; }
+    public function getIcon(){ return $this->isAlta() ? Heroicon::CheckCircle : Heroicon::XCircle; }
+    public function getColor(){ return $this->isAlta() ? 'success' : 'danger'; }
     
     public static function getFormSchema(bool $visible_persona_id): array{
         

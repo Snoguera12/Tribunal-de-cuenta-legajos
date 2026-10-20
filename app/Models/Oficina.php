@@ -12,7 +12,5 @@ class Oficina extends Model
         //'fecha_creacion',
         'area_id',
     ];
-    public function area(){
-        return $this->hasMany(Area::class, 'area_id');
-    }
+    public function area(){ return $this->hasMany(Area::class, 'area_id'); }
 }

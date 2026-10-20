@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 
 class Licencia extends Model
@@ -27,15 +28,9 @@ class Licencia extends Model
         'payload_original',
     ];
 
-    public function legajo()
-    {
-        return $this->belongsTo(Legajo::class, 'legajo_id');
-    }
+    public function legajo(){ return $this->belongsTo(Legajo::class, 'legajo_id'); }
 
-    public function apiClient()
-    {
-        return $this->belongsTo(ApiClient::class, 'api_client_id');
-    }
+    public function apiClient(){ return $this->belongsTo(ApiClient::class, 'api_client_id'); }
 
     /**
      * ¿Un reenvío trae exactamente los mismos datos que ya guardamos?
@@ -101,5 +96,76 @@ class Licencia extends Model
         }
 
         return $observaciones;
+    }
+
+    public static function getFormSchema(): array{
+        $resultado = [
+            TextColumn::make('legajo.persona.nombre')
+            ->label('Nombre')
+            ->sortable()
+            ->searchable()
+            ->toggleable(isToggledHiddenByDefault: true),
+
+            TextColumn::make('legajo.persona.apellido')
+            ->label('Apellido')
+            ->sortable()
+            ->searchable()
+            ->toggleable(isToggledHiddenByDefault: true),
+            
+            TextColumn::make('legajo.persona.dni')
+            ->label('DNI')
+            ->sortable()
+            ->searchable()
+            ->toggleable(isToggledHiddenByDefault: true),
+
+            TextColumn::make('legajo.num_legajo')
+            ->label('Nº Legajo')
+            ->sortable()
+            ->searchable(),
+
+            TextColumn::make('tipo_licencia')
+            ->label('Tipo')
+            ->searchable(),
+
+            TextColumn::make('fecha_inicio')
+            ->label('Desde')
+            ->date('d/m/Y')
+            ->sortable(),
+
+            TextColumn::make('fecha_fin')
+            ->label('Hasta')
+            ->date('d/m/Y')
+            ->sortable(),
+
+            TextColumn::make('dias_solicitados')
+            ->label('Días')
+            ->numeric(),
+
+            TextColumn::make('nro_resolucion')
+            ->label('N° resolución')
+            ->placeholder('-')
+            ->searchable(),
+
+            TextColumn::make('fecha_aprobacion')
+            ->label('Aprobada el')
+            ->date('d/m/Y')
+            ->sortable()
+            ->toggleable(isToggledHiddenByDefault: true),
+
+            TextColumn::make('observaciones')
+            ->label('Observaciones')
+            ->state(fn (Licencia $record) => implode(' · ', $record->observaciones()) ?: null)
+            ->placeholder('-')
+            ->color('warning')
+            ->wrap()
+            ->toggleable(isToggledHiddenByDefault: true),
+
+            TextColumn::make('created_at')
+            ->label('Recibida')
+            ->dateTime('d/m/Y H:i')
+            ->sortable()
+            ->toggleable(isToggledHiddenByDefault: true),
+        ];
+        return $resultado;
     }
 }
