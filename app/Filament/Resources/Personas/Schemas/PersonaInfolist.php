@@ -33,10 +33,12 @@ class PersonaInfolist
         ->components([
             Tabs::make('Tabs_base')
             ->columnSpanFull()
+            ->persistTabInQueryString()
             ->tabs([
                 Tab::make('Tab Persona')
                 ->label('Persona')
                 ->id('persona')
+                ->key('persona')
                 ->icon('heroicon-m-identification')
                 ->columns(4)
                 ->schema(Persona::getOutSchema('list')),
@@ -44,6 +46,7 @@ class PersonaInfolist
                 Tab::make('Tab Familiares')
                 ->label('Familiares')
                 ->id('familiar')
+                ->key('familiar')
                 ->icon('heroicon-m-users')
                 ->schema([
                     RepeatableEntry::make('familiares')
@@ -57,6 +60,7 @@ class PersonaInfolist
                 Tab::make('Tab Idiomas')
                 ->label('Idiomas')
                 ->id('idioma')
+                ->key('idioma')
                 ->icon('heroicon-m-language')
                 ->schema([
                     RepeatableEntry::make('idiomas')
@@ -68,6 +72,8 @@ class PersonaInfolist
 
                 Tab::make('Tab Papeles')
                 ->label('Papeles')
+                ->id('legajo')
+                ->key('legajo')
                 ->icon('heroicon-m-folder-open')
                 ->columnSpanFull()
                 ->schema([
@@ -124,6 +130,7 @@ class PersonaInfolist
                 Tab::make('Tab Estudio/Títulos')
                 ->label('Estudios/Títulos')
                 ->id('estudio')
+                ->key('estudio')
                 ->icon('heroicon-m-academic-cap')
                 ->schema([
                     RepeatableEntry::make('estudiosPrincipal')
@@ -150,6 +157,7 @@ class PersonaInfolist
                 Tab::make('Tab Cursos')
                 ->label('Cursos')
                 ->id('curso')
+                ->key('curso')
                 ->icon('heroicon-m-book-open')
                 ->columnSpanFull()
                 ->schema([
@@ -163,6 +171,7 @@ class PersonaInfolist
                 Tab::make('Tab Antecedentes Laborales')
                 ->label('Antecedentes Laborales')
                 ->id('antecedenteslaborales')
+                ->key('antecedenteslaborales')
                 ->icon('heroicon-m-briefcase')
                 ->columnSpanFull()
                 ->schema([
@@ -177,6 +186,7 @@ class PersonaInfolist
                 ->label('Usuario')
                 ->icon('heroicon-m-user-circle')
                 ->id('usuario')
+                ->key('usuario')
                 ->columnSpanFull()
                 ->visible(auth()->user()->isAdmin_RRHH())
                 ->schema([

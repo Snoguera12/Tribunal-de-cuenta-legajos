@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Personas\Pages;
 use App\Filament\Resources\Personas\PersonaResource;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Js;
 
 class EditPersona extends EditRecord
 {
@@ -12,9 +13,16 @@ class EditPersona extends EditRecord
 
     protected function getHeaderActions(): array
     {
+        $vista = Js::from(PersonaResource::getUrl('view', ['record' => $this->record]));
+
         return [
             //DeleteAction::make(),
-            ViewAction::make(),
+            ViewAction::make()
+            ->extraAttributes([
+                'onclick' => "event.preventDefault();"
+                    . "const tab = new URLSearchParams(window.location.search).get('tab');"
+                    . "window.location.href = {$vista} + (tab ? '?tab=' + encodeURIComponent(tab) : '');",
+            ]),
         ];
     }
     public function getTitle(): string

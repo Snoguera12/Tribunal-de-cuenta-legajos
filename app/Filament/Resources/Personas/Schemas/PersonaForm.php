@@ -38,6 +38,7 @@ class PersonaForm
                 Tab::make('Tab Persona')
                 ->label('Persona')
                 ->id('persona')
+                ->key('persona')
                 ->icon('heroicon-m-identification')
                 ->columns(4)
                 ->columnSpanFull()
@@ -46,18 +47,21 @@ class PersonaForm
                 Tab::make('Tab Familiares')
                 ->label('Familiares')
                 ->id('familiar')
+                ->key('familiar')
                 ->icon('heroicon-m-users')
                 ->schema(Familiar::getRepeaterSchema()),
 
                 Tab::make('Tab Idiomas')
                 ->label('Idiomas')
                 ->id('idioma')
+                ->key('idioma')
                 ->icon('heroicon-m-language')
                 ->schema(Idioma::getRepeaterSchema()),
                 
                 Tab::make('Tab Legajos/Documentos')
                 ->icon('heroicon-m-folder-open')
                 ->id('legajo')
+                ->key('legajo')
                 ->label('Legajos')
                 ->icon('heroicon-m-folder-open')
                 ->schema(Legajo::getRepeaterSchema()),
@@ -65,6 +69,7 @@ class PersonaForm
                 Tab::make('Tab Estudios/Títulos')
                 ->label("Estudios/Títulos")
                 ->id('estudio')
+                ->key('estudio')
                 ->icon('heroicon-m-academic-cap')
                 ->columnSpanFull()
                 ->schema(Estudio::getRepeaterSchema()),
@@ -72,6 +77,7 @@ class PersonaForm
                 Tab::make('Tab Cursos')
                 ->label('Cursos')
                 ->id('curso')
+                ->key('curso')
                 ->icon('heroicon-m-book-open')
                 ->columnSpanFull()
                 ->schema([
@@ -92,6 +98,7 @@ class PersonaForm
                 Tab::make('Tab Antecedentes Laborales')
                 ->label('Antecedentes Laborales')
                 ->id('antecedenteslaborales')
+                ->key('antecedenteslaborales')
                 ->icon('heroicon-m-briefcase')
                 ->columnSpanFull()
                 ->schema([
@@ -113,6 +120,7 @@ class PersonaForm
                 ->label('Usuario')
                 ->icon('heroicon-m-user-circle')
                 ->id('usuario')
+                ->key('usuario')
                 ->columnSpanFull()
                 ->visible(fn () => auth()->user()->isAdmin_RRHH())
                 ->schema([
