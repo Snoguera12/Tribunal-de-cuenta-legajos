@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Imports;
+namespace App\Filament\Services\Imports;
 
 use App\Enums\EstadoCivilEnum;
 use App\Enums\GeneroEnum;

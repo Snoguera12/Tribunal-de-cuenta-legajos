@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('cursos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('persona_id');
+            $table->foreignId('institucion_id')->nullable()->constrained('institucions')->restrictOnDelete();
+            $table->string('institucion_otro', 300)->nullable();
             $table->string('nombre');
-            $table->string('institucion')->nullable();
-            $table->string('duracion')->nullable();
-            $table->date('fecha')->nullable();
+            $table->string('duracion');
+            $table->date('fecha');
             $table->boolean('tiene_certificado');
             $table->timestamps();
         });

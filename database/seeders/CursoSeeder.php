@@ -15,7 +15,7 @@ class CursoSeeder extends Seeder
         Curso::create([
             'persona_id' => 15,
             'nombre' => 'Carpinteria',
-            'institucion' => 'Instituto Banda',
+            'institucion_otro' => 'Instituto Banda',
             'duracion' => '1 año',
             'fecha' => '2024-11-30',
             'tiene_certificado' => 1,

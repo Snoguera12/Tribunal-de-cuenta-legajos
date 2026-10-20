@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\Personas\Pages;
 
-use App\Filament\Exports\PersonaExporter;
-use App\Filament\Imports\PersonaImporter;
+
 use App\Filament\Resources\Personas\PersonaResource;
+
+use App\Filament\Services\Exports\PersonaExporter;
+use App\Filament\Services\Imports\PersonaImporter;
 use Filament\Actions\CreateAction;
 use Filament\Actions\ExportAction;
 use Filament\Actions\ImportAction;
-use Filament\Forms\Components\FileUpload;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Tables\Table;
 
 class ListPersonas extends ListRecords
 {
@@ -25,9 +27,18 @@ class ListPersonas extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            ImportAction::make()->label('Importar')->importer(PersonaImporter::class)->visible(auth()->user()->isAdmin_RRHH()),
-            ExportAction::make()->label('Exportar')->exporter(PersonaExporter::class)->visible(auth()->user()->isAdmin_RRHH()),
-            CreateAction::make()->label('Registrar Persona'),
+            
+            ImportAction::make()
+            ->label('Importar')
+            ->visible(auth()->user()->isAdmin_RRHH())
+            ->importer(PersonaImporter::class),
+
+            ExportAction::make()
+            ->label('Exportar')
+            ->exporter(PersonaExporter::class),
+
+            CreateAction::make()
+            ->label('Registrar Persona'),
         ];
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Exports;
+namespace App\Filament\Services\Exports;
 
 use App\Models\Persona;
 use Filament\Actions\Exports\ExportColumn;
@@ -11,7 +11,7 @@ use Illuminate\Support\Number;
 class PersonaExporter extends Exporter
 {
     protected static ?string $model = Persona::class;
-
+    
     public static function getColumns(): array
     {
         return [

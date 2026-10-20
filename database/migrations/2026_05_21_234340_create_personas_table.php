@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string("apellido", 100);
             $table->integer("dni")->unique();
             $table->bigInteger("cuil")->unique();
-            $table->string("email", 50)->nullable();
-            $table->integer('genero')->nullable();
-            $table->integer('estado_civil')->nullable();
+            $table->string("email", 50);
+            $table->integer('genero');
+            $table->integer('estado_civil');
             $table->date("fecha_de_nacimiento");
             $table->string("domicilio", 250)->nullable();
             $table->string("telefono", 20)->nullable();

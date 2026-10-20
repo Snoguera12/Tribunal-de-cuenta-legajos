@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use App\Enums\IdiomaNivelEnum;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Grid;
 use Illuminate\Database\Eloquent\Model;
 
 class Idioma extends Model
@@ -49,5 +52,29 @@ class Idioma extends Model
         };
 
         return $resultado;
+    }
+
+    public static function getRepeaterSchema(): array{
+        return [
+            Repeater::make('idiomas')
+            ->relationship('idiomas')
+            ->hiddenLabel()
+            ->columnSpanFull()
+            ->addActionLabel('Agregar un Idioma')
+            ->itemLabel('Idioma Adjuntado')
+            ->defaultItems(0)
+            ->collapsible()
+            ->grid(3)
+            ->addAction(
+                fn (Action $action) => $action
+                ->icon('heroicon-m-plus')
+                ->color('gray')
+            )
+            ->schema([
+                Grid::make(1)
+                ->columnSpan(1)
+                ->schema(Idioma::getFromSchema()),
+            ]),
+        ];
     }
 }

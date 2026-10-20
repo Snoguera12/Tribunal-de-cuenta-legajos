@@ -35,7 +35,25 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        if($user->isEmpleado() || $user->isFuncionario()){
+            return false;
+        }
+
+        if($user->id === $model->id){
+            return true;
+        }
+
+        if ($user->isRRHH()){
+            if($model->isEmpleado() || $model->isFuncionario()){
+                return true;
+            }
+        }
+
+        if ($user->isAdmin()){
+            return true;
+        }
+        
+        return false;
     }
 
     /**

@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('estudios', function (Blueprint $table) {
             $table->id();
-            //$table->string('nombre', 100)->nullable();
-            $table->string('institucion', 100)->nullable();
             $table->integer('nivel_estudio');
             $table->date('fecha_fin')->nullable();
+            $table->string('institucion_otro', 300)->nullable();
+            $table->foreignId('institucion_id')->nullable()->constrained('institucions')->restrictOnDelete();
             $table->foreignId('persona_id')->constrained()->onDelete("cascade");
             $table->timestamps();
         });

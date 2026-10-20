@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\EstadoLegajoEnum;
 use App\Enums\TipoContratoEnum;
+use App\Models\Helpers\PersonaHelper;
 use Carbon\Carbon;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
@@ -79,7 +80,7 @@ class Legajo extends Model
             ->required()
             ->searchable()
             ->visible($visible_persona_id)
-            ->options(Persona::getPersonas())
+            ->options(PersonaHelper::getPersonas())
             ->default(fn () => request()->query('persona_id'))
             ->disabled(fn () => request()->has('persona_id')) // Opcional: deshabilita el campo si ya viene en la URL
             ->dehydrated() // Obligatorio si usas disabled(), para que guarde el valor en la base de datos
@@ -291,12 +292,14 @@ class Legajo extends Model
             ])
             ->schema([
                 Repeater::make('Documento')
+                ->label('Documentos')
                 ->relationship('Documentos')
+                ->addActionLabel('Adjuntar un Documento')
+                ->itemLabel('Nuevo Documento')
                 ->hiddenLabel()
                 ->columnSpanFull()
                 ->collapsible()
-                ->addActionLabel('Adjuntar un Documento')
-                ->itemLabel('Nuevo Documento')
+                ->defaultItems(0)
                 ->grid(3) // Mantiene tus dos columnas de documentos lado a lado
                 ->schema([
                     // SOLUCIÓN NATIVA: Usamos un Fieldset o una Section interna. 
@@ -309,4 +312,26 @@ class Legajo extends Model
         ];
         return $resutlado;
     }
+
+    public static function getRepeaterSchema(): array{
+        return [
+            Repeater::make('Legajo')
+            ->relationship('legajos')
+            ->hiddenLabel()
+            ->columnSpanFull()
+            ->collapsible() // Permite encoger legajos antiguos para mantener orden visual
+            ->defaultItems(0)
+            ->addActionLabel('Agregar un Legajo')
+            ->itemLabel(
+                fn (array $state): ?string => ($state['num_legajo'] ?? null) ? "Legajo N° " . $state['num_legajo']: 'Nuevo Registro de Legajo' 
+            ) // Muestra un título claro en cada bloque (Ej: "Legajo N° 4512")
+            ->addAction(
+                fn (Action $action) => $action
+                ->icon('heroicon-m-plus')
+                ->color('gray')
+            )
+            ->schema(Legajo::getFrontLegajoDocumentos('mul')),
+        ];
+    }
+    
 }

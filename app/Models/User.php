@@ -4,14 +4,17 @@ namespace App\Models;
 
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Filament\Schemas\Components\Utilities\Get;
 use Hash;
+use App\Models\Helpers\UserHelper;
+use App\Models\Helpers\PersonaHelper;
 use Database\Factories\UserFactory;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -33,8 +36,9 @@ class User extends Authenticatable implements FilamentUser
         'rol',
         'persona_id',
     ];
-    public function persona() : HasOne{
-        return $this->hasOne(Persona::class, 'persona_id');
+    public function persona(): BelongsTo
+    {
+        return $this->belongsTo(Persona::class, 'persona_id');
     }
     /**
      * The attributes that should be hidden for serialization.
@@ -85,157 +89,98 @@ class User extends Authenticatable implements FilamentUser
     }
     public static function getFormSchema(bool $visible_persona_id): array
     {
-        return [
-            TextInput::make('name')->label('Nombre de Usuario')
-                ->required(),
-                
-            TextInput::make('email')->label('Correo Electrónico')
-            ->email()
-            ->default(function () {
-                // Captura el 'persona_id' enviado desde la URL
-                $personaId = request()->query('persona_id');
-                
-                if ($personaId) {
-                    // Busca la persona y retorna su correo
-                    return Persona::find($personaId)?->email;
-                }
-                
-                return null;
-            })
+        $array_personas = fn ($record) => PersonaHelper::getPersonasUsuario($record?->persona_id);
+
+        $resultado = [
+            TextInput::make('name')
+            ->label('Nombre de Usuario')
             ->required(),
+                
+            TextInput::make('email')
+            ->label('Correo Electrónico')
+            ->required()
+            ->email()
+            ->unique(ignoreRecord: true),
 
             TextInput::make('password')
             ->label('Contraseña')
             ->password()
-            ->required(function (string $context, $record): bool {
-                // 1. En contexto de creación general, siempre es obligatoria
-                if ($context === 'create') {
-                    return true;
-                }
-
-                // 2. En contexto de edición, evaluamos según el modelo que disparó el formulario
-                if ($context === 'edit' && $record) {
-                    
-                    // Si viene desde PersonaResource (se está editando una Persona para adjuntarle un Usuario)
-                    if ($record instanceof Persona) {
-                        return !$record->Usuario()->exists(); // Obligatoria si la persona no tiene usuario aún
-                    }
-                    
-                    // Si viene desde UserResource (se está editando el Usuario directamente)
-                    if ($record instanceof self) { // 'self' hace referencia al modelo User actual
-                        return false; // Al editar un usuario directo, ya tiene contraseña (es opcional)
-                    }
-                }
-
-                return false;
-            })
-            // Si el campo está vacío al guardar, no lo incluye en el Query de actualización
+            ->required(fn ($record): bool => ! $record?->exists)
             ->dehydrated(fn (?string $state) => filled($state))
-            // Encripta la contraseña automáticamente antes de guardarla (si se modificó)
-            ->mutateDehydratedStateUsing(fn (string $state) => Hash::make($state))
-            ->helperText(function (string $context, $record) {
-                // Ajustamos el texto de ayuda según el modelo actual
-                if ($context === 'edit' && $record) {
-                    if ($record instanceof Persona && !$record->Usuario()->exists()) {
-                        return 'Defina una contraseña para el nuevo usuario.';
-                    }
-                    return 'Deje este campo en blanco si no desea cambiar la contraseña.';
-                }
-                return null;
-            }),
+            // quitá mutateDehydratedStateUsing: el cast 'hashed' del modelo ya hashea
+            ->helperText(fn ($record) => $record?->exists
+                ? 'Deje este campo en blanco si no desea cambiar la contraseña.'
+            : null),
 
-            Select::make('rol')->label('Rol del Usuario')
-            ->options([
-                'empleado' => 'Empleado',
-                'funcionario' => 'Funcionario',
-                'rrhh' => 'RRHH (Recursos Humanos)',
-            ])
-            ->required(),
+            Select::make('rol')
+            ->label('Rol del Usuario')
+            ->required()
+            ->options(UserHelper::getOpcionesRoles())
+            ->visible(fn ($record): bool => UserHelper::getShouldVisibleField($record))
+            ->disabled(fn ($record): bool => UserHelper::getShouldDisableField($record)),
 
-            Select::make("persona_id")->label("Persona")
-            ->visible($visible_persona_id)
+            Select::make("persona_id")
+            ->label('Persona')
+            ->placeholder("Sin adjuntar una Persona")
             ->searchable()
             ->nullable()
-            ->default(fn () => request()->query('persona_id'))
-            ->placeholder("Ninguna persona")
-            ->options(Persona::selectRaw("id, nombre || ' ' || apellido || ' (DNI: ' || dni || ')' AS nombre_completo")->pluck('nombre_completo', 'id')),
+            ->visible($visible_persona_id)
+            ->disabled(!$visible_persona_id)
+            ->default(request()->query('persona_id'))
+            ->options($array_personas),
+
         ];
+        return $resultado;
     }
 
     public static function getOutSchema(string $mode_out): array{
         $resultado = match($mode_out){
             "table" => [
-                TextColumn::make('persona.nombre')
-                    ->label("Nombre")
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('persona.apellido')
-                    ->label("Apellido")
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('persona.dni')
-                    ->label("DNI")
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
                 TextColumn::make('name')
-                    ->label("Nombre de Usuario")
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                ->label("Nombre de Usuario")
+                ->searchable()
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: false),
 
                 TextColumn::make('email')
-                    ->label('Correo Electrónico')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
-
-                TextColumn::make('email_verified_at')
-                    ->label('Correo Verificado')
-                    ->dateTime('d/m/Y H:i:s')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                ->label('Correo Electrónico')
+                ->searchable()
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: false),
                 
                 TextColumn::make('rol')
-                    ->label('Rol')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'empleado' => 'Empleado',
-                        'funcionario' => 'Funcionario',
-                        'rrhh' => 'RRHH (Recursos Humanos)',
-                        'administrador' => 'Administrador',
-                        default => 'Desconocido',
-                    })
-                    ->toggleable(isToggledHiddenByDefault: false),
+                ->label('Rol')
+                ->formatStateUsing(fn (string $state): string => UserHelper::getFormatStateRoles($state))
+                ->toggleable(isToggledHiddenByDefault: false),
+
+                TextColumn::make('email_verified_at')
+                ->label('Correo Verificado')
+                ->dateTime('d/m/Y H:i:s')
+                ->searchable()
+                ->sortable()
+                ->visible(auth()->user()->isAdmin())
+                ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
-                    ->dateTime('d/m/Y H:i:s')
-                    ->label('Fecha de Creación')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                
-                TextColumn::make('updated_at')
-                    ->label('Fecha de Actualización')
-                    ->dateTime('d/m/Y H:i:s')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                ->dateTime('d/m/Y H:i:s')
+                ->label('Fecha de Creación')
+                ->sortable()
+                ->visible(auth()->user()->isAdmin())
+                ->toggleable(isToggledHiddenByDefault: true),
             ],
             'folist' => [
-                TextEntry::make('name')->label('Nombre de Usuario')->placeholder('-'),
-                TextEntry::make('email')->label('Correo Electrónico')->placeholder('-'),
-                TextEntry::make('rol')->label('Rol del Usuario')->placeholder('-')
-                ->formatStateUsing(fn (string $state): string => match ($state) {
-                    'empleado' => 'Empleado',
-                    'funcionario' => 'Funcionario',
-                    'rrhh' => 'RRHH (Recursos Humanos)',
-                    'administrador' => 'Administrador',
-                    default => 'Desconocido',
-                }),
+                TextEntry::make('name')
+                ->label('Nombre de Usuario')
+                ->placeholder('-'),
+
+                TextEntry::make('email')
+                ->label('Correo Electrónico')
+                ->placeholder('-'),
+
+                TextEntry::make('rol')
+                ->label('Rol del Usuario')
+                ->placeholder('-')
+                ->formatStateUsing(fn (string $state): string => UserHelper::getFormatStateRoles($state)),
             ],
             default => [],
         };

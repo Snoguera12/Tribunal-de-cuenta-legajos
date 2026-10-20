@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\EstadoCivilEnum;
 use App\Enums\GeneroEnum;
+use App\Enums\NivelEstudioEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -35,55 +36,15 @@ class Persona extends Model
         'borrar_logico',
     ];
     
-    public function legajos()
-    {
-        return $this->hasMany(Legajo::class)->where('estado', 1);
-    }
-    public function estudios()
-    {
-        return $this->hasMany(Estudio::class);
-    }
-    public function familiares()
-    {
-        return $this->hasMany(Familiar::class);
-    }
-    public function cursos()
-    {
-        return $this->hasMany(Curso::class);
-    }
-    public function idiomas()
-    {
-        return $this->hasMany(Idioma::class);
-    }
-    public function antecedentesLaborales()
-    {
-        return $this->hasMany(AntecedenteLaboral::class);
-    }
-    public function estudioPrioritario()
-    {
-        return $this->hasOne(Estudio::class)
-            ->orderByRaw("CASE 
-                WHEN nivel_estudio = 'Universitario' THEN 1
-                WHEN nivel_estudio = 'Terciario' THEN 2
-                WHEN nivel_estudio = 'Secundario' THEN 3
-                WHEN nivel_estudio = 'Primario' THEN 4
-                ELSE 5 
-            END")->latestOfMany(); // Garantiza que devuelva un solo registro compatible con Section::relationship
-    }
-    public function usuario()
-    {
-        return $this->hasOne(User::class);
-    }
-
-    public static function getPersonas(): array
-    {
-        return self::query()
-        ->get(['id', 'nombre', 'apellido', 'dni'])
-        ->mapWithKeys(fn ($item) => [
-            $item->id => "{$item->nombre} {$item->apellido} (DNI: {$item->dni})"
-        ])
-        ->toArray();
-    }
+    public function legajos() { return $this->hasMany(Legajo::class)->where('estado', 1); }
+    public function estudios() { return $this->hasMany(Estudio::class); }
+    public function estudiosPrincipal() { return $this->hasMany(Estudio::class)->mayorNivel()->with('estudioTitulos.titulo'); }
+    public function estudiosAnteriores() { return $this->hasMany(Estudio::class)->otrosNiveles()->with('estudioTitulos.titulo');}
+    public function familiares() { return $this->hasMany(Familiar::class); }
+    public function cursos() { return $this->hasMany(Curso::class); }
+    public function idiomas() { return $this->hasMany(Idioma::class); }
+    public function antecedentesLaborales() { return $this->hasMany(AntecedenteLaboral::class); }
+    public function usuario() { return $this->hasOne(User::class); }
     public static function getFormSchema(): array{
         $resultado = [
             TextInput::make('nombre')->label('Nombre')

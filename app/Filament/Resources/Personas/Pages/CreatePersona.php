@@ -23,12 +23,12 @@ class CreatePersona extends CreateRecord
     protected function getCreateFormAction(): Action
     {
         return parent::getCreateFormAction()
-            ->label('Registrar Persona');
+        ->label('Registrar Persona');
     }
     protected function getCreateAnotherFormAction(): Action
     {
         return parent::getCreateAnotherFormAction()
-            ->label('Registrar y crear otro');
+        ->label('Registrar y crear otro');
     }
     protected function getRedirectUrl(): string
     {
@@ -37,13 +37,9 @@ class CreatePersona extends CreateRecord
     protected function afterCreate(): void
     {
         $user = auth()->user();
-
-        // Solo se auto-asigna si el usuario actual NO tiene una persona vinculada
-        // Esto evita que Administradores o RRHH se adueñen del registro al crear otras personas
-        if (!$user->persona_id) {
-            $user->update([
-                'persona_id' => $this->record->id,
-            ]);
+        
+        if ($user->isEmpleado() && ! $user->persona_id) {
+            $user->update(['persona_id' => $this->record->id]);
         }
     }
 }

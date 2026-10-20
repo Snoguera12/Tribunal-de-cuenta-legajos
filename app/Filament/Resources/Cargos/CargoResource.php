@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Cargos;
 
-use App\Filament\Resources\Cargos\Pages\CreateCargo;
-use App\Filament\Resources\Cargos\Pages\EditCargo;
 use App\Filament\Resources\Cargos\Pages\ListCargos;
 use App\Filament\Resources\Cargos\Schemas\CargoForm;
 use App\Filament\Resources\Cargos\Tables\CargosTable;
@@ -21,7 +19,7 @@ class CargoResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBriefcase;
     protected static string|\UnitEnum|null $navigationGroup = "Departamento";
     protected static ?string $modelLabel = "Cargo";
-    protected static ?int $navigationSort = 30;
+    protected static ?int $navigationSort = 2;
     public static function form(Schema $schema): Schema
     {
         return CargoForm::configure($schema);

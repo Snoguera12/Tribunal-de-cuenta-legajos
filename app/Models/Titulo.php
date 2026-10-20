@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Filament\Forms\Components\Select;
+use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Columns\TextColumn;
@@ -12,62 +12,30 @@ class Titulo extends Model
 {
     protected $fillable = [
         'nombre',
-        'estudio_id',
     ];
-    public function estudio(){
-        return $this->belongsTo(Estudio::class, 'estudio_id');
+    public function estudioTitulos() {
+        return $this->hasMany(EstudioTitulo::class);
     }
-    public static function getFormSchema(bool $show_estudio_id): array{
-        $resultado = [
-            TextInput::make('nombre')
-            ->label('Nombre del Título')
-            ->required()
-            ->validationMessages([
-                "required" => "Requiere introducir el Nombre del Título.",
-            ])
-            ->extraInputAttributes([
-                'oninvalid' => "this.setCustomValidity('Requiere introducir el Nombre del Título.')",
-                'oninput' => "this.setCustomValidity('')",
-            ]),
-            
-            Select::make("estudio_id")
-            ->label("Estudio")
-            ->searchable()
-            ->required($show_estudio_id)
-            ->visible($show_estudio_id)
-            ->options(Estudio::getInstitucion()),
-        ];
+
+    public static function getFormSchema(string $modeForm): array{
+        $resultado = match($modeForm){
+            'table' => [
+                TextInput::make('nombre')
+                ->label('Nombre del Título')
+                ->maxLength(100)
+                ->unique(ignoreRecord: true)
+                ->required(),
+            ],
+            'list' => [],
+        };
+
         return $resultado;
     }
     public static function getOutSchema(string $mode_out) : array{
         $resultado = match ($mode_out) {
             'table' => [
-                TextColumn::make('estudio.persona.nombre')
-                ->label('Nombre')
-                ->sortable()
-                ->searchable()
-                ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('estudio.persona.apellido')
-                ->label('Apellido')
-                ->sortable()
-                ->searchable()
-                ->toggleable(isToggledHiddenByDefault: false),
-
-                TextColumn::make('estudio.persona.dni')
-                ->label('DNI')
-                ->sortable()
-                ->searchable()
-                ->toggleable(isToggledHiddenByDefault: false),
-
                 TextColumn::make('nombre')
                 ->label('Nombre del Título')
-                ->sortable()
-                ->searchable()
-                ->toggleable(isToggledHiddenByDefault: false),
-
-                TextColumn::make('estudio.institucion')
-                ->label("Institución")
                 ->sortable()
                 ->searchable()
                 ->toggleable(isToggledHiddenByDefault: false),
@@ -79,11 +47,25 @@ class Titulo extends Model
                 ->toggleable(isToggledHiddenByDefault: true),
             ],
             'list' => [
-                TextEntry::make('nombre') // Campo 'nombre' de tu tabla de títulos
-                ->hiddenLabel() // Oculta la etiqueta repetitiva dentro de la cuadrícula
-                ->icon('heroicon-m-academic-cap') // Un ícono visual para el título
+                TextEntry::make('nombre')
+                ->hiddenLabel()
+                ->visible(fn ($record) => $record->nombre != 'otro')
+                ->icon('heroicon-m-academic-cap'),
             ],
         };
         return $resultado;
+    }
+    public function fusionarEn(Titulo $destino): void
+    {
+        DB::transaction(function () use ($destino) {
+            $this->estudioTitulos()->get()->each(function (EstudioTitulo $et) use ($destino) {
+                EstudioTitulo::where(
+                    'estudio_id', $et->estudio_id)->where('titulo_id', $destino->id)->exists()
+                    ? $et->delete()
+                    : $et->update(['titulo_id' => $destino->id]);
+            });
+
+            $this->delete();
+        });
     }
 }

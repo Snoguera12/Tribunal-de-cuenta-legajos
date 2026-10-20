@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Personas;
 
+use BackedEnum;
+use App\Models\Persona;
 use App\Filament\Resources\Personas\Pages\CreatePersona;
 use App\Filament\Resources\Personas\Pages\EditPersona;
 use App\Filament\Resources\Personas\Pages\ListPersonas;
@@ -9,14 +11,11 @@ use App\Filament\Resources\Personas\Pages\ViewPersona;
 use App\Filament\Resources\Personas\Schemas\PersonaForm;
 use App\Filament\Resources\Personas\Schemas\PersonaInfolist;
 use App\Filament\Resources\Personas\Tables\PersonasTable;
-use App\Models\Persona;
-use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
 class PersonaResource extends Resource
 {

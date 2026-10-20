@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::create('titulos', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 100);
-            $table->foreignId('estudio_id')->constrained()->onDelete("cascade");
-            //$table->foreignId('legajo_id')->constrained()->onDelete("cascade");
+            $table->string('nombre', 100)->unique();
             $table->timestamps();
         });
     }

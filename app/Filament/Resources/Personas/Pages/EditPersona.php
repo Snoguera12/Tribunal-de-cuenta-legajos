@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Personas\Pages;
 
 use App\Filament\Resources\Personas\PersonaResource;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
