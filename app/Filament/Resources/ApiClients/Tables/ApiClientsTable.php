@@ -4,15 +4,11 @@ namespace App\Filament\Resources\ApiClients\Tables;
 
 use App\Models\ApiClient;
 use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
-use Hamcrest\Core\Set;
 use Illuminate\Support\HtmlString;
 
 class ApiClientsTable
@@ -37,7 +33,6 @@ class ApiClientsTable
                     ->send();
                 }),
 
-
                 TextColumn::make('created_at')
                 ->dateTime()
                 ->sortable()
@@ -47,20 +42,12 @@ class ApiClientsTable
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                //
-            ])
             ->recordActions([
-                EditAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+            EditAction::make(),
             ])
             ->actions([
             EditAction::make(),
-            
+        
             // Acción personalizada para generar el token
             Action::make('generateToken')
             ->label('Generar Token')
@@ -69,7 +56,7 @@ class ApiClientsTable
             ->requiresConfirmation()
             ->modalHeading('¿Generar nuevo API Token?')
             ->modalDescription('Este cliente se activará automáticamente y este nuevo token solo se mostrará UNA VEZ.')
-            
+        
             // Condición: El botón se oculta de la interfaz si el cliente ya está activo
             ->hidden(fn (ApiClient $record): bool => $record->is_token)
             ->action(function (ApiClient $record) {
@@ -92,9 +79,9 @@ class ApiClientsTable
                         <code class='flex-1 font-mono text-xs select-all text-danger-600 dark:text-danger-400'>{$token}</code>
                     </div>
                 "))
-                ->success()
-                ->persistent()
-                ->send();
+            ->success()
+            ->persistent()
+            ->send();
             }),
 
             Action::make('deleteToken')
@@ -110,9 +97,9 @@ class ApiClientsTable
                 $record->forceDelete();
 
                 Notification::make()
-                    ->title('Token borrado con éxito')
-                    ->success()
-                    ->send();
+                ->title('Token borrado con éxito')
+                ->success()
+                ->send();
             }),
         ]);
     }
