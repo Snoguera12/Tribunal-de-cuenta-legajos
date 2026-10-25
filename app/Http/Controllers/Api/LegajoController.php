@@ -2,19 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Enums\TipoContratoEnum;
 use App\Http\Controllers\Controller;
-use App\Models\ApiClient;
-use App\Models\Historialbaja;
 use App\Models\Legajo;
 use App\Models\Persona;
+use App\Models\Token;
 use Illuminate\Http\Request;
 
 class LegajoController extends Controller
 {
     public function show_dni(Request $request, $dni){
         $client = $request->user();
-        if (!($client instanceof ApiClient) || !$client->is_active) {
+        if (!($client instanceof Token) || !$client->is_active) {
             return response()->json(['error' => 'Acceso no autorizado o cliente inactivo.'], 403);
         }
 

@@ -16,7 +16,7 @@ class Licencia extends Model
 
     protected $fillable = [
         'legajo_id',
-        'api_client_id',
+        'token_id',
         'id_solicitud',
         'tipo_licencia',
         'fecha_inicio',
@@ -30,7 +30,7 @@ class Licencia extends Model
 
     public function legajo(){ return $this->belongsTo(Legajo::class, 'legajo_id'); }
 
-    public function apiClient(){ return $this->belongsTo(ApiClient::class, 'api_client_id'); }
+    public function token(){ return $this->belongsTo(Token::class, 'token_id'); }
 
     /**
      * ¿Un reenvío trae exactamente los mismos datos que ya guardamos?

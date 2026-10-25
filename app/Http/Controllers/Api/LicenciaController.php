@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLicenciaRequest;
-use App\Models\ApiClient;
+use App\Models\Token;
 use App\Models\Legajo;
 use App\Models\Licencia;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -24,7 +24,7 @@ class LicenciaController extends Controller
      */
     public function store(StoreLicenciaRequest $request, Legajo $legajo): JsonResponse
     {
-        /** @var ApiClient $client */
+        /** @var Token $client */
         $client = $request->user();
         $datos = $request->validated();
         $idSolicitud = (int) $datos['id_solicitud'];
@@ -38,7 +38,7 @@ class LicenciaController extends Controller
             $licencia = Licencia::create([
                 ...$datos,
                 'legajo_id' => $legajo->id,
-                'api_client_id' => $client->id,
+                'token_id' => $client->id,
                 // Lo recibido tal cual (antes de normalizar), para auditoría
                 'payload_original' => json_decode($request->getContent(), true) ?? $request->all(),
             ]);
@@ -55,10 +55,10 @@ class LicenciaController extends Controller
         return $this->respuesta($licencia, 'Licencia registrada en el legajo', 201);
     }
 
-    private function buscarExistente(ApiClient $client, int $idSolicitud): ?Licencia
+    private function buscarExistente(Token $client, int $idSolicitud): ?Licencia
     {
         return Licencia::query()
-            ->where('api_client_id', $client->id)
+            ->where('token_id', $client->id)
             ->where('id_solicitud', $idSolicitud)
             ->first();
     }

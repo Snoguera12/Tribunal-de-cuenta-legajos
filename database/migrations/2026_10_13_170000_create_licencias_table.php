@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('legajo_id')->constrained()->onDelete('cascade');
 
             // Qué cliente de la API la envió (sistema de licencias del otro grupo).
-            $table->foreignId('api_client_id')->nullable()->constrained('api_clients')->nullOnDelete();
+            $table->foreignId('token_id')->nullable()->constrained('tokens')->nullOnDelete();
 
             // Datos que envía el otro sistema (licencias ya aprobadas allá)
             $table->unsignedBigInteger('id_solicitud');
@@ -34,7 +34,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Idempotencia: el mismo envío del mismo cliente no se duplica.
-            $table->unique(['api_client_id', 'id_solicitud']);
+            $table->unique(['token_id', 'id_solicitud']);
             $table->index(['legajo_id', 'fecha_inicio']);
         });
     }

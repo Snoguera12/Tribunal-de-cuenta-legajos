@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\ApiClient;
+use App\Models\Token;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -14,7 +14,7 @@ class StoreLicenciaRequest extends FormRequest
     {
         $client = $this->user();
 
-        return $client instanceof ApiClient && $client->is_active;
+        return $client instanceof Token && $client->is_active;
     }
 
     // Mismo mensaje que usa LegajoController::show_dni

@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('api_clients', function (Blueprint $table) {
+        Schema::create('tokens', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
             $table->boolean('is_active')->default(false);
-            $table->boolean('is_token')->default(false);
+            $table->boolean('is_created')->default(false);
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('api_clients');
+        Schema::dropIfExists('tokens');
     }
 };

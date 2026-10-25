@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Token;
 use App\Models\User;
 
 return [
@@ -45,7 +46,7 @@ return [
         
         'api' => [
             'driver' => 'sanctum',
-            'provider' => 'api_clients',
+            'provider' => 'tokens',
         ],
     ],
 
@@ -71,9 +72,9 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
         ],
-        'api_clients' => [
+        'tokens' => [
             'driver' => 'eloquent',
-            'model' => App\Models\ApiClient::class,
+            'model' => Token::class,
         ],
 
         // 'users' => [
