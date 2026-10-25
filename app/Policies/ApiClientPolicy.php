@@ -13,7 +13,7 @@ class ApiClientPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin_RRHH();
     }
 
     /**
@@ -21,7 +21,7 @@ class ApiClientPolicy
      */
     public function view(User $user, ApiClient $apiClient): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin_RRHH();
     }
 
     /**
@@ -29,7 +29,7 @@ class ApiClientPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin_RRHH();
     }
 
     /**
@@ -37,7 +37,7 @@ class ApiClientPolicy
      */
     public function update(User $user, ApiClient $apiClient): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin_RRHH();
     }
 
     /**
@@ -45,7 +45,7 @@ class ApiClientPolicy
      */
     public function delete(User $user, ApiClient $apiClient): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin_RRHH();
     }
 
     /**
@@ -53,7 +53,7 @@ class ApiClientPolicy
      */
     public function restore(User $user, ApiClient $apiClient): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin_RRHH();
     }
 
     /**
@@ -61,6 +61,6 @@ class ApiClientPolicy
      */
     public function forceDelete(User $user, ApiClient $apiClient): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin_RRHH();
     }
 }

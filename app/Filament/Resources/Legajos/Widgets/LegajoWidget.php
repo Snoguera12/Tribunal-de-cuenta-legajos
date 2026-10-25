@@ -8,6 +8,8 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class LegajoWidget extends StatsOverviewWidget
 {
+    protected static ?int $sort = 1;
+    protected int|string|array $columnSpan = 'full';
     public static function canView(): bool
     {
         return auth()->user()->isStaffRoles();
