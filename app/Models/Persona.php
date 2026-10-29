@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
+use App\Services\HabilitacionUsuarios;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\EstadoCivilEnum;
 use App\Enums\GeneroEnum;
 use App\Enums\NivelEstudioEnum;
@@ -17,6 +20,10 @@ use Illuminate\Support\Collection;
 
 class Persona extends Model
 {
+    use RegistraAuditoria;
+    use \App\Models\Concerns\RegistraActividadReciente;
+    use SoftDeletes;
+
     protected $casts = [
         'genero' => GeneroEnum::class,
         'estado_civil' => EstadoCivilEnum::class,
@@ -36,15 +43,69 @@ class Persona extends Model
         'borrar_logico',
     ];
     
-    public function legajos() { return $this->hasMany(Legajo::class)->where('estado', 1); }
-    public function estudios() { return $this->hasMany(Estudio::class); }
+    public function legajos()
+    {
+        return $this->hasMany(Legajo::class)->where('estado', 1);
+    }
+    public function estudios()
+    {
+        return $this->hasMany(Estudio::class);
+    }
     public function estudiosPrincipal() { return $this->hasMany(Estudio::class)->mayorNivel()->with('estudioTitulos.titulo'); }
-    public function estudiosAnteriores() { return $this->hasMany(Estudio::class)->otrosNiveles()->with('estudioTitulos.titulo');}
-    public function familiares() { return $this->hasMany(Familiar::class); }
-    public function cursos() { return $this->hasMany(Curso::class); }
-    public function idiomas() { return $this->hasMany(Idioma::class); }
-    public function antecedentesLaborales() { return $this->hasMany(AntecedenteLaboral::class); }
-    public function usuario() { return $this->hasOne(User::class); }
+    public function estudiosAnteriores() { return $this->hasMany(Estudio::class)->otrosNiveles()->with('estudioTitulos.titulo'); }
+    public function familiares()
+    {
+        return $this->hasMany(Familiar::class);
+    }
+    public function cursos()
+    {
+        return $this->hasMany(Curso::class);
+    }
+    public function idiomas()
+    {
+        return $this->hasMany(Idioma::class);
+    }
+    public function antecedentesLaborales()
+    {
+        return $this->hasMany(AntecedenteLaboral::class);
+    }
+    // si se elimina la persona, su usuario tampoco puede entrar (y vuelve si se restaura)
+    // para "ultimos agentes": cualquier cambio en la ficha cuenta
+    public function actividadReciente(bool $creado = false): ?array
+    {
+        return $creado || $this->wasChanged() ? ['agente', $this->id] : null;
+    }
+
+    protected static function booted(): void
+    {
+        static::deleted(function (Persona $persona) {
+            if (! $persona->isForceDeleting() && $persona->usuario) {
+                HabilitacionUsuarios::deshabilitar($persona->usuario, 'persona_eliminada');
+            }
+        });
+
+        static::restored(function (Persona $persona) {
+            if ($persona->usuario) {
+                HabilitacionUsuarios::habilitar($persona->usuario, ['persona_eliminada']);
+            }
+        });
+    }
+
+
+    public function usuario()
+    {
+        return $this->hasOne(User::class);
+    }
+
+    public static function getPersonas(): array
+    {
+        return self::query()
+        ->get(['id', 'nombre', 'apellido', 'dni'])
+        ->mapWithKeys(fn ($item) => [
+            $item->id => "{$item->nombre} {$item->apellido} (DNI: {$item->dni})"
+        ])
+        ->toArray();
+    }
     public static function getFormSchema(): array{
         $resultado = [
             TextInput::make('nombre')->label('Nombre')
@@ -86,16 +147,16 @@ class Persona extends Model
                 'oninput' => "this.setCustomValidity('')",
             ])
             ->dehydrateStateUsing(fn (string|null $state) => $state ? (int) preg_replace('/\D/', '', $state) : null)
-            // Se ejecuta al perder el foco si el CUIL está vacío
+            // al salir del campo, si el cuil esta vacio se arma con el dni
             ->afterStateUpdated(function (string|null $state, Set $set, Get $get) {
                 if (blank($state) || filled($get('cuil'))) {
                     return;
                 }
 
-                // El DNI físico se rellena con ceros a la izquierda hasta tener 8 dígitos para armar el CUIL estándar
+                // el dni se completa con ceros hasta 8 digitos
                 $dniPad = str_pad(preg_replace('/\D/', '', $state), 8, '0', STR_PAD_LEFT);
 
-                // Prefijo genérico 20 y sufijo 2 (El usuario podrá corregirlo si es mujer/empresa)
+                // prefijo 20 y sufijo 2 genericos (se pueden corregir)
                 $prefijo = '20';
                 $sufijo = '2';
 
@@ -106,9 +167,9 @@ class Persona extends Model
             ->required()
             ->unique(ignoreRecord: true)
             ->maxLength(11)
-            // Pasamos un Closure a rules() para que Filament nos inyecte la instancia de Get correctamente
+            // closure para que filament inyecte Get
             ->rules(fn (Get $get): array => [
-                'regex:/^\d{11}$/', // Formato numérico puro de 11 dígitos
+                'regex:/^\d{11}$/',
                 function (string $attribute, $value, $fail) use ($get) {
                     $dni = preg_replace('/\D/', '', (string) $get('dni'));
                     $cuilNumericoPuro = preg_replace('/\D/', '', (string) $value);
@@ -117,7 +178,7 @@ class Persona extends Model
                         return;
                     }
 
-                    // El DNI dentro del CUIL siempre ocupa 8 dígitos (de la posición 2 a la 9)
+                    // el dni va en las posiciones 2 a 9 del cuil
                     $dniEnCuil = substr($cuilNumericoPuro, 2, 8);
                     $dniConCeros = str_pad($dni, 8, '0', STR_PAD_LEFT);
 

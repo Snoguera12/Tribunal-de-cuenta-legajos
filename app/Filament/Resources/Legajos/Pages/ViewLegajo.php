@@ -11,6 +11,15 @@ class ViewLegajo extends ViewRecord
 {
     protected static string $resource = LegajoResource::class;
 
+    public function mount(int | string $record): void
+    {
+        parent::mount($record);
+
+        if ($this->record->persona_id) {
+            \App\Models\ActividadReciente::registrar('agente', $this->record->persona_id, 'visto');
+        }
+    }
+
     protected function getHeaderActions(): array
     {
         return [

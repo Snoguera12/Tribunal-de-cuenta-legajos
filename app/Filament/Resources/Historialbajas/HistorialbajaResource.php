@@ -20,9 +20,6 @@ class HistorialbajaResource extends Resource
     protected static ?string $modelLabel = "Historial de Bajas";
     //protected static ?string $navigationParentItem = "Legajos";
     protected static ?int $navigationSort = 2;
-    /*public static function getNavigationBadge(): ?string{
-        return Historialbaja::count();
-    }*/
 
     public static function getNavigationBadgeColor(): string|array|null{
         return "success";

@@ -14,23 +14,22 @@ class DocumentosPendientesWidget extends StatsOverviewWidget
     }
     protected function getStats(): array
     {
-        $total = Documento::query()
-        ->whereNull('descripcion')
-        ->orWhereNull('tipodoc')
-        ->orWhereNull('legajo_id')->count();
+        $total = Documento::pendientes()->count();
 
         $resultado = $total == 0 ?
         [
             Stat::make('Documentos pendientes', $total)
             ->description('No hay documentos pendientes.')
-            ->color('primary'),
+            ->descriptionIcon('heroicon-m-check-circle')
+            ->color('success'),
         ]
         :
         [
             Stat::make('Documentos pendientes', $total)
-            ->description('Falta revisar documentos.')
-            ->url('/legajos/documentos/')
-            ->color('primary'),
+            ->description('Les falta el legajo, el tipo o la descripción.')
+            ->descriptionIcon('heroicon-m-document-magnifying-glass')
+            ->url(\App\Filament\Resources\Documentos\DocumentoResource::getUrl('index'))
+            ->color('warning'),
         ];
         return $resultado;
     }

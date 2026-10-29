@@ -7,59 +7,46 @@ use App\Models\User;
 
 class DocumentoPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin() || $user->isRRHH() || $user->isFuncionario();
+        // el empleado tambien puede entrar, pero solo ve los suyos
+        return $user->isAdmin() || $user->isRRHH() || $user->isFuncionario() || $user->isEmpleado();
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Documento $documento): bool
     {
-        return $user->isAdmin() || $user->isRRHH() || $user->isFuncionario();
+        if ($user->isAdmin() || $user->isRRHH() || $user->isFuncionario()) {
+            return true;
+        }
+
+        // empleado: solo si es su documento
+        return $documento->perteneceAPersona($user->persona_id);
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
+        // el empleado ve pero no sube
         return $user->isAdmin() || $user->isRRHH();
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Documento $documento): bool
     {
         return $user->isAdmin() || $user->isRRHH();
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, Documento $documento): bool
     {
         return $user->isAdmin() || $user->isRRHH();
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
     public function restore(User $user, Documento $documento): bool
     {
         return $user->isAdmin() || $user->isRRHH();
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
     public function forceDelete(User $user, Documento $documento): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        // borrar para siempre (sin papelera): solo el administrador
+        return $user->isAdmin();
     }
 }

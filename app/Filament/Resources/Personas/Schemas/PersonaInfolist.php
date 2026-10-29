@@ -107,7 +107,7 @@ class PersonaInfolist
                                 'style' => 'max-height: 300px; overflow-y: auto;',
                             ])
                             ->schema([
-                                RepeatableEntry::make('documentos')
+                                RepeatableEntry::make('documentosTodos')
                                 ->label('Archivos Adjuntos')
                                 ->hiddenLabel()
                                 ->placeholder('Sin documentos')

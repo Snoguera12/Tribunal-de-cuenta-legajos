@@ -14,8 +14,8 @@ class PersonaPolicy
 
     public function view(User $user, Persona $persona): bool
     {
-        if ($user->isStaffRoles()) {
-            return $user->isStaffRoles();
+        if ($user->isAdmin() || $user->isRRHH() || $user->isFuncionario()) {
+            return true;
         }
 
         return $user->persona_id !== null && $user->persona_id === $persona->id;
@@ -43,6 +43,7 @@ class PersonaPolicy
 
     public function forceDelete(User $user, Persona $persona): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        // borrar para siempre (sin papelera): solo el administrador
+        return $user->isAdmin();
     }
 }

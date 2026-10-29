@@ -22,7 +22,7 @@ class LegajoInfolist
                 Section::make('Documentos adjuntos')
                     ->columnSpanFull()
                     ->schema([
-                        RepeatableEntry::make('documentos')
+                        RepeatableEntry::make('documentosTodos')
                             ->hiddenLabel()
                             ->placeholder('Sin documentos')
                             ->columns(3)

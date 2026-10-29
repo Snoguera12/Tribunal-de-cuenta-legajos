@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\MotivoBajaEnum;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 
 class Historialbaja extends Model
 {
+    use RegistraAuditoria;
+    use SoftDeletes;
+
     protected $casts = [
         "motivo" => MotivoBajaEnum::class,
     ];

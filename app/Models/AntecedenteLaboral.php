@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
@@ -9,6 +11,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class AntecedenteLaboral extends Model
 {
+    use RegistraAuditoria;
+    use SoftDeletes;
+
     //protected $table = 'antecedentes_laborales';
 
     protected $fillable = [

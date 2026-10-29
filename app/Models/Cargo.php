@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 
 class Cargo extends Model
 {
+    use RegistraAuditoria;
+
     protected $fillable = [
         "nombre"
     ];
@@ -32,11 +35,6 @@ class Cargo extends Model
             ->sortable()
             ->searchable(),
 
-            /*TextColumn::make('cargos_count')
-            ->label('Empleados Asociados')
-            ->counts('legajos')
-            ->badge()
-            ->sortable(),*/
         ];
         return $resultado;
     }

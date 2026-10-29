@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\SecurityHeaders;
+use App\Models\Auditoria;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -15,7 +16,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // permisos por token de la API: ->middleware('abilities:personas:leer')
+        $middleware->alias([
+            'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
+            'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
+        ]);
+
         $middleware->append(SecurityHeaders::class);
+
+        // detras de un proxy/balanceador, para que la IP de la auditoria sea la real
+        // TRUSTED_PROXIES=* o una lista de IPs separadas por coma. Sin esto no se confia en ninguno
+        if ($proxies = env('TRUSTED_PROXIES')) {
+            $middleware->trustProxies(at: $proxies === '*' ? '*' : array_map('trim', explode(',', $proxies)));
+        }
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(function (Request $request, Throwable $e): bool {
@@ -28,4 +41,17 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json(['message' => 'Recurso no encontrado.'], 404);
             }
         });
+
+        // cada error 500 queda en la auditoria (sin datos de la peticion)
+        $exceptions->report(function (\Throwable $e) {
+            Auditoria::registrar(
+                evento: 'error_sistema',
+                descripcion: class_basename($e) . ': ' . mb_substr($e->getMessage(), 0, 200),
+                extra: [
+                    'archivo' => str_replace(base_path() . DIRECTORY_SEPARATOR, '', $e->getFile()),
+                    'linea' => $e->getLine(),
+                ],
+            );
+        });
+
     })->create();

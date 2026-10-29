@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
+use App\Models\Concerns\RegistraAuditoria;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Columns\TextColumn;
@@ -10,6 +12,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Titulo extends Model
 {
+    use RegistraAuditoria;
+    use SoftDeletes;
+
     protected $fillable = [
         'nombre',
     ];

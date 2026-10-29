@@ -52,6 +52,14 @@
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ],
+        "test:mysql": [
+            "@php artisan config:clear --ansi",
+            "@php vendor/bin/phpunit -c phpunit.mysql.xml --exclude-group=lento"
+        ],
+        "test:rapido": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test --exclude-group=lento"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi",

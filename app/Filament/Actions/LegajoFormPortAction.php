@@ -1,6 +1,5 @@
 <?php
 
-// IMPORTANTE: El namespace debe coincidir exactamente con la estructura de carpetas
 namespace App\Filament\Actions;
 
 use App\Enums\TipoContratoEnum;
@@ -10,6 +9,7 @@ use App\Models\Cargo;
 use App\Models\Categoria;
 use App\Models\Legajo;
 use Carbon\Carbon;
+use Filament\Actions\Action;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
@@ -24,17 +24,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class LegajoFormPortAction extends Action
 {
-    /**
-     * El nombre por defecto de la acción.
-     */
     public static function getDefaultName(): ?string
     {
         return 'crearLegajo';
     }
 
-    /**
-     * Configuración inicial de la acción.
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -100,7 +94,7 @@ class LegajoFormPortAction extends Action
                                 Select::make("categoria_id")->label("Categoría")
                                     ->searchable()
                                     ->required()
-                                    ->options(Categoria::selectRaw("id, nombre || ' ' || descripcion AS nombre_completo")->pluck('nombre_completo', 'id')),
+                                    ->options(Categoria::getCategorias()),
 
                                 DateTimePicker::make('fecha_de_ingreso')->label('Fecha de Ingreso')
                                     ->helperText('Si no introduce la fecha de ingreso, se asigna la fecha de hoy.')
@@ -135,10 +129,12 @@ class LegajoFormPortAction extends Action
                                         Grid::make(1)
                                             ->schema([
                                                 FileUpload::make('archivo')->label('Documento Adjunto')
-                                                    ->disk('public')
+                                                    ->disk('local')
                                                     ->directory('documentos/')
-                                                    ->visibility('public')
-                                                    ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                                    ->visibility('private')
+                                                    ->acceptedFileTypes(['application/pdf', 'image/jpeg'])
+                                                    ->rules([new \App\Rules\ArchivoPdfOJpeg()])
+                                                    ->saveUploadedFileUsing(fn ($file) => \App\Services\ArchivoSeguro::guardar($file, 'documentos'))
                                                     ->maxSize(10240)
                                                     ->required(),
                                             ]),
@@ -146,7 +142,7 @@ class LegajoFormPortAction extends Action
                             ]),
                     ]),
             ])
-            // Guardado utilizando el $record inyectado dinámicamente por Filament (el modelo Persona actual)
+            // se guarda con el $record que inyecta filament (la persona actual)
             ->action(function (array $data, Model $record): void {
                 $fechaIngreso = $data['fecha_de_ingreso'] ?? Carbon::now()->format('Y-m-d H:i:s');
 

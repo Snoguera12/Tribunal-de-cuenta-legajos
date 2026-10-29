@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\NivelEstudioEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -17,6 +19,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Estudio extends Model
 {
+    use RegistraAuditoria;
+    use SoftDeletes;
+
     protected $casts = [
         'nivel_estudio' => NivelEstudioEnum::class,
     ];

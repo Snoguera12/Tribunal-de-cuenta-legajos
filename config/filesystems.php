@@ -47,6 +47,22 @@ return [
             'report' => false,
         ],
 
+        // los backups van fuera de storage/app/private para que no se incluyan a si mismos
+        'backups' => [
+            'driver' => 'local',
+            'root' => storage_path('app/backups'),
+            'visibility' => 'private',
+            'throw' => true,
+        ],
+
+        // segunda copia en otro lado (disco externo, carpeta de red montada, etc)
+        'backups_externo' => [
+            'driver' => 'local',
+            'root' => env('BACKUP_EXTERNO_RUTA', storage_path('app/backups_externo')),
+            'visibility' => 'private',
+            'throw' => true,
+        ],
+
         'documentos' => [
             'driver' => 'local',
             'root' => storage_path('app/private/documentos'),

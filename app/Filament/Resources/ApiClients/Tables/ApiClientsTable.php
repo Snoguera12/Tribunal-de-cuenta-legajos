@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ApiClients\Tables;
 
 use App\Models\ApiClient;
+use App\Models\Auditoria;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
@@ -44,9 +45,6 @@ class ApiClientsTable
             ])
             ->recordActions([
             EditAction::make(),
-            ])
-            ->actions([
-            EditAction::make(),
         
             // Acción personalizada para generar el token
             Action::make('generateToken')
@@ -55,11 +53,22 @@ class ApiClientsTable
             ->color('warning')
             ->requiresConfirmation()
             ->modalHeading('¿Generar nuevo API Token?')
-            ->modalDescription('Este cliente se activará automáticamente y este nuevo token solo se mostrará UNA VEZ.')
+            ->modalDescription('Este cliente se activará automáticamente y este nuevo token solo se mostrará UNA VEZ. Elegí qué puede hacer.')
+            ->form([
+                \Filament\Forms\Components\CheckboxList::make('habilidades')
+                    ->label('Permisos del token')
+                    ->options(ApiClient::HABILIDADES)
+                    ->default(array_keys(ApiClient::HABILIDADES))
+                    ->required()
+                    ->bulkToggleable(),
+            ])
         
             // Condición: El botón se oculta de la interfaz si el cliente ya está activo
             ->hidden(fn (ApiClient $record): bool => $record->is_token)
-            ->action(function (ApiClient $record) {
+            ->action(function (ApiClient $record, array $data) {
+                // aunque la pagina ya es solo del administrador, se vuelve a comprobar
+                abort_unless(auth()->user()?->isAdmin(), 403);
+
                 // 1. Activamos el cliente en la base de datos
                 $record->update([
                     'is_active' => true,
@@ -67,8 +76,17 @@ class ApiClientsTable
                 ]);
 
                 // 2. Generamos el token usando Sanctum
-                $tokenName = 'Token-' . $record->name . '-' . now()->format('YmdHis');
-                $token = $record->createToken($tokenName)->plainTextToken;
+                $tokenName = 'Token-' . $record->nombre . '-' . now()->format('YmdHis');
+                $habilidades = ApiClient::habilidadesValidas($data['habilidades'] ?? null);
+                $token = $record->createToken($tokenName, $habilidades)->plainTextToken;
+
+                // en la auditoria solo va el nombre, el token nunca
+                Auditoria::registrar(
+                    evento: 'token_generado',
+                    descripcion: 'Generó un token para el cliente API ' . $record->nombre,
+                    modelo: $record,
+                    extra: ['nombre_token' => $tokenName, 'permisos' => implode(',', $habilidades)],
+                );
 
                 // 3. Enviamos la notificación persistente con el token
                 Notification::make()
@@ -90,16 +108,26 @@ class ApiClientsTable
             ->color('danger')
             ->requiresConfirmation()
             ->modalHeading('¿Borrar / Revocar Token?')
-            ->modalDescription('Esto eliminará de forma permanente cualquier token de Sanctum asociado. El cliente se desactivará de inmediato.')
+            ->modalDescription('Esto elimina los tokens de este cliente y lo desactiva de inmediato. Después se puede generar uno nuevo.')
+            ->visible(fn (ApiClient $record): bool => $record->is_token)
             ->action(function (ApiClient $record) {
+                abort_unless(auth()->user()?->isAdmin(), 403);
+
                 $record->tokens()->delete();
 
-                $record->forceDelete();
+                // queda desactivado y se puede generar otro token
+                $record->update(['is_active' => false, 'is_token' => false]);
+
+                Auditoria::registrar(
+                    evento: 'token_eliminado',
+                    descripcion: 'Revocó los tokens del cliente API ' . $record->nombre,
+                    modelo: $record,
+                );
 
                 Notification::make()
-                ->title('Token borrado con éxito')
-                ->success()
-                ->send();
+                    ->title('Token revocado y cliente desactivado')
+                    ->success()
+                    ->send();
             }),
         ]);
     }

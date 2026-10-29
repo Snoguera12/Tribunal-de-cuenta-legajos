@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
+use App\Services\HabilitacionUsuarios;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\EstadoLegajoEnum;
 use App\Enums\TipoContratoEnum;
 use App\Models\Helpers\PersonaHelper;
@@ -21,6 +24,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Legajo extends Model
 {
+    use RegistraAuditoria;
+    use \App\Models\Concerns\RegistraActividadReciente;
+    use SoftDeletes;
+
     protected $attributes = [
         "estado" => true,
     ];
@@ -38,13 +45,44 @@ class Legajo extends Model
         "cargo_id",
         "area_id",
     ];
-    
+    // al cambiar el estado de un legajo se revisa si el usuario sigue habilitado
+    public function actividadReciente(bool $creado = false): ?array
+    {
+        return $this->persona_id && ($creado || $this->wasChanged()) ? ['agente', $this->persona_id] : null;
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(function (Legajo $legajo) {
+
+            if ($legajo->wasRecentlyCreated || $legajo->wasChanged(['estado', 'persona_id'])) {
+
+                HabilitacionUsuarios::sincronizar(Persona::find($legajo->persona_id));
+
+                // si lo pasaron a otra persona, tambien se revisa la anterior
+                if ($legajo->wasChanged('persona_id')) {
+                    HabilitacionUsuarios::sincronizar(Persona::find($legajo->getOriginal('persona_id')), forzar: true);
+                }
+            }
+        });
+
+        static::deleted(fn (Legajo $legajo) => HabilitacionUsuarios::sincronizar(Persona::find($legajo->persona_id)));
+        static::restored(fn (Legajo $legajo) => HabilitacionUsuarios::sincronizar(Persona::find($legajo->persona_id)));
+    }
+
+
     public function historial(){ return $this->hasMany(Historialbaja::class); }
     public function persona(){ return $this->belongsTo(Persona::class, 'persona_id'); }
     public function categoria(){ return $this->belongsTo(Categoria::class, 'categoria_id'); }
     public function cargo(){ return $this->belongsTo(Cargo::class, 'cargo_id'); }
     public function area(){ return $this->belongsTo(Area::class, 'area_id'); }
     public function documentos(){ return $this->hasMany(Documento::class); }
+
+    // los documentos del legajo: los propios y los que se compartieron con otros legajos
+    public function documentosTodos()
+    {
+        return $this->belongsToMany(Documento::class, 'documento_legajo')->withTimestamps();
+    }
     public function licencias(){ return $this->hasMany(Licencia::class); }
     public function isAlta(){ return $this->estado == EstadoLegajoEnum::Alta; }
     public function getIcon(){ return $this->isAlta() ? Heroicon::CheckCircle : Heroicon::XCircle; }
@@ -232,7 +270,7 @@ class Legajo extends Model
     }
 
     public static function getFrontLegajoDocumentos(string $formmode) : array{
-        // BLOQUE 1: Datos Administrativos del Legajo
+        // datos del legajo
         $resutlado = match ($formmode) {
             'mul' => [
                 Grid::make([
@@ -252,14 +290,14 @@ class Legajo extends Model
         $resutlado = [
             ...$resutlado, // Esos tres puntos en la variable $resultado es un "operador de propagación" (spread operator)
 
-            // BLOQUE 2: Sección Integrada de Documentos Adjuntos
+            // documentos adjuntos
             Section::make('Documentación Digitalizada')
             ->description('Cargue los archivos adjuntos y documentos que respaldan este legajo.')
             ->icon('heroicon-o-document-arrow-up')
-            ->collapsible() // El usuario puede ocultar la zona de archivos si no la necesita en el momento
+            ->collapsible()
             ->columnSpanFull()
             ->extraAttributes([
-                // Forzamos un borde más oscuro y fondo claro para que resalte del contenedor de Legajos
+                // borde oscuro y fondo claro para que se note
                 'style' => '
                     border: 2px solid #b4b4b4 !important; 
                     border-radius: 12px !important; 
@@ -277,10 +315,9 @@ class Legajo extends Model
                 ->columnSpanFull()
                 ->collapsible()
                 ->defaultItems(0)
-                ->grid(3) // Mantiene tus dos columnas de documentos lado a lado
+                ->grid(3)
                 ->schema([
-                    // SOLUCIÓN NATIVA: Usamos un Fieldset o una Section interna. 
-                    // Cada vez que se crea un documento, Filament genera este recuadro contenedor.
+                    // recuadro que filament arma por cada documento
                     Grid::make(1)
                     ->columnSpan(1)
                     ->schema(Documento::getFromSchema(false, false)),
@@ -310,5 +347,31 @@ class Legajo extends Model
             ->schema(Legajo::getFrontLegajoDocumentos('mul')),
         ];
     }
-    
+
+    // opciones para los select: "Legajo: 12 (Ana Lopez - DNI: 123)"
+    public static function etiqueta(self $legajo): string
+    {
+        return 'Legajo: ' . $legajo->num_legajo . ' (' . $legajo->persona->nombre . ' ' . $legajo->persona->apellido
+            . ' - DNI: ' . $legajo->persona->dni . ')' . ($legajo->estado ? '' : ' [de baja]');
+    }
+
+    public static function opcionesPorIds(array $ids): array
+    {
+        return static::with('persona')->whereIn('id', $ids)->get()
+            ->filter(fn ($legajo) => $legajo->persona)
+            ->mapWithKeys(fn ($legajo) => [$legajo->id => static::etiqueta($legajo)])
+            ->all();
+    }
+
+    public static function opcionesConPersona(?int $personaId = null): array
+    {
+        return static::with('persona')
+            ->when($personaId, fn ($q) => $q->where('persona_id', $personaId))
+            ->get()
+            ->filter(fn ($legajo) => $legajo->persona)
+            ->mapWithKeys(fn ($legajo) => [
+                $legajo->id => 'Legajo: ' . $legajo->num_legajo . ' (' . $legajo->persona->nombre . ' ' . $legajo->persona->apellido . ' - DNI: ' . $legajo->persona->dni . ')',
+            ])
+            ->all();
+    }
 }

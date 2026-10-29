@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
 use Illuminate\Database\Eloquent\Model;
 
 class Categoria extends Model
 {
+    use RegistraAuditoria;
+
     protected $fillable = [
         "nombre",
         "descripcion",

@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('familiars', function (Blueprint $table) {
@@ -24,15 +21,9 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('familiares', function (Blueprint $table) {
-            $table->dropForeign(['persona_id']);
-            $table->dropColumn(['nombre', 'apellido', 'dni', 'parentesco', 'fecha_de_nacimiento', 'vive', 'persona_id']);
-        });
+        // (antes apuntaba a una tabla "familiares" que no existe y migrate:rollback fallaba)
         Schema::dropIfExists('familiars');
     }
 };

@@ -37,7 +37,7 @@ class DocumentoResource extends Resource
         $user = auth()->user();
 
         if ($user->isEmpleado()) {
-            return $query->whereHas('legajo', fn ($q) => $q->where('persona_id', $user->persona_id));
+            return $query->deLaPersona($user->persona_id);
         }
 
         return $query;
@@ -51,9 +51,7 @@ class DocumentoResource extends Resource
     }
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::whereNull('descripcion')
-                ->orWhereNull('tipodoc')
-                ->orWhereNull('legajo_id')->count();
+        return static::getModel()::pendientes()->count();
     }
     public static function getPages(): array
     {

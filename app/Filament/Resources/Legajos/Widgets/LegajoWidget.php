@@ -18,7 +18,6 @@ class LegajoWidget extends StatsOverviewWidget
         $total = Legajo::query()->count();
         $alta = Legajo::query()->where('estado', true)->count();
         $baja = Legajo::query()->where('estado', false)->count();
-
         $porcentajeAltas = $total > 0 ? round(($alta / $total) * 100) : 0;
         $porcentajeBajas = $total > 0 ? round(($baja / $total) * 100) : 0;
 
@@ -35,7 +34,8 @@ class LegajoWidget extends StatsOverviewWidget
             Stat::make('De Baja', $baja)
             ->description("Legajos de baja. {$porcentajeBajas}% del total.")
             ->descriptionIcon('heroicon-m-x-circle')
-            ->color('danger')
+            ->color('danger'),
+
         ];
     }
 }

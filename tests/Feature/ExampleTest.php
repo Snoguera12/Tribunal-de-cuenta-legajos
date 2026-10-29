@@ -2,18 +2,20 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    /**
-     * A basic test example.
-     */
-    public function test_the_application_returns_a_successful_response(): void
+    // la raiz manda al panel
+    public function test_la_raiz_redirige_al_panel(): void
     {
-        $response = $this->get('/');
+        $this->get('/')->assertRedirect('legajos');
+    }
 
-        $response->assertStatus(200);
+
+    // un link de documento sin firma no sirve
+    public function test_un_documento_sin_login_no_se_abre(): void
+    {
+        $this->get('/documentos/algo.pdf')->assertStatus(401);
     }
 }

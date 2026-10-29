@@ -38,10 +38,34 @@ return [
             'database' => env('DB_DATABASE', database_path('database.sqlite')),
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-            'busy_timeout' => null,
-            'journal_mode' => null,
-            'synchronous' => null,
-            'transaction_mode' => 'DEFERRED',
+            // varios usuarios a la vez: sin esto SQLite responde "database is locked" y se pierden registros
+            // WAL = las lecturas no bloquean a las escrituras; busy_timeout = espera hasta 5 s en vez de fallar
+            'busy_timeout' => (int) env('DB_BUSY_TIMEOUT', 5000),
+            'journal_mode' => env('DB_JOURNAL_MODE', 'WAL'),
+            'synchronous' => env('DB_SYNCHRONOUS', 'NORMAL'),
+            // IMMEDIATE (solo lo aplica Laravel con PHP 8.4 o mas): la transaccion toma el lugar de escritura al empezar y espera su turno.
+            // Con PHP 8.3 la auditoria repite el guardado si la base esta ocupada (Auditoria::conReintentos)
+            'transaction_mode' => env('DB_TRANSACTION_MODE', 'IMMEDIATE'),
+        ],
+
+        // base aparte: historicos + auditoria (si no se configura usa un sqlite propio)
+        'historico' => [
+            'driver' => env('HIST_DB_CONNECTION', 'sqlite'),
+            'database' => env('HIST_DB_DATABASE', database_path('historico.sqlite')),
+            'host' => env('HIST_DB_HOST', '127.0.0.1'),
+            'port' => env('HIST_DB_PORT', '3306'),
+            'username' => env('HIST_DB_USERNAME', 'root'),
+            'password' => env('HIST_DB_PASSWORD', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'foreign_key_constraints' => false,
+            // solo cuando el historico es un archivo sqlite (la auditoria escribe en cada pedido): ver la nota de arriba
+            'busy_timeout' => (int) env('HIST_DB_BUSY_TIMEOUT', 5000),
+            'journal_mode' => env('HIST_DB_JOURNAL_MODE', 'WAL'),
+            'synchronous' => env('HIST_DB_SYNCHRONOUS', 'NORMAL'),
+            'transaction_mode' => env('HIST_DB_TRANSACTION_MODE', 'IMMEDIATE'),
         ],
 
         'mysql' => [
