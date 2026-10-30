@@ -18,8 +18,9 @@ class Token extends Model
         'nombre',
         'is_active',
         'is_created',
+        'enviado_at',
     ];
-    protected $casts = ['expires_at' => 'datetime'];
+    protected $casts = ['expires_at' => 'datetime', 'enviado_at' => 'datetime'];
     public function restablecer(): void
     {
         $this->update([

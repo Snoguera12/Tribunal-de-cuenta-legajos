@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+
+    // Buzón del sistema de licencias (recibe los tokens de la API)
+    'licencias' => [
+        'buzon_url' => env('LICENCIAS_BUZON_URL'),
+        'buzon_clave' => env('LICENCIAS_BUZON_CLAVE'),
+    ],
+
 ];
