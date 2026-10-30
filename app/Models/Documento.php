@@ -10,6 +10,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\URL;
 
 class Documento extends Model
@@ -25,10 +26,19 @@ class Documento extends Model
         'descripcion',
         'tipodoc',
         'legajo_id',
+        'token_id',
+        'id_solicitud',
+        'sha256',
     ];
 
     public function legajo(){
         return $this->belongsTo(Legajo::class, 'legajo_id');
+    }
+
+    // Legajos a los que está asignado el documento (un archivo, varios legajos)
+    public function legajos(): BelongsToMany
+    {
+        return $this->belongsToMany(Legajo::class, 'documento_legajo')->withTimestamps();
     }
     public static function abrirDocumento($record): ?string{
         if (!$record->ruta) return null;
