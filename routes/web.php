@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 
-Route::get('/', fn () => redirect('legajos'));
+Route::get('/', fn () => redirect('/legajos'))->where('path', '.+');
 
 Route::get('/login', fn () => redirect()->to('/legajos/login'))->name('login');
 
