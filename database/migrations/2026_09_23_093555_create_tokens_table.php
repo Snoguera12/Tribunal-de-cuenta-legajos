@@ -16,8 +16,7 @@ return new class extends Migration
             $table->string('nombre');
             $table->boolean('is_active')->default(false);
             $table->boolean('is_created')->default(false);
-            // Cuándo se envió el token al buzón del sistema de licencias (null = no enviado)
-            $table->timestamp('enviado_at')->nullable();
+            $table->json('enviados')->nullable();
             $table->timestamps();
         });
     }

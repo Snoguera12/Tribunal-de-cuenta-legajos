@@ -19,8 +19,8 @@ class EnviarTokenBuzonTest extends TestCase
     {
         parent::setUp();
 
-        config()->set('services.licencias.buzon_url', 'https://licencias.test');
-        config()->set('services.licencias.buzon_clave', null);
+        config()->set('buzones.licencias.url', 'https://licencias.test');
+        config()->set('buzones.licencias.clave', null);
 
         $this->cliente = Token::create(['nombre' => 'Sistema de licencias', 'is_active' => true, 'is_created' => true]);
     }
@@ -30,22 +30,22 @@ class EnviarTokenBuzonTest extends TestCase
         Http::fake(['licencias.test/api/buzon/tokens' => Http::response(['ok' => true], 201)]);
 
         $vence = now()->addHours(3)->startOfSecond();
-        $resultado = BuzonLicencias::enviar($this->cliente, 'texto-del-token', $vence);
+        $resultado = BuzonLicencias::enviar('licencias', $this->cliente, 'texto-del-token', $vence);
 
         $this->assertTrue($resultado['ok']);
         Http::assertSent(fn (Request $r) => $r->url() === 'https://licencias.test/api/buzon/tokens'
             && $r['nombre'] === 'Sistema de licencias'
             && $r['token'] === 'texto-del-token'
             && $r['vence_en'] === $vence->toIso8601String());
-        $this->assertNotNull($this->cliente->fresh()->enviado_at);
+        $this->assertNotNull($this->cliente->fresh()->enviados);
     }
 
     public function test_envia_la_clave_del_buzon_si_esta_configurada(): void
     {
-        config()->set('services.licencias.buzon_clave', 'clave-secreta');
+        config()->set('buzones.licencias.clave', 'clave-secreta');
         Http::fake(['*' => Http::response([], 201)]);
 
-        BuzonLicencias::enviar($this->cliente, 'x', null);
+        BuzonLicencias::enviar('licencias', $this->cliente, 'x', null);
 
         Http::assertSent(fn (Request $r) => $r->hasHeader('X-Buzon-Clave', 'clave-secreta'));
     }
@@ -54,29 +54,29 @@ class EnviarTokenBuzonTest extends TestCase
     {
         Http::fake(['*' => Http::response(['error' => 'x'], 500)]);
 
-        $resultado = BuzonLicencias::enviar($this->cliente, 'x', null);
+        $resultado = BuzonLicencias::enviar('licencias', $this->cliente, 'x', null);
 
         $this->assertFalse($resultado['ok']);
         $this->assertStringContainsString('500', $resultado['mensaje']);
-        $this->assertNull($this->cliente->fresh()->enviado_at);
+        $this->assertNull($this->cliente->fresh()->enviados);
     }
 
     public function test_sin_conexion_devuelve_error_sin_romper(): void
     {
         Http::fake(fn () => throw new \Illuminate\Http\Client\ConnectionException('sin red'));
 
-        $resultado = BuzonLicencias::enviar($this->cliente, 'x', null);
+        $resultado = BuzonLicencias::enviar('licencias', $this->cliente, 'x', null);
 
         $this->assertFalse($resultado['ok']);
-        $this->assertNull($this->cliente->fresh()->enviado_at);
+        $this->assertNull($this->cliente->fresh()->enviados);
     }
 
     public function test_sin_url_configurada_no_envia_nada(): void
     {
-        config()->set('services.licencias.buzon_url', null);
+        config()->set('buzones.licencias.url', null);
         Http::fake();
 
-        $resultado = BuzonLicencias::enviar($this->cliente, 'x', null);
+        $resultado = BuzonLicencias::enviar('licencias', $this->cliente, 'x', null);
 
         $this->assertFalse($resultado['ok']);
         Http::assertNothingSent();

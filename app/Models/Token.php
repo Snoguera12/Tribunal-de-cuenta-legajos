@@ -1,13 +1,9 @@
 <?php
-
 namespace App\Models;
 
-use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\Builder;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class Token extends Model
@@ -18,9 +14,9 @@ class Token extends Model
         'nombre',
         'is_active',
         'is_created',
-        'enviado_at',
+        'enviados',
     ];
-    protected $casts = ['expires_at' => 'datetime', 'enviado_at' => 'datetime'];
+    protected $casts = ['expires_at' => 'datetime', 'enviados' => 'array'];
     public function restablecer(): void
     {
         $this->update([

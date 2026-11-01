@@ -8,48 +8,64 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
 /**
- * Envía un token recién generado al buzón del sistema de licencias.
- * La transferencia va por HTTPS (la URL tiene que empezar con https://).
+ * Envía un token recién generado a un destino aprobado (ver config/buzones.php).
+ * La transferencia va por HTTPS en producción.
  */
 class BuzonLicencias
 {
     /**
+     * Destinos disponibles para la pantalla: solo los que tienen URL configurada.
+     *
+     * @return array<string, string> clave => nombre
+     */
+    public static function destinos(): array
+    {
+        return collect(config('buzones'))
+            ->filter(fn (array $d) => filled($d['url']))
+            ->map(fn (array $d) => $d['nombre'])
+            ->all();
+    }
+
+    /**
      * @return array{ok: bool, mensaje: string}
      */
-    public static function enviar(Token $token, string $textoToken, ?CarbonInterface $venceEn): array
+    public static function enviar(string $destino, Token $token, string $textoToken, ?CarbonInterface $venceEn): array
     {
-        $url = config('services.licencias.buzon_url');
-        if (blank($url)) {
-            return ['ok' => false, 'mensaje' => 'Falta configurar LICENCIAS_BUZON_URL en el .env.'];
+        $config = config("buzones.{$destino}");
+
+        if (! $config || blank($config['url'])) {
+            return ['ok' => false, 'mensaje' => 'El destino no está aprobado o no tiene URL configurada.'];
         }
 
-        if (! str_starts_with($url, 'https://') && app()->environment('production')) {
-            return ['ok' => false, 'mensaje' => 'El buzón de licencias tiene que usar HTTPS en producción.'];
+        if (! str_starts_with($config['url'], 'https://') && app()->environment('production')) {
+            return ['ok' => false, 'mensaje' => 'El buzón de destino tiene que usar HTTPS en producción.'];
         }
 
         $cabeceras = ['Accept' => 'application/json'];
-        if ($clave = config('services.licencias.buzon_clave')) {
-            $cabeceras['X-Buzon-Clave'] = $clave;
+        if (filled($config['clave'])) {
+            $cabeceras['X-Buzon-Clave'] = $config['clave'];
         }
 
         try {
             $respuesta = Http::withHeaders($cabeceras)
                 ->timeout(10)
-                ->post(rtrim($url, '/') . '/api/buzon/tokens', [
+                ->post(rtrim($config['url'], '/') . '/api/buzon/tokens', [
                     'nombre' => $token->nombre,
                     'token' => $textoToken,
                     'vence_en' => $venceEn?->toIso8601String(),
                 ]);
         } catch (ConnectionException) {
-            return ['ok' => false, 'mensaje' => 'No se pudo conectar con el buzón de licencias.'];
+            return ['ok' => false, 'mensaje' => "No se pudo conectar con {$config['nombre']}."];
         }
 
         if ($respuesta->successful()) {
-            $token->update(['enviado_at' => now()]);
+            $envios = $token->enviados ?? [];
+            $envios[$destino] = now()->toDateTimeString();
+            $token->update(['enviados' => $envios]);
 
-            return ['ok' => true, 'mensaje' => 'Token enviado al buzón de licencias.'];
+            return ['ok' => true, 'mensaje' => "Token enviado a {$config['nombre']}."];
         }
 
-        return ['ok' => false, 'mensaje' => "El buzón de licencias respondió con error {$respuesta->status()}."];
+        return ['ok' => false, 'mensaje' => "{$config['nombre']} respondió con error {$respuesta->status()}."];
     }
 }

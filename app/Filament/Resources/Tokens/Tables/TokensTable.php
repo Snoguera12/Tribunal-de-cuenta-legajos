@@ -14,9 +14,52 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Facades\DB;
 
 class TokensTable
 {
+    /**
+     * Crea el token y lo envía al destino dentro de una transacción.
+     * Si el envío falla, se deshace todo: no queda ningún token creado.
+     * @return array{ok: bool, mensaje: string}
+     */
+    private static function generarYEnviar(Token $record, TokenDuracion|string $duracion, string $destino): array
+    {
+        $duracion = $duracion instanceof TokenDuracion ? $duracion : TokenDuracion::from($duracion);
+        $expiraEn = $duracion->expiraEn()->startOfSecond();
+
+        DB::beginTransaction();
+
+        try {
+            $record->update([
+                'is_active' => true,
+                'is_created' => true,
+                'enviados' => null,
+            ]);
+
+            $tokenName = 'Token-' . $record->nombre . '-' . now()->format('YmdHis');
+            $texto = $record->createToken($tokenName, ['*'], $expiraEn)->plainTextToken;
+
+            $envio = BuzonLicencias::enviar($destino, $record, $texto, $expiraEn);
+
+            if (! $envio['ok']) {
+                DB::rollBack();
+
+                return ['ok' => false, 'mensaje' => $envio['mensaje']];
+            }
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            throw $e;
+        }
+
+        // Programa el borrado para el momento del vencimiento (solo si el token quedó creado)
+        EliminarTokenVencido::dispatch()->delay($expiraEn->copy()->addSeconds(2));
+
+        return ['ok' => true, 'mensaje' => $envio['mensaje']];
+    }
     public static function configure(Table $table): Table
     {
         return $table
@@ -42,9 +85,12 @@ class TokensTable
                 ->placeholder('Sin token')
                 ->dateTime(),
 
-                TextColumn::make('enviado_at')
-                ->label('Enviado a licencias')
-                ->dateTime()
+                TextColumn::make('enviados')
+                ->label('Enviado a')
+                ->state(fn (Token $record) => collect($record->enviados ?? [])
+                    ->map(fn ($fecha, $destino) => (config("buzones.{$destino}.nombre") ?? $destino)
+                        . ' (' . \Illuminate\Support\Carbon::parse($fecha)->format('d/m H:i') . ')')
+                    ->implode(', ') ?: null)
                 ->placeholder('No enviado'),
 
                 TextColumn::make('created_at')
@@ -92,44 +138,45 @@ class TokensTable
                 // Genera el token y lo envía de una vez al buzón del sistema de licencias.
                 // El texto del token existe solo en este momento, por eso el envío va en la misma acción.
                 Action::make('generarYEnviar')
-                ->label('Generar y enviar a licencias')
+                ->label('Generar y Enviar a...')
                 ->icon('heroicon-o-paper-airplane')
                 ->color('success')
-                ->visible(fn (): bool => auth()->user()?->isAdmin_RRHH() ?? false)
+                ->visible(fn (): bool => (auth()->user()?->isAdmin_RRHH() ?? false) && BuzonLicencias::destinos() !== [])
                 ->requiresConfirmation()
-                ->modalHeading('¿Generar el token y enviarlo a licencias?')
-                ->modalDescription('El token se envía por HTTPS al buzón del sistema de licencias. Si el envío falla, el token se muestra acá una sola vez para que no se pierda.')
-                ->hidden(fn (Token $record): bool => $record->is_created)
+                ->modalHeading('¿Generar el token y enviarlo?')
+                ->modalDescription('El token se envía por HTTPS al destino elegido. Si el envío falla, el token se muestra acá una sola vez para que no se pierda.')
+                ->hidden(fn (Token $record): bool => $record->tokens()
+                    ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
+                    ->exists())
                 ->schema([
+                    Select::make('destino')
+                    ->label('Destino')
+                    ->options(fn () => BuzonLicencias::destinos())
+                    ->default(fn () => array_key_first(BuzonLicencias::destinos()))
+                    ->required(),
+
                     Select::make('duracion')
                     ->label('Duración')
                     ->options(TokenDuracion::class)
                     ->required(),
                 ])
-                ->hidden(fn (Token $record): bool => $record->tokens()
-                ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
-                ->exists())
                 ->action(function (Token $record, array $data) {
-                    $generado = self::generarToken($record, $data['duracion']);
-                    $envio = BuzonLicencias::enviar($record, $generado['texto'], $generado['vence']);
+                    $resultado = self::generarYEnviar($record, $data['duracion'], $data['destino']);
 
-                    if ($envio['ok']) {
+                    if ($resultado['ok']) {
                         Notification::make()
-                        ->title('Token generado y enviado a licencias')
-                        ->body($envio['mensaje'])
+                        ->title('Token generado y enviado')
+                        ->body($resultado['mensaje'])
                         ->success()
                         ->send();
 
                         return;
                     }
 
-                    // Si el envío falla, el token se muestra una sola vez para no perderlo
                     Notification::make()
-                    ->title('Token generado, pero no se pudo enviar')
-                    ->body(new HtmlString(
-                        "<p class='mb-2 text-sm'>{$envio['mensaje']}</p>" . self::cajaDelToken($generado['texto'])
-                    ))
-                    ->warning()
+                    ->title('No se generó el token')
+                    ->body('No se pudo enviar al destino, así que no se creó ningún token. ' . $resultado['mensaje'])
+                    ->danger()
                     ->persistent()
                     ->send();
                 }),
@@ -168,7 +215,7 @@ class TokensTable
         $record->update([
             'is_active' => true,
             'is_created' => true,
-            'enviado_at' => null,
+            'enviados' => null,
         ]);
 
         $tokenName = 'Token-' . $record->nombre . '-' . now()->format('YmdHis');
