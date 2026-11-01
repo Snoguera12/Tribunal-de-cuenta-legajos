@@ -1,6 +1,9 @@
 <?php
 namespace App\Models;
 
+use Filament\Notifications\Notification;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
@@ -24,7 +27,50 @@ class Token extends Model
             'is_created' => false,
         ]);
     }
+    public static function tablaColumnas() : array {
+        $resultado = [
+            TextColumn::make('nombre')
+            ->label("Nombre")
+            ->searchable(),
 
+            ToggleColumn::make('is_active')
+            ->label('Estado')
+            ->disabled(fn (Token $record): bool => !$record->is_created)// El interruptor solo se puede usar si ya se generó un token
+            ->afterStateUpdated(function ($state) {
+                Notification::make() // O la notificación estándar
+                ->title($state ? 'Cliente activado' : 'Cliente desactivado')
+                ->success()
+                ->send();
+
+            }),
+
+            TextColumn::make('vence')
+            ->label('Fecha de Vencimiento')
+            ->state(fn (Token $record) => $record->tokens()->max('expires_at'))
+            ->placeholder('Sin token')
+            ->dateTime(),
+
+            TextColumn::make('enviados')
+            ->label('Enviado a')
+            ->state(fn (Token $record) => collect($record->enviados ?? [])
+                ->map(fn ($fecha, $destino) => (config("buzones.{$destino}.nombre") ?? $destino)
+                    . ' (' . \Illuminate\Support\Carbon::parse($fecha)->format('d/m H:i') . ')')
+                ->implode(', ') ?: null)
+            ->placeholder('No enviado'),
+
+            TextColumn::make('created_at')
+            ->dateTime()
+            ->sortable()
+            ->toggleable(isToggledHiddenByDefault: true),
+
+            TextColumn::make('updated_at')
+            ->dateTime()
+            ->sortable()
+            ->toggleable(isToggledHiddenByDefault: true),
+        ];
+        return $resultado;
+    }
+    
     public static function purgarVencidos(): int
     {
         return DB::transaction(function (): int {

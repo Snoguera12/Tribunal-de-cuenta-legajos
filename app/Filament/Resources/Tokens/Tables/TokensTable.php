@@ -10,10 +10,7 @@ use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Facades\DB;
 
 class TokensTable
@@ -63,78 +60,9 @@ class TokensTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->columns([
-                TextColumn::make('nombre')
-                ->label("Nombre")
-                ->searchable(),
-
-                ToggleColumn::make('is_active')
-                ->label('Estado')
-                ->disabled(fn (Token $record): bool => !$record->is_created)// El interruptor solo se puede usar si ya se generó un token
-                ->afterStateUpdated(function ($state) {
-                    Notification::make() // O la notificación estándar
-                    ->title($state ? 'Cliente activado' : 'Cliente desactivado')
-                    ->success()
-                    ->send();
-
-                }),
-
-                TextColumn::make('vence')
-                ->label('Fecha de Vencimiento')
-                ->state(fn (Token $record) => $record->tokens()->max('expires_at'))
-                ->placeholder('Sin token')
-                ->dateTime(),
-
-                TextColumn::make('enviados')
-                ->label('Enviado a')
-                ->state(fn (Token $record) => collect($record->enviados ?? [])
-                    ->map(fn ($fecha, $destino) => (config("buzones.{$destino}.nombre") ?? $destino)
-                        . ' (' . \Illuminate\Support\Carbon::parse($fecha)->format('d/m H:i') . ')')
-                    ->implode(', ') ?: null)
-                ->placeholder('No enviado'),
-
-                TextColumn::make('created_at')
-                ->dateTime()
-                ->sortable()
-                ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('updated_at')
-                ->dateTime()
-                ->sortable()
-                ->toggleable(isToggledHiddenByDefault: true),
-            ])
+            ->columns(Token::tablaColumnas())
             ->recordActions([ EditAction::make(), ])
             ->actions([
-                // Acción personalizada para generar el token
-                Action::make('generateToken')
-                ->label('Generar Token')
-                ->icon('heroicon-o-key')
-                ->color('warning')
-                ->requiresConfirmation()
-                ->modalHeading('¿Generar nuevo API Token?')
-                ->modalDescription('El token se activará automáticamente y solo se mostrará UNA VEZ.')
-                ->hidden(fn (Token $record): bool => $record->is_created) // Condición: El botón se oculta de la interfaz si el cliente ya está activo
-                ->schema([
-                    Select::make('duracion')
-                    ->label('Duración')
-                    ->options(TokenDuracion::class)
-                    ->required(),
-                ])
-                ->hidden(fn (Token $record): bool => $record->tokens()
-                ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
-                ->exists())
-                ->action(function (Token $record, array $data) {
-                    $generado = self::generarToken($record, $data['duracion']);
-
-                    // 3. Enviamos la notificación persistente con el token
-                    Notification::make()
-                    ->title('Token hacido generado')
-                    ->body(new HtmlString(self::cajaDelToken($generado['texto'])))
-                    ->success()
-                    ->persistent()
-                    ->send();
-                }),
-
                 // Genera el token y lo envía de una vez al buzón del sistema de licencias.
                 // El texto del token existe solo en este momento, por eso el envío va en la misma acción.
                 Action::make('generarYEnviar')
@@ -144,7 +72,7 @@ class TokensTable
                 ->visible(fn (): bool => (auth()->user()?->isAdmin_RRHH() ?? false) && BuzonLicencias::destinos() !== [])
                 ->requiresConfirmation()
                 ->modalHeading('¿Generar el token y enviarlo?')
-                ->modalDescription('El token se envía por HTTPS al destino elegido. Si el envío falla, el token se muestra acá una sola vez para que no se pierda.')
+                ->modalDescription('El token se envía por HTTPS al destino elegido. Si el envío falla, no se crea ningún token.')
                 ->hidden(fn (Token $record): bool => $record->tokens()
                     ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
                     ->exists())
@@ -181,14 +109,14 @@ class TokensTable
                     ->send();
                 }),
 
-            Action::make('deleteToken')
-            ->label('Borrar Token')
-            ->icon('heroicon-o-trash')
-            ->color('danger')
-            ->requiresConfirmation()
-            ->modalHeading('¿Borrar / Revocar Token?')
-            ->modalDescription('Esto eliminará de forma permanente cualquier token de Sanctum asociado. El cliente se desactivará de inmediato.')
-            ->action(function (Token $record) {
+                Action::make('deleteToken')
+                ->label('Borrar Token')
+                ->icon('heroicon-o-trash')
+                ->color('danger')
+                ->requiresConfirmation()
+                ->modalHeading('¿Borrar / Revocar Token?')
+                ->modalDescription('Esto eliminará de forma permanente cualquier token de Sanctum asociado. El cliente se desactivará de inmediato.')
+                ->action(function (Token $record) {
                 $record->tokens()->delete();
 
                 $record->forceDelete();
