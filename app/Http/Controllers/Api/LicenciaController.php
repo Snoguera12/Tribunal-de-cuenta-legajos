@@ -81,10 +81,10 @@ class LicenciaController extends Controller
         return $this->respuesta($licencia, 'Licencia y documento registrados en el legajo', 201);
     }
 
-    private function buscarExistente(int $idSolicitud): ?Licencia
+    private function buscarExistente(int $solicitudId): ?Licencia
     {
         return Licencia::query()
-            ->where('id_solicitud', $idSolicitud)
+            ->where('solicitud_id', $solicitudId)
             ->first();
     }
 
