@@ -18,16 +18,7 @@ return new class extends Migration
             $table->text('descripcion')->nullable();
             $table->integer('tipodoc')->nullable();
             $table->foreignId("legajo_id")->nullable();
-
-            // Origen cuando lo envía la API de licencias (sin FK: la tabla tokens se crea después)
-            $table->unsignedBigInteger('token_id')->nullable();
-            $table->unsignedBigInteger('id_solicitud')->nullable();
-            $table->char('sha256', 64)->nullable();
-
             $table->timestamps();
-
-            // Idempotencia: el mismo envío del mismo cliente no se duplica
-            $table->unique(['token_id', 'id_solicitud']);
         });
 
         // Un documento puede estar asignado a varios legajos sin repetir el archivo

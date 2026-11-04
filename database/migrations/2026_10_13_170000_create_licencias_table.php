@@ -13,13 +13,8 @@ return new class extends Migration
     {
         Schema::create('licencias', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('legajo_id')->constrained()->onDelete('cascade');
-
-            // Qué cliente de la API la envió (sistema de licencias del otro grupo).
-            $table->foreignId('token_id')->nullable()->constrained('tokens')->nullOnDelete();
-
-            // Datos que envía el otro sistema (licencias ya aprobadas allá)
-            $table->unsignedBigInteger('id_solicitud');
+            $table->foreignId('documento_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('solicitud_id');
             $table->string('tipo_licencia', 100);
             $table->date('fecha_inicio');
             $table->date('fecha_fin');
@@ -28,14 +23,7 @@ return new class extends Migration
             $table->string('nro_resolucion', 50)->nullable();
             $table->date('fecha_aprobacion');
 
-            // Lo recibido tal cual, para auditoría
-            $table->json('payload_original')->nullable();
-
             $table->timestamps();
-
-            // Idempotencia: el mismo envío del mismo cliente no se duplica.
-            $table->unique(['token_id', 'id_solicitud']);
-            $table->index(['legajo_id', 'fecha_inicio']);
         });
     }
 

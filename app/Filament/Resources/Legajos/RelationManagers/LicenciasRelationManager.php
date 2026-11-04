@@ -6,6 +6,7 @@ use App\Filament\Resources\Legajos\Pages\ViewLegajo;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class LicenciasRelationManager extends RelationManager
 {
-    protected static string $relationship = 'licencias';
+    protected static string $relationship = 'documentos';
 
     protected static ?string $title = 'Licencias';
 
@@ -33,41 +34,15 @@ class LicenciasRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('id_solicitud')
+            ->recordTitleAttribute('nombre_original')
+            ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('licencia'))
             ->columns([
-                TextColumn::make('tipo_licencia')
-                    ->label('Tipo')
-                    ->searchable(),
-
-                TextColumn::make('fecha_inicio')
-                    ->label('Desde')
-                    ->date('d/m/Y')
-                    ->sortable(),
-
-                TextColumn::make('fecha_fin')
-                    ->label('Hasta')
-                    ->date('d/m/Y')
-                    ->sortable(),
-
-                TextColumn::make('dias_solicitados')
-                    ->label('Días')
-                    ->numeric(),
-
-                TextColumn::make('nro_resolucion')
-                    ->label('N° resolución')
-                    ->placeholder('-'),
-
-                TextColumn::make('fecha_aprobacion')
-                    ->label('Aprobada el')
-                    ->date('d/m/Y'),
-
-                TextColumn::make('motivo')
-                    ->label('Motivo')
-                    ->placeholder('-')
-                    ->wrap()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->defaultSort('fecha_inicio', 'desc')
-            ->emptyStateHeading('Este legajo no tiene licencias registradas');
+                TextColumn::make('licencia.tipo_licencia')->label('Tipo')->searchable(),
+                TextColumn::make('licencia.fecha_inicio')->label('Desde')->date('d/m/Y')->sortable(),
+                TextColumn::make('licencia.fecha_fin')->label('Hasta')->date('d/m/Y')->sortable(),
+                TextColumn::make('licencia.dias_solicitados')->label('Días')->numeric(),
+                TextColumn::make('licencia.nro_resolucion')->label('N° resolución')->placeholder('-'),
+                TextColumn::make('licencia.fecha_aprobacion')->label('Aprobada el')->date('d/m/Y')->sortable(),
+            ]);
     }
 }

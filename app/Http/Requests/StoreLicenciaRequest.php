@@ -53,7 +53,8 @@ class StoreLicenciaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id_solicitud' => ['required', 'integer', 'min:1'],
+            'archivo' => ['required', 'file', 'mimes:pdf', 'max:10240'],
+            'solicitud_id' => ['required', 'integer', 'min:1'],
             'fecha_inicio' => ['required', 'date_format:Y-m-d'],
             'fecha_fin' => ['required', 'date_format:Y-m-d', 'after_or_equal:fecha_inicio'],
             'dias_solicitados' => ['required', 'integer', 'min:1', 'max:366'],

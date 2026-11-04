@@ -2,63 +2,88 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\TipodocEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLicenciaRequest;
-use App\Models\Token;
+use App\Models\Documento;
 use App\Models\Legajo;
 use App\Models\Licencia;
+use App\Models\Token;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class LicenciaController extends Controller
 {
     /**
      * POST /api/legajos/{legajo}/licencias
      *
-     * Registra en el legajo una licencia ya aprobada por el Sistema de Licencias.
-     * Es idempotente por (cliente, id_solicitud):
-     *  - 201: licencia nueva
-     *  - 200: reintento idéntico (devuelve la ya registrada, no duplica)
-     *  - 409: mismo id_solicitud pero con datos distintos
-     *  - 422: datos inválidos
+     * Registra la licencia aprobada y guarda su PDF de respaldo en el legajo.
+     * Todo en una sola operación. Idempotente por (cliente, id_solicitud):
+     *  - 201: licencia y documento nuevos
+     *  - 200: reenvío idéntico (mismo legajo, datos y archivo); no duplica
+     *  - 409: mismo solicitud_id con otro legajo, otros datos o otro archivo
+     *  - 422: datos inválidos o archivo inválido
      */
     public function store(StoreLicenciaRequest $request, Legajo $legajo): JsonResponse
     {
         /** @var Token $client */
-        $client = $request->user();
-        $datos = $request->validated();
-        $idSolicitud = (int) $datos['id_solicitud'];
+        $datos = Arr::except($request->validated(), ['archivo']);
+        $archivo = $request->file('archivo');
+        $solicitud_id = (int) $datos['solicitud_id'];
 
-        $existente = $this->buscarExistente($client, $idSolicitud);
+        $existente = $this->buscarExistente($solicitud_id);
         if ($existente) {
             return $this->responderReenvio($existente, $legajo, $datos);
         }
 
+        // El archivo se guarda antes de la transacción; si algo falla, se borra
+        $ruta = $archivo->store('documentos', 'local');
+
         try {
-            $licencia = Licencia::create([
-                ...$datos,
-                'legajo_id' => $legajo->id,
-                'token_id' => $client->id,
-                // Lo recibido tal cual (antes de normalizar), para auditoría
-                'payload_original' => json_decode($request->getContent(), true) ?? $request->all(),
-            ]);
+            $licencia = DB::transaction(function () use ($legajo, $datos, $archivo, $ruta) {
+
+                $documento = Documento::create([
+                    'ruta' => $ruta,
+                    'nombre_original' => $archivo->getClientOriginalName(),
+                    'descripcion' => 'Licencia aprobada' . (isset($datos['nro_resolucion']) ? " (resolución {$datos['nro_resolucion']})" : ''),
+                    'tipodoc' => TipodocEnum::Licencia,
+                    'legajo_id' => $legajo->id,
+                ]);
+
+                $licencia = Licencia::create([
+                    ...$datos,
+                    'documento_id' => $documento->id,
+                ]);
+
+                $documento->legajos()->syncWithoutDetaching([$legajo->id]);
+
+                return $licencia;
+            });
         } catch (UniqueConstraintViolationException) {
-            // Dos envíos simultáneos del mismo id_solicitud: el segundo se trata como reintento.
-            $existente = $this->buscarExistente($client, $idSolicitud);
+            // Dos envíos simultáneos del mismo id_solicitud: el segundo se trata como reintento
+            Storage::disk('local')->delete($ruta);
+
+            $existente = $this->buscarExistente($solicitud_id);
             if (! $existente) {
                 throw new \RuntimeException('No se pudo guardar la licencia.');
             }
 
             return $this->responderReenvio($existente, $legajo, $datos);
+        } catch (Throwable $e) {
+            Storage::disk('local')->delete($ruta);
+            throw $e;
         }
 
-        return $this->respuesta($licencia, 'Licencia registrada en el legajo', 201);
+        return $this->respuesta($licencia, 'Licencia y documento registrados en el legajo', 201);
     }
 
-    private function buscarExistente(Token $client, int $idSolicitud): ?Licencia
+    private function buscarExistente(int $idSolicitud): ?Licencia
     {
         return Licencia::query()
-            ->where('token_id', $client->id)
             ->where('id_solicitud', $idSolicitud)
             ->first();
     }
@@ -66,14 +91,15 @@ class LicenciaController extends Controller
     private function responderReenvio(Licencia $existente, Legajo $legajo, array $datos): JsonResponse
     {
         $mismoLegajo = (int) $existente->legajo_id === (int) $legajo->id;
+        $mismosDatos = $existente->tieneLosMismosDatos($datos);
 
-        if (! $mismoLegajo || ! $existente->tieneLosMismosDatos($datos)) {
+        if (!$mismoLegajo || !$mismosDatos) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Ya existe una licencia con ese id_solicitud pero con datos distintos.',
+                'message' => 'Ya existe una licencia con ese solicitud_id pero con datos o archivo distintos.',
                 'id' => $existente->id,
-                'id_solicitud' => $existente->id_solicitud,
-                'legajo_id' => $existente->legajo_id,
+                'solicitud_id' => $existente->solicitud_id,
+                'documento_id' => $existente->documento_id,
             ], 409);
         }
 
@@ -86,8 +112,8 @@ class LicenciaController extends Controller
             'ok' => true,
             'id' => $licencia->id,
             'mensaje' => $mensaje,
-            'id_solicitud' => $licencia->id_solicitud,
-            'legajo_id' => $licencia->legajo_id,
+            'id_solicitud' => $licencia->solicitud_id,
+            'documento_id' => $licencia->documento_id,
         ], $codigo);
     }
 }

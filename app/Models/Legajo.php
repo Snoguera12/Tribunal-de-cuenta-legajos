@@ -44,8 +44,9 @@ class Legajo extends Model
     public function categoria(){ return $this->belongsTo(Categoria::class, 'categoria_id'); }
     public function cargo(){ return $this->belongsTo(Cargo::class, 'cargo_id'); }
     public function area(){ return $this->belongsTo(Area::class, 'area_id'); }
-    public function documentos(){ return $this->hasMany(Documento::class); }
-    public function licencias(){ return $this->hasMany(Licencia::class); }
+    public function documentos(){
+        return $this->belongsToMany(Documento::class, 'documento_legajo')->withTimestamps();
+    }
     public function isAlta(){ return $this->estado == EstadoLegajoEnum::Alta; }
     public function getIcon(){ return $this->isAlta() ? Heroicon::CheckCircle : Heroicon::XCircle; }
     public function getColor(){ return $this->isAlta() ? 'success' : 'danger'; }

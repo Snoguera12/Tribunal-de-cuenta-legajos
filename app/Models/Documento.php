@@ -26,20 +26,12 @@ class Documento extends Model
         'descripcion',
         'tipodoc',
         'legajo_id',
-        'token_id',
-        'id_solicitud',
-        'sha256',
     ];
-
-    public function legajo(){
-        return $this->belongsTo(Legajo::class, 'legajo_id');
-    }
-
-    // Legajos a los que está asignado el documento (un archivo, varios legajos)
     public function legajos(): BelongsToMany
     {
         return $this->belongsToMany(Legajo::class, 'documento_legajo')->withTimestamps();
     }
+    public function licencia(){ return $this->hasOne(Licencia::class); }
     public static function abrirDocumento($record): ?string{
         if (!$record->ruta) return null;
         
