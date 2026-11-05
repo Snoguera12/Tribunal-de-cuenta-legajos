@@ -17,7 +17,7 @@ use Filament\Widgets\Widget;
  */
 class CompletitudFichaWidget extends Widget
 {
-    protected static ?int $sort = -1;
+    protected static ?int $sort = 2;
 
     protected string $view = 'filament.widgets.completitud-ficha';
 
@@ -73,8 +73,8 @@ class CompletitudFichaWidget extends Widget
 
         $legajoIds = Legajo::query()->where('persona_id', $persona->id)->pluck('id');
         $tieneDni = $legajoIds->isNotEmpty() && Documento::query()
-            ->whereIn('legajo_id', $legajoIds)
             ->where('tipodoc', TipodocEnum::DNI->value)
+            ->whereHas('legajos', fn ($q) => $q->whereIn('legajos.id', $legajoIds))
             ->exists();
 
         return [
