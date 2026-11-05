@@ -18,6 +18,11 @@ class TokenResource extends Resource
     protected static ?int $navigationSort = 4;
     protected static ?string $model = Token::class;
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->isAdmin() ?? false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return TokenForm::configure($schema);
