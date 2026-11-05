@@ -48,6 +48,7 @@ class BuzonLicencias
 
         try {
             $respuesta = Http::withHeaders($cabeceras)
+                ->withOptions(['verify' => (bool) ($config['verificar_ssl'] ?? true)])
                 ->timeout(10)
                 ->post(rtrim($config['url'], '/') . '/api/buzon/tokens', [
                     'nombre' => $token->nombre,
