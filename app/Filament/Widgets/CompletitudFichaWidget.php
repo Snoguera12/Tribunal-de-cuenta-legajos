@@ -73,7 +73,7 @@ class CompletitudFichaWidget extends Widget
 
         $legajoIds = Legajo::query()->where('persona_id', $persona->id)->pluck('id');
         $tieneDni = $legajoIds->isNotEmpty() && Documento::query()
-            ->whereIn('legajo_id', $legajoIds)
+            ->whereHas('legajos', fn ($q) => $q->whereIn('legajos.id', $legajoIds))
             ->where('tipodoc', TipodocEnum::DNI->value)
             ->exists();
 

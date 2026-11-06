@@ -12,7 +12,7 @@ class DocumentoPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin() || $user->isRRHH() || $user->isFuncionario();
+        return $user->isStaffRoles();
     }
 
     /**
@@ -20,7 +20,11 @@ class DocumentoPolicy
      */
     public function view(User $user, Documento $documento): bool
     {
-        return $user->isAdmin() || $user->isRRHH() || $user->isFuncionario();
+        if ($user->isStaffRoles()) {
+            return $user->isStaffRoles();
+        }
+
+        return filled($user->persona_id) && $documento->legajos()->where('legajos.persona_id', $user->persona_id)->exists();
     }
 
     /**
@@ -28,7 +32,7 @@ class DocumentoPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isAdmin_RRHH();
     }
 
     /**
@@ -36,7 +40,7 @@ class DocumentoPolicy
      */
     public function update(User $user, Documento $documento): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isAdmin_RRHH();
     }
 
     /**
@@ -44,7 +48,7 @@ class DocumentoPolicy
      */
     public function delete(User $user, Documento $documento): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isAdmin_RRHH();
     }
 
     /**
@@ -52,7 +56,7 @@ class DocumentoPolicy
      */
     public function restore(User $user, Documento $documento): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isAdmin_RRHH();
     }
 
     /**
@@ -60,6 +64,6 @@ class DocumentoPolicy
      */
     public function forceDelete(User $user, Documento $documento): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isAdmin_RRHH();
     }
 }

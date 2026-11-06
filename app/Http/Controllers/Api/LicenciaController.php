@@ -51,7 +51,6 @@ class LicenciaController extends Controller
                     'nombre_original' => $archivo->getClientOriginalName(),
                     'descripcion' => 'Licencia aprobada' . (isset($datos['nro_resolucion']) ? " (resolución {$datos['nro_resolucion']})" : ''),
                     'tipodoc' => TipodocEnum::Licencia,
-                    'legajo_id' => $legajo->id,
                 ]);
 
                 $licencia = Licencia::create([

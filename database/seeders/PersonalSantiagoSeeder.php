@@ -754,11 +754,11 @@ class PersonalSantiagoSeeder extends Seeder
             }
 
             if (!empty($datos['licencia'])) {
-                Documento::create([
+                $documento = Documento::create([
                     'descripcion' => 'Licencia solicitada por ' . $datos['nombre'] . ' ' . $datos['apellido'],
                     'tipodoc' => 3,
-                    'legajo_id' => $legajo->id,
                 ]);
+                $documento->legajos()->attach($legajo->id);
             }
 
             if (!empty($datos['estudio'])) {

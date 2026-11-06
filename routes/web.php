@@ -1,49 +1,11 @@
 <?php
-use App\Models\Legajo;
-use Illuminate\Http\Request;
+use App\Http\Controllers\DocumentoDownloadController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Response;
 
 Route::get('/', fn () => redirect('/legajos'))->where('path', '.+');
 
 Route::get('/login', fn () => redirect()->to('/legajos/login'))->name('login');
 
-// Dirección de documentos
-Route::get('/{path}', function (Request $request, string $path) {
-    if (!auth()->check()) {
-        abort(401); // Usuario no autorizado.
-    }
-    
-    if (!$request->hasValidSignature()) {
-        abort(403, 'El enlace sea ha expirado.');
-    }
-
-    $legajoId = $request->route('legajo_id') ?? $request->query('legajo_id');
-    $legajo = Legajo::select('id', 'persona_id')->find($legajoId);
-    $usuario = auth()->user();
-    if (!$usuario->isStaffRoles()){
-        // Si NO es staff, obligatoriamente ambos deben tener una persona asignada (no ser null) 
-        // Y además, esa persona_id debe coincidir exactamente.
-        $tieneMismaPersona = 
-        isset($usuario->persona_id) &&
-        isset($legajo->persona_id) &&
-        $usuario->persona_id === $legajo->persona_id;
-        
-        if (!$tieneMismaPersona) {
-            abort(403, 'No tienes autorización para ver este documento de esta persona.');
-        }
-    }
-
-    if (!Storage::disk('local')->exists($path)) {
-        abort(404);
-    }
-
-    // Obtiene la ruta física real del archivo privado de forma segura
-    $realPath = Storage::disk('local')->path($path);
-
-    // Retorna el archivo directamente (el navegador intentará renderizarlo si es PDF/imagen)
-    return Response::file($realPath);
-})
-->where('path', '.*',)
+Route::get('/documentos/{documento}', DocumentoDownloadController::class)
+->middleware(['auth', 'signed'])
 ->name('documentos.ver');

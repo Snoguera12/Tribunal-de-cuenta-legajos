@@ -7,13 +7,14 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Components\Grid;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Illuminate\Database\Eloquent\Builder;
+use App\Models\Legajo;
 
 class Documento extends Model
 {
@@ -27,67 +28,42 @@ class Documento extends Model
         'nombre_original',
         'descripcion',
         'tipodoc',
-        'legajo_id',
     ];
     public function legajos(): BelongsToMany
     {
         return $this->belongsToMany(Legajo::class, 'documento_legajo')->withTimestamps();
     }
     public function licencia(){ return $this->hasOne(Licencia::class); }
+    private static function etiquetaLegajo(Legajo $legajo): string
+    {
+        return 'Legajo ' . $legajo->num_legajo . ' (' . $legajo->persona?->nombre . ' ' . $legajo->persona?->apellido . ' - DNI: ' . $legajo->persona?->dni . ')';
+    }
+    public function scopePendientes(Builder $query): Builder
+    {
+        return $query->where(function (Builder $q) {
+            $q->whereNull('descripcion')
+                ->orWhereNull('tipodoc')
+                ->orDoesntHave('legajos');
+        });
+    }
     public static function nombreAleatorio(TemporaryUploadedFile $file): string
     {
         return Str::random(40) . '.' . strtolower($file->getClientOriginalExtension());
     }
     public static function abrirDocumento($record): ?string{
-        if (!$record->ruta) return null;
-        
+        if (! $record->ruta) {
+            return null;
+        }
+
         return URL::temporarySignedRoute(
             'documentos.ver',
             now()->addMinutes(self::$TIEMPO_ACCESO),
-            [
-                'path' => $record->ruta,
-                'legajo_id' => $record->legajo_id
-            ]
+            ['documento' => $record->id]
         );
     }
     public static function nombreVisible($record): string
     {
         return $record->nombre_original ?: ($record->descripcion ?: basename((string) $record->ruta));
-    }
-    public static function getFromSchemaRevisar() : array{
-        $resultado = [
-            Grid::make([
-                'default' => 1,
-                'sm' => 2,
-            ])->schema([
-            Select::make('legajo_id')
-            ->label('Número de legajo')
-            ->searchable()
-            ->columns(1)
-            ->options(Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')->selectRaw("legajos.id, CONCAT('Legajo: ', ' ',legajos.num_legajo, ' (', personas.nombre, ' ', personas.apellido, ' - DNI: ', personas.dni, ')') as nombre_completo")->pluck('nombre_completo', 'id'))
-            ->validationMessages([
-                'required' => 'Requiere asociar a un Legajo.',
-            ])
-            ->extraInputAttributes([
-                'oninvalid' => "this.setCustomValidity('Requiere asociar a un Legajo.')",
-                'oninput' => "this.setCustomValidity('')",
-            ]),
-
-            Textarea::make('descripcion')
-            ->label('Descripción / Notas')
-            ->placeholder('Ej. Copia certificada del título...')
-            ->required(),
-
-            Select::make('tipodoc')
-            ->label('Tipo de Documento')
-            ->required()
-            ->native(false)
-            ->options(TipodocEnum::class)
-            ->validationMessages(['required' => 'Seleccione el tipo de documento.']),
-            ]),
-            
-        ];
-        return $resultado;
     }
     public static function getFromSchema(bool $solo_archivos, bool $adjunto_legajo) : array{
 
@@ -109,18 +85,27 @@ class Documento extends Model
             ];
         } else{
             $resultado = [
-                Select::make('legajo_id')
-                ->label('Número de legajo')
+                Select::make('legajos')
+                ->label('Legajos asociados')
                 ->visible($adjunto_legajo)
+                ->multiple()
                 ->searchable()
-                ->options(Legajo::join('personas', 'legajos.persona_id', '=', 'personas.id')->selectRaw("legajos.id, CONCAT('Legajo: ', ' ',legajos.num_legajo, ' (', personas.nombre, ' ', personas.apellido, ' - DNI: ', personas.dni, ')') as nombre_completo")->pluck('nombre_completo', 'id'))
-                ->validationMessages([
-                    'required' => 'Requiere asociar a un Legajo.',
-                ])
-                ->extraInputAttributes([
-                    'oninvalid' => "this.setCustomValidity('Requiere asociar a un Legajo.')",
-                    'oninput' => "this.setCustomValidity('')",
-                ]),
+                ->preload()
+                ->relationship('legajos', 'num_legajo', fn (Builder $query) => $query->with('persona'))
+                ->getOptionLabelFromRecordUsing(fn (Legajo $legajo) => self::etiquetaLegajo($legajo))
+                ->getSearchResultsUsing(fn (string $search): array => Legajo::query()
+                    ->with('persona')
+                    ->where('num_legajo', 'like', "%{$search}%")
+                    ->orWhereHas('persona', fn (Builder $q) => $q
+                        ->where('nombre', 'like', "%{$search}%")
+                        ->orWhere('apellido', 'like', "%{$search}%")
+                        ->orWhere('dni', 'like', "%{$search}%"))
+                    ->limit(50)
+                    ->get()
+                    ->mapWithKeys(fn (Legajo $legajo) => [$legajo->id => self::etiquetaLegajo($legajo)])
+                    ->all())
+                ->required()
+                ->validationMessages(['required' => 'Requiere asociar al menos un Legajo.']),
 
                 Textarea::make('descripcion')
                 ->label('Descripción / Notas')

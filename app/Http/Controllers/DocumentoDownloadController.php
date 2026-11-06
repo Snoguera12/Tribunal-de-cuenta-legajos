@@ -15,11 +15,11 @@ class DocumentoDownloadController extends Controller
     {
         Gate::authorize('view', $documento);
 
-        abort_unless(Storage::disk('local')->exists($documento->archivo), 404);
+        abort_unless($documento->ruta && Storage::disk('local')->exists($documento->ruta), 404);
 
-        return Storage::disk('local')->download(
-            $documento->archivo,
-            'documento-' . $documento->id . '.' . pathinfo($documento->archivo, PATHINFO_EXTENSION)
+        return Storage::disk('local')->response(
+            $documento->ruta,
+            $documento->nombre_original ?: basename($documento->ruta)
         );
     }
 }

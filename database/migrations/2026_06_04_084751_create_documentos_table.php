@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('nombre_original')->nullable();
             $table->text('descripcion')->nullable();
             $table->integer('tipodoc')->nullable();
-            $table->foreignId("legajo_id")->nullable();
             $table->timestamps();
         });
 

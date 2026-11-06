@@ -16,10 +16,7 @@ class DocumentosPendientesWidget extends StatsOverviewWidget
     }
     protected function getStats(): array
     {
-        $total = Documento::query()
-        ->whereNull('descripcion')
-        ->orWhereNull('tipodoc')
-        ->orWhereNull('legajo_id')->count();
+        $total = Documento::pendientes()->count();
 
         $resultado = $total == 0 ?
         [
