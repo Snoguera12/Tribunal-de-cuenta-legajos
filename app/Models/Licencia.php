@@ -122,6 +122,15 @@ class Licencia extends Model
             ->sortable()
             ->searchable(),
 
+            TextColumn::make('documento.nombre_original')
+            ->label('Documento')
+            ->state(fn (Licencia $record) => $record->documento ? Documento::nombreVisible($record->documento) : null)
+            ->icon('heroicon-o-document-arrow-down')
+            ->color('primary')
+            ->url(fn (Licencia $record) => $record->documento ? Documento::abrirDocumento($record->documento) : null)
+            ->openUrlInNewTab()
+            ->placeholder('-'),
+
             TextColumn::make('tipo_licencia')
             ->label('Tipo')
             ->searchable(),

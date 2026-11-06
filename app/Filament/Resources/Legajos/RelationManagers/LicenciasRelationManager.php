@@ -34,6 +34,7 @@ class LicenciasRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->heading(null)
             ->recordTitleAttribute('nombre_original')
             ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('licencia'))
             ->columns([

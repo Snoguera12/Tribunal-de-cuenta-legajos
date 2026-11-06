@@ -7,6 +7,7 @@ use App\Filament\Resources\Legajos\Pages\EditLegajo;
 use App\Filament\Resources\Legajos\Pages\ListLegajos;
 use App\Filament\Resources\Legajos\Pages\ViewLegajo;
 use App\Filament\Resources\Legajos\RelationManagers\LicenciasRelationManager;
+use App\Filament\Resources\Legajos\RelationManagers\DocumentosRelationManager;
 use App\Filament\Resources\Legajos\Schemas\LegajoForm;
 use App\Filament\Resources\Legajos\Schemas\LegajoInfolist;
 use App\Filament\Resources\Legajos\Tables\LegajosTable;
@@ -60,13 +61,6 @@ class LegajoResource extends Resource
         }
 
         return $query;
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            LicenciasRelationManager::class,
-        ];
     }
 
     public static function getPages(): array

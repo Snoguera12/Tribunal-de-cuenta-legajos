@@ -6,6 +6,7 @@ use App\Filament\Actions\MotivoBajaAction;
 use App\Filament\Resources\Legajos\LegajoResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ViewLegajo extends ViewRecord
 {
@@ -17,5 +18,15 @@ class ViewLegajo extends ViewRecord
             EditAction::make(),
             MotivoBajaAction::make(),
         ];
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        $legajo = $this->getRecord()->loadMissing('persona');
+        $persona = $legajo->persona;
+
+        $nombre = trim(($persona?->nombre ?? '') . ' ' . ($persona?->apellido ?? ''));
+
+        return "Legajo de {$nombre} (DNI: {$persona?->dni} - NºLegajo: {$legajo->num_legajo})";
     }
 }

@@ -44,6 +44,8 @@ class SubirDocumentos extends Page implements HasForms
                 ->disk('local') // o el disk que uses
                 ->visibility('private')
                 //->preserveFilenames()
+                ->storeFileNamesIn('nombres')
+                ->getUploadedFileNameForStorageUsing(Documento::nombreAleatorio(...))
                 ->required(),
             ])
             ->statePath('data');
@@ -61,11 +63,14 @@ class SubirDocumentos extends Page implements HasForms
 
     public function guardar(): void
     {
-        $paths = $this->form->getState()['archivos'] ?? [];
+        $estado = $this->form->getState();
+        $paths = $estado['archivos'] ?? [];
+        $nombres = $estado['nombres'] ?? [];
 
         foreach ($paths as $path) {
             Documento::create([
                 'ruta' => $path,
+                'nombre_original' => $nombres[$path] ?? basename($path),
             ]);
         }
 

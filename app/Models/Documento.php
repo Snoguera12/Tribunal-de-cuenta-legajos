@@ -12,6 +12,8 @@ use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class Documento extends Model
 {
@@ -32,6 +34,10 @@ class Documento extends Model
         return $this->belongsToMany(Legajo::class, 'documento_legajo')->withTimestamps();
     }
     public function licencia(){ return $this->hasOne(Licencia::class); }
+    public static function nombreAleatorio(TemporaryUploadedFile $file): string
+    {
+        return Str::random(40) . '.' . strtolower($file->getClientOriginalExtension());
+    }
     public static function abrirDocumento($record): ?string{
         if (!$record->ruta) return null;
         
@@ -43,6 +49,10 @@ class Documento extends Model
                 'legajo_id' => $record->legajo_id
             ]
         );
+    }
+    public static function nombreVisible($record): string
+    {
+        return $record->nombre_original ?: ($record->descripcion ?: basename((string) $record->ruta));
     }
     public static function getFromSchemaRevisar() : array{
         $resultado = [
@@ -94,6 +104,7 @@ class Documento extends Model
                 ->acceptedFileTypes(['application/pdf', 'image/jpeg'])
                 ->rules(['mimes:pdf,jpg,jpeg'])
                 ->validationMessages(['required' => 'Debe subir un archivo válido.'])
+                ->getUploadedFileNameForStorageUsing(self::nombreAleatorio(...))
                 ->required(),
             ];
         } else{
@@ -133,6 +144,7 @@ class Documento extends Model
                 ->acceptedFileTypes(['application/pdf', 'image/jpeg'])
                 ->rules(['mimes:pdf,jpg,jpeg'])
                 ->validationMessages(['required' => 'Debe subir un archivo válido.'])
+                ->getUploadedFileNameForStorageUsing(self::nombreAleatorio(...))
                 ->required()
                 ->deletable(false),
             ];
@@ -144,27 +156,32 @@ class Documento extends Model
     public static function getOutSchema(string $mode_out) : array{
         $resultado = match($mode_out){
             'table' => [
-                TextColumn::make('ruta')
+                TextColumn::make('nombre_original')
                 ->label('Documento')
+                ->state(self::nombreVisible(...))
+                ->limit(50)
+                ->searchable(['nombre_original', 'descripcion'])
+                ->icon('heroicon-o-document-arrow-down')
+                ->color('primary')
                 ->url(self::abrirDocumento(...))
                 ->openUrlInNewTab(),
 
             ],
             'list' => [
+                TextEntry::make('nombre_original')
+                ->hiddenLabel()
+                ->state(self::nombreVisible(...))
+                ->limit(50)
+                ->icon('heroicon-o-document-arrow-down')
+                ->color('primary')
+                ->openUrlInNewTab()
+                ->url(self::abrirDocumento(...)),
+
                 TextEntry::make('descripcion')
                 ->label('Descripción'),
 
                 TextEntry::make('tipodoc')
                 ->label('Tipo'),
-
-                TextEntry::make('ruta')
-                ->label('Documento')
-                ->hiddenLabel()
-                ->bulleted()
-                ->icon('heroicon-o-document-arrow-down')
-                ->color('primary')
-                ->openUrlInNewTab()
-                ->url(self::abrirDocumento(...)),
             ],
         };
 

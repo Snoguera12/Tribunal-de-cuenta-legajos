@@ -34,11 +34,11 @@ class LicenciaResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $query = parent::getEloquentQuery()->with(['legajo.persona']);
+        $query = parent::getEloquentQuery()->with(['documento.legajos.persona']);
         $user = auth()->user();
 
         if ($user->isEmpleado()) {
-            return $query->whereHas('legajo', fn (Builder $q) => $q->where('persona_id', $user->persona_id));
+            return $query->whereHas('documento.legajos', fn (Builder $q) => $q->where('legajos.persona_id', $user->persona_id));
         }
 
         return $query;
