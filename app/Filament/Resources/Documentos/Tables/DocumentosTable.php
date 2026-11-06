@@ -6,6 +6,7 @@ use App\Models\Documento;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\Filter;
 
 class DocumentosTable
 {
@@ -13,9 +14,12 @@ class DocumentosTable
     {
         return $table
             ->columns(Documento::getOutSchema('table'))
-            ->modifyQueryUsing(fn (Builder $query) => $query->pendientes())
             ->filters([
-                //
+                Filter::make('ocultar_adjuntados')
+                ->label('Ocultar los ya adjuntados')
+                ->toggle()
+                ->default()
+                ->query(fn (Builder $query) => $query->doesntHave('legajos')),
             ])
             ->recordActions([
                 EditAction::make()->label('Adjuntar'),

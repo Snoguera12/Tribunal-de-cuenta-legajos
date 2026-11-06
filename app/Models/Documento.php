@@ -86,26 +86,18 @@ class Documento extends Model
         } else{
             $resultado = [
                 Select::make('legajos')
-                ->label('Legajos asociados')
+                ->label('Legajos')
                 ->visible($adjunto_legajo)
+                ->relationship(
+                    name: 'legajos',
+                    titleAttribute: 'num_legajo',
+                    modifyQueryUsing: fn (Builder $query) => $query->where('legajos.estado', true),
+                )
+                ->getOptionLabelFromRecordUsing(fn (Legajo $legajo) => "{$legajo->persona?->nombre} {$legajo->persona?->apellido} (DNI: {$legajo->persona?->dni}) - Legajo {$legajo->num_legajo}")
                 ->multiple()
                 ->searchable()
                 ->preload()
-                ->relationship('legajos', 'num_legajo', fn (Builder $query) => $query->with('persona'))
-                ->getOptionLabelFromRecordUsing(fn (Legajo $legajo) => self::etiquetaLegajo($legajo))
-                ->getSearchResultsUsing(fn (string $search): array => Legajo::query()
-                    ->with('persona')
-                    ->where('num_legajo', 'like', "%{$search}%")
-                    ->orWhereHas('persona', fn (Builder $q) => $q
-                        ->where('nombre', 'like', "%{$search}%")
-                        ->orWhere('apellido', 'like', "%{$search}%")
-                        ->orWhere('dni', 'like', "%{$search}%"))
-                    ->limit(50)
-                    ->get()
-                    ->mapWithKeys(fn (Legajo $legajo) => [$legajo->id => self::etiquetaLegajo($legajo)])
-                    ->all())
-                ->required()
-                ->validationMessages(['required' => 'Requiere asociar al menos un Legajo.']),
+                ->required(),
 
                 Textarea::make('descripcion')
                 ->label('Descripción / Notas')

@@ -210,6 +210,17 @@ class Legajo extends Model
 
                 TextEntry::make('estado')
                 ->label('Estado')
+                ->formatStateUsing(function (Legajo $record) {
+                    $etiqueta = $record->estado->getLabel();
+
+                    if ($record->isAlta()) {
+                        return $etiqueta;
+                    }
+
+                    $motivo = $record->historial()->latest('fecha_baja')->first()?->motivo;
+
+                    return $motivo ? "{$etiqueta} - {$motivo->getLabel()}" : $etiqueta;
+                })
                 ->icon(fn (Legajo $record) => $record->isAlta() ? Heroicon::CheckCircle : Heroicon::XCircle)
                 ->color(fn (Legajo $record) => $record->isAlta() ? 'success' : 'danger')
                 ->iconColor(fn (Legajo $record) => $record->isAlta() ? 'success' : 'danger')

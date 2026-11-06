@@ -19,7 +19,7 @@ class DocumentoResource extends Resource
     protected static ?string $model = Documento::class;
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
     protected static string|\UnitEnum|null $navigationGroup = "Papeles";
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {
@@ -37,7 +37,7 @@ class DocumentoResource extends Resource
         $user = auth()->user();
 
         if ($user->isEmpleado()) {
-            return $query->whereHas('legajo', fn ($q) => $q->where('persona_id', $user->persona_id));
+            return $query->whereHas('legajos', fn ($q) => $q->where('legajos.persona_id', $user->persona_id));
         }
 
         return $query;

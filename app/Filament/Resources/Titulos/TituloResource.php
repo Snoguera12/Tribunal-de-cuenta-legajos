@@ -20,9 +20,9 @@ class TituloResource extends Resource
     protected static ?string $model = Titulo::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-identification';
-    protected static string|\UnitEnum|null $navigationGroup = "Papeles";
+    protected static string|\UnitEnum|null $navigationGroup = "Departamento";
     protected static ?string $modelLabel = "Títulos";
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
     public static function form(Schema $schema): Schema
     {
         return TituloForm::configure($schema);
