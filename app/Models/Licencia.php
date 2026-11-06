@@ -56,10 +56,11 @@ class Licencia extends Model
     public function observaciones(): array
     {
         $observaciones = [];
+        $legajos = $this->documento?->legajos ?? collect();
 
         // 1) Legajo dado de baja
-        if ($this->legajo && ! $this->legajo->isAlta()) {
-            $observaciones[] = 'El legajo está dado de baja.';
+        if ($legajos->contains(fn ($legajo) => ! $legajo->isAlta())) {
+            $observaciones[] = 'Hay un legajo vinculado dado de baja.';
         }
 
         // 2) Días solicitados vs. rango de fechas
@@ -80,15 +81,17 @@ class Licencia extends Model
         }
 
         // 3) Superposición con otras licencias del mismo legajo
-        $solapadas = static::query()
-            ->where('legajo_id', $this->legajo_id)
-            ->whereKeyNot($this->getKey())
-            ->whereDate('fecha_inicio', '<=', $this->fecha_fin->toDateString())
-            ->whereDate('fecha_fin', '>=', $this->fecha_inicio->toDateString())
-            ->count();
+        if ($legajos->isNotEmpty()) {
+            $solapadas = static::query()
+                ->whereKeyNot($this->getKey())
+                ->whereHas('documento.legajos', fn ($q) => $q->whereIn('legajos.id', $legajos->pluck('id')))
+                ->whereDate('fecha_inicio', '<=', $this->fecha_fin->toDateString())
+                ->whereDate('fecha_fin', '>=', $this->fecha_inicio->toDateString())
+                ->count();
 
-        if ($solapadas > 0) {
-            $observaciones[] = "Se superpone con {$solapadas} licencia(s) del mismo legajo.";
+            if ($solapadas > 0) {
+                $observaciones[] = "Se superpone con {$solapadas} licencia(s) del mismo legajo.";
+            }
         }
 
         return $observaciones;
@@ -96,25 +99,25 @@ class Licencia extends Model
 
     public static function getFormSchema(): array{
         $resultado = [
-            TextColumn::make('legajo.persona.nombre')
+            TextColumn::make('documento.legajos.persona.nombre')
             ->label('Nombre')
             ->sortable()
             ->searchable()
             ->toggleable(isToggledHiddenByDefault: true),
 
-            TextColumn::make('legajo.persona.apellido')
+            TextColumn::make('documento.legajos.persona.apellido')
             ->label('Apellido')
             ->sortable()
             ->searchable()
             ->toggleable(isToggledHiddenByDefault: true),
             
-            TextColumn::make('legajo.persona.dni')
+            TextColumn::make('documento.legajos.persona.dni')
             ->label('DNI')
             ->sortable()
             ->searchable()
             ->toggleable(isToggledHiddenByDefault: true),
 
-            TextColumn::make('legajo.num_legajo')
+            TextColumn::make('documento.legajos.num_legajo')
             ->label('Nº Legajo')
             ->sortable()
             ->searchable(),

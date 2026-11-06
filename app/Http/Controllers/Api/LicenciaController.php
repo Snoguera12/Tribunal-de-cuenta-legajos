@@ -90,7 +90,7 @@ class LicenciaController extends Controller
 
     private function responderReenvio(Licencia $existente, Legajo $legajo, array $datos): JsonResponse
     {
-        $mismoLegajo = (int) $existente->legajo_id === (int) $legajo->id;
+        $mismoLegajo = $existente->documento?->legajos()->whereKey($legajo->id)->exists() ?? false;
         $mismosDatos = $existente->tieneLosMismosDatos($datos);
 
         if (!$mismoLegajo || !$mismosDatos) {
