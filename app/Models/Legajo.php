@@ -9,7 +9,6 @@ use App\Models\Helpers\PersonaHelper;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
@@ -17,8 +16,8 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-
 
 class Legajo extends Model
 {
@@ -51,7 +50,14 @@ class Legajo extends Model
     public function isAlta(){ return $this->estado == EstadoLegajoEnum::Alta; }
     public function getIcon(){ return $this->isAlta() ? Heroicon::CheckCircle : Heroicon::XCircle; }
     public function getColor(){ return $this->isAlta() ? 'success' : 'danger'; }
-    
+    public function scopeSinDatos(Builder $query): Builder
+    {
+        return $query->where(fn (Builder $q) => $q
+            ->whereNull('area_id')
+            ->orWhereNull('categoria_id')
+            ->orWhereNull('cargo_id'))
+            ->orWhereNull('persona_id');
+    }
     public static function getFormSchema(bool $visible_persona_id): array{
         
         $resultado = [
@@ -284,34 +290,7 @@ class Legajo extends Model
                     box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
                 '
             ])
-            ->schema([
-                RepeaterAdjuntable::make('Documento')
-                ->adjuntable(fn ($r) => 
-                $r->nombre_original ?:
-                \Illuminate\Support\Str::limit($r->descripcion ?? '', 60) ?:
-                ($r->tipodoc?->getLabel() ??
-                "Documento #{$r->id}"))
-
-                ->label('Documentos')
-                ->relationship('Documentos')
-                ->addActionLabel('Crear un Documento')
-                ->itemLabel('Nuevo Documento')
-                ->hiddenLabel()
-                ->columnSpanFull()
-                ->collapsible()
-                ->defaultItems(0)
-                ->grid(3)
-                ->addAction(
-                    fn (Action $action) => $action
-                    ->icon('heroicon-m-plus')
-                    ->color('gray')
-                )
-                ->schema([
-                    Grid::make(1)
-                    ->columnSpan(1)
-                    ->schema(Documento::getFromSchema(false, false)),
-                ]),
-            ]),
+            ->schema(Documento::getRepeaterSchema()),
         ];
         return $resutlado;
     }

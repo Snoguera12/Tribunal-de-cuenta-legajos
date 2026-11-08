@@ -50,6 +50,10 @@ class LegajosTable
                 ->label('Estado')
                 ->options(EstadoLegajoEnum::class)
                 ->default(true),
+                Filter::make('sin_datos')
+                ->label('Sin área, categoría o cargo')
+                ->toggle()
+                ->query(fn (Builder $query): Builder => $query->sinDatos()),
             ])
             ->recordActions([
                 // Botón "Ver": abre la página de vista del legajo (con sus licencias)

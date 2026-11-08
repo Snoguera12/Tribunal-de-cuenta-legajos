@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Filament\Resources\Legajos\Pages;
+
+use App\Models\Legajo;
 use App\Filament\Resources\Legajos\LegajoResource;
 use App\Filament\Resources\Licencias\LicenciaResource;
 use App\Models\Licencia;
@@ -23,6 +25,19 @@ class ListLegajos extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('sin_datos')
+            ->label('Legajos sin datos')
+            ->icon(Heroicon::ExclamationTriangle)
+            ->color('warning')
+            ->badge(fn () => Legajo::sinDatos()->count())
+            ->visible(fn ($livewire) => ! ($livewire->getTableFilterState('sin_datos')['isActive'] ?? false)
+    && Legajo::sinDatos()->exists())
+            ->url(fn () => LegajoResource::getUrl('index', [
+                'filters' => [
+                    'sin_datos' => ['isActive' => true],
+                    'estado' => ['value' => ''], // para que también salgan los dados de baja
+                ],
+            ])),
             // Lleva al listado de licencias registradas por el Sistema de Licencias
             Action::make('licencias')
                 ->label('Licencias Aprobadas')

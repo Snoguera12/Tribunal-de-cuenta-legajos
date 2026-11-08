@@ -31,36 +31,50 @@ class RepeaterAdjuntable extends Repeater
         $this->esAdjuntable = true;
         $this->etiquetaAdjuntar = $etiqueta;
 
-        $this->deleteAction(fn (Action $action) => $action
-            ->label('Desadjuntar')
-            ->icon('heroicon-m-link-slash')
-            ->color('warning')
-            ->requiresConfirmation()
-            ->modalHeading('¿Desadjuntar este registro?')
-            ->modalDescription('No se borra: queda sin asignar y se puede volver a adjuntar.')
-            ->after(function (Repeater $component): void {
-                // Cuántos registros que están en la base ya no figuran en el formulario.
-                $estado = $component->getRawState() ?? [];
+        $this->deleteAction(function (Action $action): Action {
+            // ¿Este item ya está guardado en la base para este registro?
+            $guardado = fn (Repeater $component, array $arguments): bool => $component
+                ->getCachedExistingRecords()
+                ->has($arguments['item'] ?? '');
 
-                $pendientes = $component->getCachedExistingRecords()
-                    ->keys()
-                    ->reject(fn ($clave) => array_key_exists($clave, $estado))
-                    ->count();
+            return $action
+                ->label(fn (Repeater $component, array $arguments) => $guardado($component, $arguments)
+                    ? 'Desadjuntar'
+                    : 'Quitar')
+                ->icon(fn (Repeater $component, array $arguments) => $guardado($component, $arguments)
+                    ? 'heroicon-m-link-slash'
+                    : 'heroicon-m-x-mark')
+                ->color(fn (Repeater $component, array $arguments) => $guardado($component, $arguments)
+                    ? 'warning'
+                    : 'gray')
+                ->requiresConfirmation(fn (Repeater $component, array $arguments) => $guardado($component, $arguments))
+                ->modalHidden(fn (Repeater $component, array $arguments) => !$guardado($component, $arguments))
+                ->modalHeading('¿Desadjuntar este registro?')
+                ->modalDescription('No se borra: queda sin asignar y se puede volver a adjuntar.')
+                ->modalSubmitActionLabel('Quitar')
+                ->after(function (Repeater $component, array $arguments): void {
+                    // Quitar un item que no estaba guardado no es un desadjuntado: no se avisa.
+                    if (! $component->getCachedExistingRecords()->has($arguments['item'] ?? '')) {
+                        return;
+                    }
 
-                // Si solo se quitó uno recién agregado (todavía no guardado), no hay nada que avisar.
-                if ($pendientes === 0) {
-                    return;
-                }
+                    // Cuántos registros que están en la base ya no figuran en el formulario.
+                    $estado = $component->getRawState() ?? [];
 
-                // Mismo id => cada aviso reemplaza al anterior, así nunca se acumulan.
-                Notification::make('desadjuntando-' . md5($component->getStatePath()))
-                ->title($pendientes === 1 ? '1 registro a desadjuntar' : "{$pendientes} registros a desadjuntar")
-                ->body('Presioná Guardar para confirmar.')
-                ->warning()
-                ->duration(5000)
-                ->send();
-            })
-        );
+                    $pendientes = $component->getCachedExistingRecords()
+                        ->keys()
+                        ->reject(fn ($clave) => array_key_exists($clave, $estado))
+                        ->count();
+
+                    // Mismo id => cada aviso reemplaza al anterior, así nunca se acumulan.
+                    Notification::make('desadjuntando-' . md5($component->getStatePath()))
+                        ->title($pendientes === 1 ? '1 registro a desadjuntar' : "{$pendientes} registros a desadjuntar")
+                        ->body('Presioná Guardar para confirmar.')
+                        ->warning()
+                        ->duration(5000)
+                        ->send();
+                });
+        });
 
         $this->registerActions([
             fn (RepeaterAdjuntable $component): Action => $component->getAdjuntarAction(),

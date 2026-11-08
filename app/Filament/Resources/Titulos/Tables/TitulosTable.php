@@ -22,6 +22,20 @@ class TitulosTable
             ])
             ->recordActions([
                 EditAction::make()->iconButton()->color('primary')->icon('heroicon-m-pencil-square'),
+                Action::make('fusionar')
+                ->label('Fusionar en…')
+                ->icon('heroicon-m-arrows-pointing-in')
+                ->color('warning')
+                ->requiresConfirmation()
+                ->modalDescription('Los Estudios de este título pasarán al título elegida y esta se eliminará.')
+                ->schema([
+                    Select::make('destino_id')
+                    ->label('Fusionar en la título')
+                    ->options(fn (Titulo $record) => Titulo::whereKeyNot($record->id)->orderBy('nombre')->pluck('nombre', 'id'))
+                    ->searchable()
+                    ->required(),
+                ])
+                ->action(fn (Titulo $record, array $data) => $record->fusionarEn(Titulo::findOrFail($data['destino_id']))),
             ])
             ->toolbarActions([
                 //

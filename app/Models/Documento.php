@@ -4,10 +4,12 @@ namespace App\Models;
 
 use App\Enums\TipodocEnum;
 use App\Filament\Forms\Components\ArchivoDocumento;
-use Filament\Forms\Components\FileUpload;
+use App\Filament\Forms\Components\RepeaterAdjuntable;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Grid;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -147,6 +149,37 @@ class Documento extends Model
             ],
         };
 
+        return $resultado;
+    }
+    public static function getRepeaterSchema(): array{
+        $resultado = [
+            RepeaterAdjuntable::make('Documento')
+            ->adjuntable(fn ($r) => 
+            $r->nombre_original ?:
+            Str::limit($r->descripcion ?? '', 60) ?:
+            ($r->tipodoc?->getLabel() ??
+            "Documento #{$r->id}"))
+
+            ->label('Documentos')
+            ->relationship('Documentos')
+            ->addActionLabel('Agregar un Documento')
+            ->itemLabel('Nuevo Documento')
+            ->hiddenLabel()
+            ->columnSpanFull()
+            ->collapsible()
+            ->defaultItems(0)
+            ->grid(3)
+            ->addAction(
+                fn (Action $action) => $action
+                ->icon('heroicon-m-plus')
+                ->color('gray')
+            )
+            ->schema([
+                Grid::make(1)
+                ->columnSpan(1)
+                ->schema(Documento::getFromSchema(false, false)),
+            ]),
+        ];
         return $resultado;
     }
 }
