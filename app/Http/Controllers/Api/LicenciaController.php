@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\TipodocEnum;
+use App\Filament\Forms\Components\ArchivoDocumento;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLicenciaRequest;
 use App\Models\Documento;
@@ -41,7 +42,7 @@ class LicenciaController extends Controller
         }
 
         // El archivo se guarda antes de la transacción; si algo falla, se borra
-        $ruta = $archivo->store('documentos', 'local');
+        $ruta = $archivo->store(ArchivoDocumento::DIRECTORIO, ArchivoDocumento::DISCO);
 
         try {
             $licencia = DB::transaction(function () use ($legajo, $datos, $archivo, $ruta) {
@@ -64,7 +65,7 @@ class LicenciaController extends Controller
             });
         } catch (UniqueConstraintViolationException) {
             // Dos envíos simultáneos del mismo id_solicitud: el segundo se trata como reintento
-            Storage::disk('local')->delete($ruta);
+            Storage::disk(ArchivoDocumento::DISCO)->delete($ruta);
 
             $existente = $this->buscarExistente($solicitud_id);
             if (! $existente) {
@@ -73,7 +74,7 @@ class LicenciaController extends Controller
 
             return $this->responderReenvio($existente, $legajo, $datos);
         } catch (Throwable $e) {
-            Storage::disk('local')->delete($ruta);
+            Storage::disk(ArchivoDocumento::DISCO)->delete($ruta);
             throw $e;
         }
 

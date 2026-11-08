@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TipodocEnum;
+use App\Filament\Forms\Components\ArchivoDocumento;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -69,18 +70,10 @@ class Documento extends Model
 
         if($solo_archivos){
             $resultado = [
-                FileUpload::make('ruta')
+                ArchivoDocumento::make('ruta')
                 ->label('Documento Adjunto')
                 ->multiple()
-                ->disk('local')
-                ->visibility('private')
-                ->directory('documentos/')
-                ->maxSize(10240)
                 ->openable()
-                ->acceptedFileTypes(['application/pdf', 'image/jpeg'])
-                ->rules(['mimes:pdf,jpg,jpeg'])
-                ->validationMessages(['required' => 'Debe subir un archivo válido.'])
-                ->getUploadedFileNameForStorageUsing(self::nombreAleatorio(...))
                 ->required(),
             ];
         } else{
@@ -112,16 +105,8 @@ class Documento extends Model
                 ->options(TipodocEnum::class)
                 ->validationMessages(['required' => 'Seleccione el tipo de documento.']),
                 
-                FileUpload::make('ruta')
+                ArchivoDocumento::make('ruta')
                 ->label('Documento Adjunto')
-                ->disk('local')
-                ->visibility('private')
-                ->directory('documentos/')
-                ->maxSize(10240)
-                ->acceptedFileTypes(['application/pdf', 'image/jpeg'])
-                ->rules(['mimes:pdf,jpg,jpeg'])
-                ->validationMessages(['required' => 'Debe subir un archivo válido.'])
-                ->getUploadedFileNameForStorageUsing(self::nombreAleatorio(...))
                 ->required()
                 ->deletable(false),
             ];

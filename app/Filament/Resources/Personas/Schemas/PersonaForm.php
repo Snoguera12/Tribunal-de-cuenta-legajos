@@ -5,24 +5,20 @@ namespace App\Filament\Resources\Personas\Schemas;
 use App\Models\AntecedenteLaboral;
 use App\Models\Curso;
 use App\Models\Estudio;
-use App\Models\EstudioTitulo;
 use App\Models\Familiar;
 use App\Models\Idioma;
 use App\Models\Legajo;
 use App\Models\Persona;
-use App\Models\Titulo;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Group;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Grid;
 
 class PersonaForm
 {
@@ -80,20 +76,7 @@ class PersonaForm
                 ->key('curso')
                 ->icon('heroicon-m-book-open')
                 ->columnSpanFull()
-                ->schema([
-                    Repeater::make('Curso')->relationship('cursos')
-                    ->hiddenLabel()
-                    ->columnSpanFull()
-                    ->columns(3)
-                    ->defaultItems(0)
-                    ->addActionLabel('Agregar un Curso')
-                    ->addAction(
-                        fn (Action $action) => $action
-                        ->icon('heroicon-m-plus')
-                        ->color('gray')
-                    )
-                    ->schema(Curso::getFromSchema())
-                ]),
+                ->schema(Curso::getRepeaterSchema()),
 
                 Tab::make('Tab Antecedentes Laborales')
                 ->label('Antecedentes Laborales')
@@ -101,20 +84,7 @@ class PersonaForm
                 ->key('antecedenteslaborales')
                 ->icon('heroicon-m-briefcase')
                 ->columnSpanFull()
-                ->schema([
-                    Repeater::make('Laboral')->relationship('antecedentesLaborales')
-                    ->hiddenLabel()
-                    ->columnSpanFull()
-                    ->defaultItems(0)
-                    ->addActionLabel('Agregar un Antecedente Laboral')
-                    ->addAction(
-                        fn (Action $action) => $action
-                        ->icon('heroicon-m-plus')
-                        ->color('gray')
-                    )
-                    ->columns(3)
-                    ->schema(AntecedenteLaboral::getFormSchema())
-                ]),
+                ->schema(AntecedenteLaboral::getRepeaterSchema()),
 
                 Tab::make('Tab Usuario')
                 ->label('Usuario')

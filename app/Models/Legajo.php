@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\EstadoLegajoEnum;
 use App\Enums\TipoContratoEnum;
+use App\Filament\Forms\Components\RepeaterAdjuntable;
 use App\Models\Helpers\PersonaHelper;
 use Carbon\Carbon;
 use Filament\Actions\Action;
@@ -144,21 +145,25 @@ class Legajo extends Model
         $resultado = match ($mode_out) {
             'table' => [
                 TextColumn::make('num_legajo')->label('Número')
+                ->placeholder('-')
                 ->sortable()
                 ->searchable()
                 ->toggleable(isToggledHiddenByDefault: false),
 
                 TextColumn::make('persona.nombre')->label("Nombre")
+                ->placeholder('Sin legajo adjuntado')
                 ->sortable()
                 ->searchable()
                 ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('persona.apellido')->label("Apellido")
+                ->placeholder('Sin legajo adjuntado')
                 ->sortable()
                 ->searchable()
                 ->toggleable(isToggledHiddenByDefault: false),
 
                 TextColumn::make('persona.dni')->label("DNI")
+                ->placeholder('Sin legajo adjuntado')
                 ->sortable()
                 ->searchable()
                 ->toggleable(isToggledHiddenByDefault: false),
@@ -280,19 +285,28 @@ class Legajo extends Model
                 '
             ])
             ->schema([
-                Repeater::make('Documento')
+                RepeaterAdjuntable::make('Documento')
+                ->adjuntable(fn ($r) => 
+                $r->nombre_original ?:
+                \Illuminate\Support\Str::limit($r->descripcion ?? '', 60) ?:
+                ($r->tipodoc?->getLabel() ??
+                "Documento #{$r->id}"))
+
                 ->label('Documentos')
                 ->relationship('Documentos')
-                ->addActionLabel('Adjuntar un Documento')
+                ->addActionLabel('Crear un Documento')
                 ->itemLabel('Nuevo Documento')
                 ->hiddenLabel()
                 ->columnSpanFull()
                 ->collapsible()
                 ->defaultItems(0)
-                ->grid(3) // Mantiene tus dos columnas de documentos lado a lado
+                ->grid(3)
+                ->addAction(
+                    fn (Action $action) => $action
+                    ->icon('heroicon-m-plus')
+                    ->color('gray')
+                )
                 ->schema([
-                    // SOLUCIÓN NATIVA: Usamos un Fieldset o una Section interna. 
-                    // Cada vez que se crea un documento, Filament genera este recuadro contenedor.
                     Grid::make(1)
                     ->columnSpan(1)
                     ->schema(Documento::getFromSchema(false, false)),
@@ -304,7 +318,8 @@ class Legajo extends Model
 
     public static function getRepeaterSchema(): array{
         return [
-            Repeater::make('Legajo')
+            RepeaterAdjuntable::make('Legajo')
+            ->adjuntable(fn ($r) => "N°Legajo: {$r->num_legajo}")
             ->relationship('legajos')
             ->hiddenLabel()
             ->columnSpanFull()

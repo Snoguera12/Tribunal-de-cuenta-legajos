@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\FamiliarViveEnum;
 use App\Enums\ParentescoEnum;
+use App\Filament\Forms\Components\RepeaterAdjuntable;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
@@ -97,7 +98,8 @@ class Familiar extends Model
 
     public static function getRepeaterSchema(): array{
         return [
-            Repeater::make('familiares')
+            RepeaterAdjuntable::make('familiares')
+            ->adjuntable(fn ($r) => "{$r->apellido}, {$r->nombre} (DNI {$r->dni})")
             ->relationship('familiares')
             ->hiddenLabel()
             ->columnSpanFull()

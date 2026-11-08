@@ -258,29 +258,36 @@ class Persona extends Model
             ],
             'list' => [
                 TextEntry::make('nombre')
-                ->label('Nombre'),
+                ->label('Nombre')
+                ->placeholder('Sin legajo adjuntado'),
 
                 TextEntry::make('apellido')
-                ->label('Apellido'),
+                ->label('Apellido')
+                ->placeholder('Sin legajo adjuntado'),
 
                 TextEntry::make('dni')
-                ->label('DNI'),
+                ->label('DNI')
+                ->placeholder('Sin legajo adjuntado'),
 
                 TextEntry::make('cuil')
-                ->label('CUIL'),
+                ->label('CUIL')
+                ->placeholder('Sin legajo adjuntado'),
 
                 TextEntry::make('email')
                 ->label('Correo Electrónico')
-                ->placeholder('-'),
+                ->placeholder('Sin legajo adjuntado'),
 
                 TextEntry::make('genero')
-                ->label('Género'),
+                ->label('Género')
+                ->placeholder('Sin legajo adjuntado'),
 
                 TextEntry::make('estado_civil')
-                ->label('Estado Civil'),
+                ->label('Estado Civil')
+                ->placeholder('Sin legajo adjuntado'),
 
                 TextEntry::make('fecha_de_nacimiento')
                 ->label('Fecha de Nacimiento')
+                ->placeholder('Sin legajo adjuntado')
                 ->date('d/m/Y'),
 
                 TextEntry::make('domicilio')

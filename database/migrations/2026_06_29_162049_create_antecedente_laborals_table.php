@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('antecedente_laborals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('persona_id');
+            $table->foreignId('persona_id')->nullable()->constrained()->nullOnDelete();
             $table->string('empleador');
             $table->string('lugar_de_trabajo');
             $table->string('cargo')->nullable();

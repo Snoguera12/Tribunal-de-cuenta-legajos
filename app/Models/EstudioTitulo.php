@@ -33,6 +33,14 @@ class EstudioTitulo extends Model
     {
         return $query->whereNull('titulo_id')->whereNotNull('titulo_otro');
     }
+    public function getEtiquetaAdjuntarAttribute(): string
+    {
+        if ($this->titulo_id) {
+            return "Título {$this->titulo?->nombre}";
+        }
+
+        return "Título {$this->titulo_otro} - en revisión";
+    }
     /** Asigna registros pendientes a un título del catálogo, respetando el índice único (estudio_id, titulo_id). */
     public static function asignarATitulo(Collection $registros, int $tituloId): void
     {

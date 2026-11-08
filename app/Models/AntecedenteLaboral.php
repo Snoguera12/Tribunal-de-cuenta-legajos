@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Filament\Forms\Components\RepeaterAdjuntable;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
@@ -81,5 +83,23 @@ class AntecedenteLaboral extends Model
             ],
         };
         return $resultado;
+    }
+    public static function getRepeaterSchema(): array{
+        return [
+            RepeaterAdjuntable::make('Laboral')
+            ->adjuntable(fn ($r) => trim("{$r->empleador} - {$r->cargo}", ' -'))
+            ->relationship('antecedentesLaborales')
+            ->hiddenLabel()
+            ->columnSpanFull()
+            ->columns(3)
+            ->defaultItems(0)
+            ->addActionLabel('Agregar un Antecedente Laboral')
+            ->addAction(
+                fn (Action $action) => $action
+                ->icon('heroicon-m-plus')
+                ->color('gray')
+            )
+            ->schema(AntecedenteLaboral::getFormSchema()),
+        ];
     }
 }

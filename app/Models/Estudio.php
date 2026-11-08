@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\NivelEstudioEnum;
+use App\Filament\Forms\Components\RepeaterAdjuntable;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
@@ -30,6 +31,19 @@ class Estudio extends Model
     public function persona(){ return $this->belongsTo(Persona::class, 'persona_id'); }
     public function estudioTitulos() { return $this->hasMany(EstudioTitulo::class); }
     public function institucion() { return $this->belongsTo(Institucion::class); }
+    public function getEtiquetaAdjuntarAttribute(): string
+    {
+        $nombre = $this->institucion_mostrada;
+
+        // Niveles que no piden institución: se muestra el nivel.
+        if (blank($nombre)) {
+            return $this->nivel_estudio?->getLabel() ?? "Estudio #{$this->id}";
+        }
+
+        return $this->institucion_id
+            ? "Institución {$nombre}"
+            : "Institución {$nombre} - en revisión";
+    }
     protected static function tieneEstudiosActivos($value): bool{
         if ($value === null) return false;
 
@@ -158,7 +172,8 @@ class Estudio extends Model
     public static function getRepeaterSchema(): array
     {
         return [
-            Repeater::make('estudios')
+            RepeaterAdjuntable::make('estudios')
+            ->adjuntable(fn ($r) => $r->etiqueta_adjuntar)
             ->relationship('estudios')
             ->hiddenLabel()
             ->columnSpanFull()
@@ -175,14 +190,21 @@ class Estudio extends Model
                 ->collapsible()
                 ->visible(fn (Get $get) => Estudio::requiereTitulo($get('nivel_estudio')))
                 ->extraAttributes([ 'style' => '...' ])
+
                 ->schema([
-                    Repeater::make('titulos')
+                    RepeaterAdjuntable::make('titulos')
+                    ->adjuntable(fn ($r) => $r->etiqueta_adjuntar)
                     ->relationship('estudioTitulos')
                     ->addActionLabel('Agregar un Título')
                     ->itemLabel('Nuevo Registro de Título')
                     ->hiddenLabel()
                     ->collapsible()
                     ->grid(3)
+                    ->addAction(
+                        fn (Action $action) => $action
+                        ->icon('heroicon-m-plus')
+                        ->color('gray')
+                    )
                     ->schema(EstudioTitulo::getFormSchema())
                     ->rule(fn () => function (string $attribute, $value, \Closure $fail) {
                         $ids = collect($value)->pluck('titulo_id')

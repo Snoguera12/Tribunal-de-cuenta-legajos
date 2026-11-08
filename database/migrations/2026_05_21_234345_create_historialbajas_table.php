@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('historialbajas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("legajo_id")->constrained()->onDelete("cascade");
+            $table->foreignId("legajo_id")->constrained()->nullOnDelete();
             $table->foreignId("user_id");
             $table->integer("motivo");
             $table->dateTime('fecha_baja');

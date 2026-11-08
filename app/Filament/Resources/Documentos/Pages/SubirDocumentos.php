@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Documentos\Pages;
 
+use App\Filament\Forms\Components\ArchivoDocumento;
 use App\Filament\Resources\Documentos\DocumentoResource;
 use App\Models\Documento;
 use BackedEnum;
@@ -37,15 +38,10 @@ class SubirDocumentos extends Page implements HasForms
     {
         return $schema
             ->components([
-                FileUpload::make('archivos')
+                ArchivoDocumento::make('archivos')
                 ->label('Archivos')
                 ->multiple()
-                ->directory('documentos') // subdirectorio dentro del disk
-                ->disk('local') // o el disk que uses
-                ->visibility('private')
-                //->preserveFilenames()
                 ->storeFileNamesIn('nombres')
-                ->getUploadedFileNameForStorageUsing(Documento::nombreAleatorio(...))
                 ->required(),
             ])
             ->statePath('data');

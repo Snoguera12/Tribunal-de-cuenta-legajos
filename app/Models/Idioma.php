@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\IdiomaNivelEnum;
+use App\Filament\Forms\Components\RepeaterAdjuntable;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -56,7 +57,8 @@ class Idioma extends Model
 
     public static function getRepeaterSchema(): array{
         return [
-            Repeater::make('idiomas')
+            RepeaterAdjuntable::make('idiomas')
+            ->adjuntable(fn ($r) => $r->idioma)
             ->relationship('idiomas')
             ->hiddenLabel()
             ->columnSpanFull()

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('idiomas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('persona_id');
+            $table->foreignId('persona_id')->nullable()->constrained()->nullOnDelete();
             $table->string('idioma', 100);
             $table->integer('nivel');
             $table->timestamps();

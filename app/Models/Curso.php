@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Filament\Forms\Components\RepeaterAdjuntable;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
@@ -32,6 +34,19 @@ class Curso extends Model
     public function scopePendientes($query)
     {
         return $query->whereNull('institucion_id')->whereNotNull('institucion_otro');
+    }
+    public function getEtiquetaAdjuntarAttribute(): string
+    {
+        $nombre = $this->nombre ?: "Curso #{$this->id}";
+        $institucion = $this->institucion_mostrada;
+
+        if (blank($institucion)) {
+            return $nombre;
+        }
+
+        return $this->institucion_id
+            ? "{$nombre} – {$institucion}"
+            : "{$nombre} – {$institucion} - en revisión";
     }
     public static function getFromSchema() : array{
         $resultado = [
@@ -86,5 +101,24 @@ class Curso extends Model
             ],
         };
         return $resultado;
+    }
+
+    public static function getRepeaterSchema(): array{
+        return [
+            RepeaterAdjuntable::make('Curso')
+            ->adjuntable(fn ($r) => $r->etiqueta_adjuntar)
+            ->relationship('cursos')
+            ->hiddenLabel()
+            ->columnSpanFull()
+            ->columns(3)
+            ->defaultItems(0)
+            ->addActionLabel('Agregar un Curso')
+            ->addAction(
+                fn (Action $action) => $action
+                ->icon('heroicon-m-plus')
+                ->color('gray')
+            )
+            ->schema(Curso::getFromSchema()),
+        ];
     }
 }
