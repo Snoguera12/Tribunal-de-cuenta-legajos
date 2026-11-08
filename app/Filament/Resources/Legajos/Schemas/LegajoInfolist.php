@@ -9,7 +9,6 @@ use App\Models\Legajo;
 use App\Models\Persona;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Livewire;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;

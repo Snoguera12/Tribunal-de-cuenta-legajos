@@ -13,13 +13,18 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
  */
 class MiLegajoWidget extends StatsOverviewWidget
 {
-    protected static ?int $sort = -2;
+    protected static ?int $sort = 5;
 
     public static function canView(): bool
     {
-        return auth()->user()?->isEmpleado() ?? false;
-    }
+        $usuario = auth()->user();
 
+        return ($usuario?->isEmpleado() || $usuario->isStaffRoles() ?? false) && $usuario->persona_id !== null;
+    }
+    protected function getColumns(): int | array | null
+    {
+        return count($this->getCachedStats()) === 1 ? 1 : parent::getColumns();
+    }
     protected function getStats(): array
     {
         $personaId = auth()->user()->persona_id;

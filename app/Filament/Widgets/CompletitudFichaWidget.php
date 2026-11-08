@@ -17,7 +17,7 @@ use Filament\Widgets\Widget;
  */
 class CompletitudFichaWidget extends Widget
 {
-    protected static ?int $sort = -1;
+    protected static ?int $sort = 6;
 
     protected string $view = 'filament.widgets.completitud-ficha';
 
@@ -39,7 +39,7 @@ class CompletitudFichaWidget extends Widget
 
     public static function canView(): bool
     {
-        return auth()->user()?->isEmpleado() ?? false;
+        return true;
     }
 
     protected function getViewData(): array

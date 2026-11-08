@@ -277,7 +277,7 @@ class RepeaterAdjuntable extends Repeater
                     $valor = match (true) {
                         $relacionado instanceof Categoria => collect([$relacionado->nombre, $relacionado->descripcion])
                             ->filter()
-                            ->implode(' – '),
+                            ->implode(' - '),
                         default => $relacionado?->nombre ?? $relacionado?->descripcion ?? $valor,
                     };
 

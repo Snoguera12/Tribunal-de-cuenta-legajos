@@ -18,6 +18,7 @@ class EditPersona extends EditRecord
         return [
             //DeleteAction::make(),
             ViewAction::make()
+            ->icon('heroicon-m-eye')
             ->extraAttributes([
                 'onclick' => "event.preventDefault();"
                     . "const tab = new URLSearchParams(window.location.search).get('tab');"

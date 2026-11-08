@@ -11,6 +11,7 @@ class PersonaTotalWidget extends StatsOverviewWidget
 {
     protected static ?int $sort = 2;
     protected int|string|array $columnSpan = 1;
+    protected int | array | null $columns = 1;
     public static function canView(): bool
     {
         return auth()->user()->isStaffRoles();
@@ -18,7 +19,8 @@ class PersonaTotalWidget extends StatsOverviewWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Personas Registradas', Persona::count())
+            Stat::make('Personas registradas', Persona::count())
+            ->description('Total en el sistema.')
             ->descriptionColor("success")
             ->color("primary")
         ];

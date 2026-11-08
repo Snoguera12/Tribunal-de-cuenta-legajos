@@ -6,7 +6,6 @@ use App\Filament\Forms\Components\ArchivoDocumento;
 use App\Filament\Resources\Documentos\DocumentoResource;
 use App\Models\Documento;
 use BackedEnum;
-use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Schema;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -29,6 +28,15 @@ class SubirDocumentos extends Page implements HasForms
         }
         return true;
     }
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('guardar')
+                ->label('Guardar')
+                ->icon('heroicon-o-check')
+                ->action('guardar'),
+        ];
+    }
     public function mount(): void
     {
         $this->form->fill();
@@ -42,6 +50,8 @@ class SubirDocumentos extends Page implements HasForms
                 ->label('Archivos')
                 ->multiple()
                 ->storeFileNamesIn('nombres')
+                ->panelLayout('grid')
+                ->imagePreviewHeight('180')
                 ->required(),
             ])
             ->statePath('data');
@@ -73,13 +83,10 @@ class SubirDocumentos extends Page implements HasForms
         $this->form->fill(); // limpia el form
 
         Notification::make()
-            ->title('Documentos subidos correctamente')
-            ->success()
-            ->send();
-    }
+        ->title('Documentos subidos correctamente')
+        ->success()
+        ->send();
 
-    protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
+        $this->redirect(DocumentoResource::getUrl('index'), navigate: true);
     }
 }

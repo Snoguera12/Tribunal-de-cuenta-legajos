@@ -7,9 +7,8 @@ use Filament\Widgets\ChartWidget;
 
 class GeneroWidget extends ChartWidget
 {
-    protected static ?int $sort = 3;
-    protected int|string|array $columnSpan = 1;
-
+    protected static ?int $sort = 4;
+    protected int|string|array $columnSpan = 'full';
     protected ?string $heading = 'Género';
     protected ?string $maxHeight = '200px';
     protected ?string $maxWidth = '5xl';
