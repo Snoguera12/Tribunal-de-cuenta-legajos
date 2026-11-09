@@ -116,10 +116,9 @@ class LegajosPanelProvider extends PanelProvider
 
             ->viteTheme('resources/css/filament/legajos/theme.css')
             ->navigationGroups([
-                'Agentes',
                 'Papeles',
-                'Institución',
-                'Departamento',
+                'Organización',
+                'Catálogos',
             ])
             ->discoverResources(
                 in: app_path('Filament/Resources'),

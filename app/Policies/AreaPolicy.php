@@ -12,7 +12,7 @@ class AreaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin() || $user->isRRHH() || $user->isFuncionario();
+        return $user->isAdmin_RRHH() || $user->isFuncionario();
     }
 
     /**
@@ -20,7 +20,7 @@ class AreaPolicy
      */
     public function view(User $user, Area $area): bool
     {
-        return $user->isAdmin() || $user->isRRHH() || $user->isFuncionario();
+        return $user->isAdmin_RRHH() || $user->isFuncionario();
     }
 
     /**
@@ -28,7 +28,7 @@ class AreaPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isAdmin_RRHH();
     }
 
     /**
@@ -36,7 +36,7 @@ class AreaPolicy
      */
     public function update(User $user, Area $area): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isAdmin_RRHH();
     }
 
     /**
@@ -44,7 +44,7 @@ class AreaPolicy
      */
     public function delete(User $user, Area $area): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 
     /**
@@ -52,7 +52,7 @@ class AreaPolicy
      */
     public function restore(User $user, Area $area): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 
     /**
@@ -60,6 +60,6 @@ class AreaPolicy
      */
     public function forceDelete(User $user, Area $area): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 }

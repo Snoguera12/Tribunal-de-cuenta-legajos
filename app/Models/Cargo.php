@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Filament\Tables\ConteoLegajos;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
@@ -32,11 +33,7 @@ class Cargo extends Model
             ->sortable()
             ->searchable(),
 
-            /*TextColumn::make('cargos_count')
-            ->label('Empleados Asociados')
-            ->counts('legajos')
-            ->badge()
-            ->sortable(),*/
+            ConteoLegajos::columna(),
         ];
         return $resultado;
     }

@@ -17,7 +17,7 @@ class CargoResource extends Resource
     protected static ?string $model = Cargo::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBriefcase;
-    protected static string|\UnitEnum|null $navigationGroup = "Departamento";
+    protected static string|\UnitEnum|null $navigationGroup = "Organización";
     protected static ?string $modelLabel = "Cargo";
     protected static ?int $navigationSort = 2;
     public static function form(Schema $schema): Schema

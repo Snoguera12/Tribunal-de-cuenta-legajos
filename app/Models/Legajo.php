@@ -166,20 +166,13 @@ class Legajo extends Model
                 ->placeholder('Sin legajo adjuntado')
                 ->sortable()
                 ->searchable()
-                ->toggleable(isToggledHiddenByDefault: false),
+                ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('persona.dni')->label("DNI")
                 ->placeholder('Sin legajo adjuntado')
                 ->sortable()
                 ->searchable()
-                ->toggleable(isToggledHiddenByDefault: false),
-
-                TextColumn::make('persona.nivel_estudio') // O el campo exacto donde guardes el título
-                ->label('Estudio')
-                ->sortable()
-                ->searchable()
-                ->placeholder('Sin registrar') // Si está vacío, muestra esto de forma prolija
-                ->toggleable(isToggledHiddenByDefault: false),
+                ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('estado')
                 ->icon(fn (Legajo $legajo) => $legajo->getIcon())
@@ -210,7 +203,7 @@ class Legajo extends Model
                 TextColumn::make('fecha_de_ingreso')
                 ->dateTime('d/m/Y')
                 ->sortable()
-                ->toggleable(isToggledHiddenByDefault: true),
+                ->toggleable(isToggledHiddenByDefault: false),
             ],
             'list' => [
                 TextEntry::make('num_legajo')

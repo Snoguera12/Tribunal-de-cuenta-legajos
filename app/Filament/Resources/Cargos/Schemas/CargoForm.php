@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Cargos\Schemas;
 
 use App\Models\Cargo;
-use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
 class CargoForm

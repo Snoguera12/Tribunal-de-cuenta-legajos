@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Areas\Tables;
 
+use App\Filament\Tables\ConteoLegajos;
 use App\Models\Area;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
@@ -12,7 +13,7 @@ class AreasTable
     {
         return $table
             ->columns(Area::getOutSchema())
-            ->filters([])
+            ->filters([ ConteoLegajos::filtro(), ])
             ->recordActions([
                 EditAction::make()
                 ->label('Editar')
