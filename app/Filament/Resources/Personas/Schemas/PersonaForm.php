@@ -7,7 +7,7 @@ use App\Models\AntecedenteLaboral;
 use App\Models\Curso;
 use App\Models\Estudio;
 use App\Models\Familiar;
-use App\Models\Idioma;
+use App\Models\PersonaIdioma;
 use App\Models\Legajo;
 use App\Models\Persona;
 use App\Models\User;
@@ -73,19 +73,19 @@ class PersonaForm
                 ->columnSpanFull()
                 ->schema(AntecedenteLaboral::getRepeaterSchema()),
                 
-                Tab::make('Tab Idiomas')
-                ->label('Idiomas')
-                ->id('idioma')
-                ->key('idioma')
-                ->icon('heroicon-m-language')
-                ->schema(Idioma::getRepeaterSchema()),
-                
                 Tab::make('Tab Familiares')
                 ->label('Familiares')
                 ->id('familiar')
                 ->key('familiar')
                 ->icon('heroicon-m-users')
                 ->schema(Familiar::getRepeaterSchema()),
+
+                Tab::make('Tab Idiomas')
+                ->label('Idiomas')
+                ->id('idioma')
+                ->key('idioma')
+                ->icon('heroicon-m-language')
+                ->schema(PersonaIdioma::getRepeaterSchema()),
 
                 Tab::make('Tab Usuario')
                 ->label('Usuario')

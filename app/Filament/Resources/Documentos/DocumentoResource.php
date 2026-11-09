@@ -51,7 +51,7 @@ class DocumentoResource extends Resource
     }
     public static function getNavigationBadge(): ?string
     {
-        return Documento::pendientes()->count();
+        return Documento::pendientes()->count() ?: null;
     }
     public static function getPages(): array
     {

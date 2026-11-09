@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Titulos;
 
 use App\Filament\Resources\Titulos\Pages\ListTitulos;
 use App\Filament\Resources\Titulos\Pages\PendientesTitulos;
-use App\Filament\Resources\Titulos\Pages\TituloPendiente;
 use App\Filament\Resources\Titulos\Schemas\TituloForm;
 use App\Filament\Resources\Titulos\Tables\TitulosTable;
 use App\Models\EstudioTitulo;
@@ -12,17 +11,15 @@ use App\Models\Titulo;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class TituloResource extends Resource
 {
     protected static ?string $model = Titulo::class;
-
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-identification';
-    protected static string|\UnitEnum|null $navigationGroup = "Departamento";
+    protected static string|\UnitEnum|null $navigationGroup = "Catálogos";
     protected static ?string $modelLabel = "Títulos";
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 1;
     public static function form(Schema $schema): Schema
     {
         return TituloForm::configure($schema);
@@ -35,7 +32,7 @@ class TituloResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         // Retorna el conteo total de la base de datos
-        return EstudioTitulo::pendientes()->count();
+        return EstudioTitulo::pendientes()->count() ?: null;
     }
     public static function getRelations(): array
     {

@@ -2,81 +2,71 @@
 
 namespace App\Models;
 
-use App\Enums\IdiomaNivelEnum;
-use App\Filament\Forms\Components\RepeaterAdjuntable;
-use Filament\Actions\Action;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Components\Grid;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Idioma extends Model
 {
-    protected $casts = [
-        'nivel' => IdiomaNivelEnum::class,
-    ];
     protected $fillable = [
-        'persona_id',
-        'idioma',
-        'nivel',
+        'nombre',
     ];
 
-    public function persona()
+    public function personaIdiomas()
     {
-        return $this->belongsTo(Persona::class);
+        return $this->hasMany(PersonaIdioma::class);
     }
-    public static function getFromSchema() : array{
-        $resultado =  [
-            TextInput::make('idioma')
-            ->label('Idioma')
-            ->required()
-            ->maxLength(100),
 
-            Select::make('nivel')
-            ->label('Nivel')
-            ->options(IdiomaNivelEnum::class)
-            ->required(),
-        ];
-        return $resultado;
+    public function fusionarEn(Idioma $destino): void
+    {
+        DB::transaction(function () use ($destino) {
+            $this->personaIdiomas()->get()->each(function (PersonaIdioma $pi) use ($destino) {
+                $yaLoTiene = PersonaIdioma::where('persona_id', $pi->persona_id)
+                ->where('idioma_id', $destino->id)
+                ->exists();
+
+                // Si la persona ya tenía el idioma destino, el duplicado se desadjunta en vez de borrarse.
+                $pi->update($yaLoTiene
+                    ? ['persona_id' => null, 'idioma_id' => $destino->id]
+                    : ['idioma_id' => $destino->id]);
+            });
+
+            $this->delete();
+        });
     }
-    public static function getOutSchema(string $mode_out) : array{
-        $resultado = match ($mode_out) {
+
+    public static function getFormSchema(string $modeForm): array
+    {
+        return match ($modeForm) {
             'table' => [
-
+                TextInput::make('nombre')
+                    ->label('Nombre del Idioma')
+                    ->maxLength(100)
+                    ->unique(ignoreRecord: true)
+                    ->required(),
             ],
-            'list' => [
-                TextEntry::make('idioma')->label('Idioma'),
-                TextEntry::make('nivel')->label('Nivel'),
-            ],
+            'list' => [],
         };
-
-        return $resultado;
     }
 
-    public static function getRepeaterSchema(): array{
-        return [
-            RepeaterAdjuntable::make('idiomas')
-            ->adjuntable(fn ($r) => $r->idioma)
-            ->relationship('idiomas')
-            ->hiddenLabel()
-            ->columnSpanFull()
-            ->addActionLabel('Agregar un Idioma')
-            ->itemLabel('Idioma Adjuntado')
-            ->defaultItems(0)
-            ->collapsible()
-            ->grid(3)
-            ->addAction(
-                fn (Action $action) => $action
-                ->icon('heroicon-m-plus')
-                ->color('gray')
-            )
-            ->schema([
-                Grid::make(1)
-                ->columnSpan(1)
-                ->schema(Idioma::getFromSchema()),
-            ]),
-        ];
+    public static function getOutSchema(string $mode_out): array
+    {
+        return match ($mode_out) {
+            'table' => [
+                TextColumn::make('nombre')
+                    ->label('Nombre del Idioma')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                TextColumn::make('created_at')
+                    ->label('Fecha de Creación')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ],
+            'list' => [],
+        };
     }
 }

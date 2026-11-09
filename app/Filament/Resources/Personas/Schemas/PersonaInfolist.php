@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Personas\Schemas;
 
-use App\Filament\Resources\Personas\PersonaResource;
 use App\Models\AntecedenteLaboral;
 use App\Models\Curso;
 use App\Filament\Resources\Legajos\Pages\ViewLegajo;
@@ -11,15 +10,13 @@ use App\Filament\Resources\Legajos\RelationManagers\LicenciasRelationManager;
 use Filament\Schemas\Components\Livewire;
 use App\Models\Estudio;
 use App\Models\Familiar;
-use App\Models\Idioma;
+use App\Models\PersonaIdioma;
 use App\Models\Legajo;
 use App\Models\Persona;
 use App\Models\User;
-use Filament\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Group;
 use Filament\Infolists\Components\RepeatableEntry;
-use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -175,12 +172,13 @@ class PersonaInfolist
                 ->id('idioma')
                 ->key('idioma')
                 ->icon('heroicon-m-language')
+                ->columns(4)
                 ->schema([
                     RepeatableEntry::make('idiomas')
                     ->hiddenLabel()
                     ->placeholder('Sin idiomas registrados')
                     ->columns(2)
-                    ->schema(Idioma::getOutSchema('list')),
+                    ->schema(PersonaIdioma::getOutSchema('list')),
                 ]),
 
                 Tab::make('Tab Usuario')

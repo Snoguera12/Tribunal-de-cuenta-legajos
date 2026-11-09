@@ -16,8 +16,10 @@ use App\Models\Legajo;
 use App\Models\Persona;
 use App\Models\Titulo;
 use App\Models\User;
+use App\Models\PersonaIdioma;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+
 
 class PersonalSantiagoSeeder extends Seeder
 {
@@ -799,9 +801,11 @@ class PersonalSantiagoSeeder extends Seeder
             if (!empty($datos['idioma'])) {
                 [$idiomaNombre, $nivelIdioma] = $datos['idioma'];
 
-                Idioma::create([
+                $idioma = Idioma::firstOrCreate(['nombre' => $idiomaNombre]);
+
+                PersonaIdioma::create([
                     'persona_id' => $persona->id,
-                    'idioma' => $idiomaNombre,
+                    'idioma_id' => $idioma->id,
                     'nivel' => $nivelIdioma,
                 ]);
             }

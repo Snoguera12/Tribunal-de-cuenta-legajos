@@ -72,10 +72,6 @@ class CompletitudFichaWidget extends Widget
             ->values();
 
         $legajoIds = Legajo::query()->where('persona_id', $persona->id)->pluck('id');
-        $tieneDni = $legajoIds->isNotEmpty() && Documento::query()
-            ->whereHas('legajos', fn ($q) => $q->whereIn('legajos.id', $legajoIds))
-            ->where('tipodoc', TipodocEnum::DNI->value)
-            ->exists();
 
         return [
             [
@@ -84,17 +80,12 @@ class CompletitudFichaWidget extends Widget
                 'detalle' => $faltantes->isEmpty() ? 'Completos' : 'Faltan: ' . $faltantes->implode(', '),
                 'url' => $this->url($persona, 'persona'),
             ],
+            $this->cantidad($persona, 'Legajos', $persona->legajos()->count(), 'legajo'),
             $this->cantidad($persona, 'Familiares', $persona->familiares()->count(), 'familiar'),
             $this->cantidad($persona, 'Idiomas', $persona->idiomas()->count(), 'idioma'),
             $this->cantidad($persona, 'Estudios y títulos', $persona->estudios()->count(), 'estudio'),
             $this->cantidad($persona, 'Cursos', $persona->cursos()->count(), 'curso'),
             $this->cantidad($persona, 'Antecedentes laborales', $persona->antecedentesLaborales()->count(), 'antecedenteslaborales'),
-            [
-                'titulo' => 'Documento de identidad (DNI)',
-                'ok' => $tieneDni,
-                'detalle' => $tieneDni ? 'Cargado' : 'Sin cargar',
-                'url' => $this->url($persona, 'legajo'),
-            ],
         ];
     }
 

@@ -19,10 +19,10 @@ class InstitucionResource extends Resource
     protected static ?string $navigationLabel = 'Instituciones';
     protected static ?string $modelLabel = 'Institución';
     protected static ?string $pluralModelLabel = 'Instituciones';
-    protected static string|\UnitEnum|null $navigationGroup = "Departamento";
+    protected static string|\UnitEnum|null $navigationGroup = "Catálogos";
     protected static ?string $model = Institucion::class;
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-academic-cap';
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {
@@ -36,7 +36,7 @@ class InstitucionResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         // Retorna el conteo total de la base de datos
-        return Estudio::pendientes()->count() + Curso::pendientes()->count();
+        return Estudio::pendientes()->count() + Curso::pendientes()->count() ?: null;
     }
     public static function getRelations(): array
     {

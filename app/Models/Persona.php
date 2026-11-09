@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\EstadoCivilEnum;
 use App\Enums\GeneroEnum;
-use App\Enums\NivelEstudioEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -13,7 +12,6 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 
 class Persona extends Model
 {
@@ -42,7 +40,7 @@ class Persona extends Model
     public function estudiosAnteriores() { return $this->hasMany(Estudio::class)->otrosNiveles()->with('estudioTitulos.titulo');}
     public function familiares() { return $this->hasMany(Familiar::class); }
     public function cursos() { return $this->hasMany(Curso::class); }
-    public function idiomas() { return $this->hasMany(Idioma::class); }
+    public function idiomas() { return $this->hasMany(PersonaIdioma::class); }
     public function antecedentesLaborales() { return $this->hasMany(AntecedenteLaboral::class); }
     public function usuario() { return $this->hasOne(User::class); }
     public static function getFormSchema(): array{
