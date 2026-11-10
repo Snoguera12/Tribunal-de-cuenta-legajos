@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Models\Auditoria;
 use App\Models\User;
 use App\Services\ControlIntentosLogin;
 use Filament\Actions\Action;
@@ -38,6 +39,12 @@ class UsersTable
                         'Temporal' => 'warning',
                         default => 'gray',
                     }),
+
+                TextColumn::make('sesion_activa_desde')
+                    ->label('Sesión abierta desde')
+                    ->dateTime('d/m/Y H:i')
+                    ->placeholder('No tiene')
+                    ->toggleable(),
             ])
             ->filters([
                 TernaryFilter::make('habilitado')
@@ -68,6 +75,27 @@ class UsersTable
                         ControlIntentosLogin::desbloquear($record, auth()->user());
 
                         Notification::make()->title('Usuario desbloqueado')->success()->send();
+                    }),
+
+                // por si alguien dejó la sesión abierta en otro equipo
+                Action::make('cerrar_sesion')
+                    ->label('Cerrar su sesión')
+                    ->icon('heroicon-m-arrow-right-start-on-rectangle')
+                    ->color('gray')
+                    ->requiresConfirmation()
+                    ->visible(fn (User $record) => auth()->user()?->isAdmin() && $record->sesion_activa_id !== null)
+                    ->action(function (User $record) {
+                        abort_unless(auth()->user()?->isAdmin(), 403);
+
+                        $record->cerrarSesiones();
+
+                        Auditoria::registrar(
+                            evento: 'sesion_cerrada_por_admin',
+                            descripcion: "El administrador cerró la sesión de {$record->name}",
+                            modelo: $record,
+                        );
+
+                        Notification::make()->title('Sesión cerrada')->success()->send();
                     }),
             ])
             ->toolbarActions([

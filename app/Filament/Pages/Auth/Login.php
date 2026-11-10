@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
+use App\Models\Auditoria;
+use App\Models\User;
 use App\Services\ControlIntentosLogin;
+use App\Services\SesionUnica;
 use Filament\Actions\Action;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Auth\Pages\Login as BaseLogin;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
@@ -35,7 +39,7 @@ class Login extends BaseLogin
         }
 
         try {
-            return parent::authenticate();
+            $respuesta = parent::authenticate();
         } catch (ValidationException $e) {
             // si fue clave mala, el mensaje dice cuántos intentos quedan
             if ($mensaje = request()->attributes->get('login_mensaje')) {
@@ -44,6 +48,39 @@ class Login extends BaseLogin
 
             throw $e;
         }
+
+        $usuario = Filament::auth()->user();
+
+        if ($usuario instanceof User && SesionUnica::activa()) {
+            $this->controlarSesionUnica($usuario);
+        }
+
+        return $respuesta;
+    }
+
+    // un usuario no puede estar dos veces a la vez
+    private function controlarSesionUnica(User $usuario): void
+    {
+        $idSesion = session()->getId();
+        $otra = SesionUnica::hayOtraActiva($usuario, SesionUnica::huella($idSesion));
+
+        if ($otra && SesionUnica::modo() === 'bloquear') {
+            Auditoria::registrar(
+                evento: 'sesion_duplicada_bloqueada',
+                descripcion: "{$usuario->name} intentó ingresar teniendo otra sesión abierta",
+                actor: $usuario,
+                extra: ['ip_sesion_abierta' => $otra->sesion_activa_ip],
+            );
+
+            Filament::auth()->logout();
+            session()->invalidate();
+            session()->regenerateToken();
+
+            throw ValidationException::withMessages(['data.email' => 'Este usuario ya tiene una sesión abierta en otro equipo o navegador. '
+                . 'Cerrala, o volvé a intentar cuando pasen ' . config('sistema.sesion_unica.inactividad_minutos') . ' minutos sin actividad.']);
+        }
+
+        SesionUnica::registrar($usuario, $idSesion, request()->ip());
     }
 
     public function form(Schema $schema): Schema

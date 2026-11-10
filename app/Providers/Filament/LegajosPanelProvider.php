@@ -11,6 +11,7 @@ use App\Filament\Resources\Legajos\Widgets\LegajoWidget;
 use App\Filament\Resources\Personas\Widgets\GeneroWidget;
 use App\Filament\Resources\Personas\Widgets\PersonaTotalWidget;
 use Filament\Enums\ThemeMode;
+use App\Http\Middleware\ControlarSesionUnica;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -154,6 +155,7 @@ class LegajosPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                ControlarSesionUnica::class,
             ]);
     }
 }

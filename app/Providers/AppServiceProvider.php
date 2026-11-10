@@ -6,6 +6,7 @@ use App\Models\Auditoria;
 use App\Models\User;
 use App\Services\ControlIntentosLogin;
 use App\Services\Etiquetas;
+use App\Services\SesionUnica;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
@@ -47,6 +48,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Event::listen(Logout::class, function (Logout $evento) {
+            // libera el lugar de la sesión única (solo si la registrada es esta)
+            if ($evento->user instanceof User && session()->getId()) {
+                SesionUnica::liberar($evento->user, session()->getId());
+            }
+
             Auditoria::registrar(
                 evento: 'logout',
                 descripcion: 'Cerró sesión',

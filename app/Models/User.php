@@ -68,6 +68,8 @@ class User extends Authenticatable implements FilamentUser
             'password' => 'hashed',
             'habilitado' => 'boolean',
             'deshabilitado_en' => 'datetime',
+            'sesion_activa_desde' => 'datetime',
+            'ultima_actividad_en' => 'datetime',
         ];
     }
     
@@ -108,6 +110,7 @@ class User extends Authenticatable implements FilamentUser
         }
 
         $this->tokens()?->delete();
+        \App\Services\SesionUnica::liberar($this);
     }
 
     // lo llama el trait RegistraAuditoria cuando cambia algo sensible del usuario
