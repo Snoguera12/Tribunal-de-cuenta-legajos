@@ -207,6 +207,9 @@ class Auditoria extends Model
 
             $registro = self::guardarEncadenado($datos);
 
+            // si el hecho sumado a los anteriores parece un ataque, se abre un incidente
+            \App\Services\DetectorIncidentes::evaluar($registro);
+
             return $registro;
 
         } catch (\Throwable $e) {

@@ -116,6 +116,16 @@ class User extends Authenticatable implements FilamentUser
     // lo llama el trait RegistraAuditoria cuando cambia algo sensible del usuario
     public function auditoriaEspecial(array $cambios, array $antes): void
     {
+        if (array_key_exists('rol', $cambios)) {
+            Auditoria::registrar(
+                evento: 'cambio_rol',
+                descripcion: "Cambió el rol de {$this->name}: " . ($antes['rol'] ?? '-') . ' -> ' . $cambios['rol'],
+                modelo: $this,
+                antes: ['rol' => $antes['rol'] ?? null],
+                despues: ['rol' => $cambios['rol']],
+            );
+        }
+
         if (! array_key_exists('habilitado', $cambios)) {
             return;
         }

@@ -62,6 +62,24 @@ return [
         ],
     ],
 
+    // cuándo se considera que algo es un incidente: tantos hechos en tantos minutos
+    'incidentes' => [
+        'minutos' => 10,
+        'intentos_login' => 5,
+        'accesos_denegados' => 3,
+        'borrados' => 10,
+        'errores' => 5,
+    ],
+
+    // avisos por correo a los administradores (además de la notificación del panel)
+    'alertas' => [
+        'correo' => (bool) env('ALERTAS_CORREO', false),
+        // correos extra, separados por coma (por ejemplo el de sistemas)
+        'destinos' => array_filter(array_map('trim', explode(',', (string) env('ALERTAS_DESTINOS', '')))),
+        // solo incidentes de esta gravedad o más: alta o critica
+        'desde' => env('ALERTAS_DESDE', 'alta'),
+    ],
+
     'login' => [
         'intentos_por_tanda' => 5,
         'espera_segundos' => 20,

@@ -47,3 +47,8 @@ Schedule::command('sistema:backup-verificar')
 Schedule::command('sistema:backup-limpiar')
     ->dailyAt('04:00')
     ->onOneServer();
+
+// resumen de las últimas 24 horas por correo (solo si ALERTAS_CORREO=true)
+Schedule::command('sistema:resumen-diario')
+    ->dailyAt('07:00')
+    ->onOneServer();
