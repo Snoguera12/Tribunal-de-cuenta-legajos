@@ -198,6 +198,7 @@ class Legajo extends Model
 
                 TextColumn::make('cargo.nombre')
                 ->label('Cargo')
+                ->searchable()
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: false),
 

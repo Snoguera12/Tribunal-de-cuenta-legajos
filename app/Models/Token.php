@@ -12,6 +12,9 @@ use Laravel\Sanctum\PersonalAccessToken;
 class Token extends Model
 {
     use HasApiTokens;
+    // un cliente de la API nunca se borra: se revoca su acceso (queda el registro y su historia en la auditoría)
+    use \App\Models\Concerns\NoSeBorra;
+    use \App\Models\Concerns\RegistraAuditoria;
 
     protected $fillable = [
         'nombre',
@@ -27,6 +30,40 @@ class Token extends Model
             'is_created' => false,
         ]);
     }
+
+
+    // corta el acceso ya: borra las credenciales de Sanctum (son secretos, no datos) y deja el cliente inactivo.
+    // El registro del cliente se conserva y se le puede generar un token nuevo
+    public function revocar(): int
+    {
+        $credenciales = $this->tokens()->count();
+
+        $this->tokens()->delete();
+        $this->update(['is_active' => false, 'is_created' => false, 'enviados' => null]);
+
+        Auditoria::registrar(
+            evento: 'token_revocado',
+            descripcion: "Se revocó el acceso de la API a {$this->nombre}",
+            modelo: $this,
+            extra: ['credenciales_borradas' => $credenciales],
+        );
+
+        return $credenciales;
+    }
+
+
+    // deja constancia de que se generó un token (nunca el texto del token)
+    public function anotarGeneracion(\DateTimeInterface $vence, ?string $destino = null): void
+    {
+        Auditoria::registrar(
+            evento: 'token_generado',
+            descripcion: "Se generó un token de la API para {$this->nombre}" . ($destino ? " y se envió a {$destino}" : ''),
+            modelo: $this,
+            extra: ['vence' => $vence->format('Y-m-d H:i:s'), 'destino' => $destino],
+        );
+    }
+
+
     public static function tablaColumnas() : array {
         $resultado = [
             TextColumn::make('nombre')

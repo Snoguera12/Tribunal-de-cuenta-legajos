@@ -45,7 +45,8 @@ class TokenPolicy
      */
     public function delete(User $user, Token $token): bool
     {
-        return $user->isAdmin_RRHH();
+        // los clientes de la API no se borran: se revoca el acceso
+        return false;
     }
 
     /**
@@ -61,6 +62,6 @@ class TokenPolicy
      */
     public function forceDelete(User $user, Token $token): bool
     {
-        return $user->isAdmin_RRHH();
+        return false;
     }
 }

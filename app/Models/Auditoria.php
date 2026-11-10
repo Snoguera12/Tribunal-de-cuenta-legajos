@@ -96,6 +96,8 @@ class Auditoria extends Model
             'usuario_deshabilitado' => ['Usuario deshabilitado', 'seguridad', 'aviso'],
             'usuario_habilitado' => ['Usuario habilitado', 'seguridad', 'info'],
             'usuario_no_deshabilitado' => ['Usuario no deshabilitado', 'seguridad', 'alta'],
+            'token_generado' => ['Token de API generado', 'seguridad', 'aviso'],
+            'token_revocado' => ['Token de API revocado', 'seguridad', 'alta'],
             'login_advertencia' => ['Último intento de clave', 'acceso', 'aviso'],
             'cuenta_bloqueada_temporal' => ['Usuario bloqueado (temporal)', 'seguridad', 'alta'],
             'cuenta_bloqueada_permanente' => ['Usuario bloqueado (definitivo)', 'seguridad', 'critica'],

@@ -58,6 +58,19 @@ class BusquedaLegajosTest extends TestCase
             ->assertCanNotSeeTableRecords([$otro]);
     }
 
+    public function test_busca_por_cargo(): void
+    {
+        $buscado = $this->crearLegajo();
+        $buscado->cargo->update(['nombre' => 'Contador Fiscal']);
+        $otro = $this->crearLegajo();
+
+        Livewire::test(ListLegajos::class)
+            ->loadTable()
+            ->searchTable('Contador Fiscal')
+            ->assertCanSeeTableRecords([$buscado])
+            ->assertCanNotSeeTableRecords([$otro]);
+    }
+
     public function test_busca_por_numero_de_legajo(): void
     {
         $buscado = $this->crearLegajo([], ['num_legajo' => 45678]);

@@ -53,6 +53,8 @@ class TokensTable
             throw $e;
         }
 
+        $record->anotarGeneracion($expiraEn, $destino);
+
         // Programa el borrado para el momento del vencimiento (solo si el token quedó creado)
         EliminarTokenVencido::dispatch()->delay($expiraEn->copy()->addSeconds(2));
 
@@ -96,6 +98,8 @@ class TokensTable
 
                         $tokenName = 'Token-' . $record->nombre . '-' . now()->format('YmdHis');
                         $token = $record->createToken($tokenName, ['*'], $expiraEn)->plainTextToken;
+
+                        $record->anotarGeneracion($expiraEn);
 
                         // Programa el borrado para el momento del vencimiento
                         EliminarTokenVencido::dispatch()->delay($expiraEn->copy()->addSeconds(2));
@@ -162,22 +166,20 @@ class TokensTable
                 }),
 
                 Action::make('deleteToken')
-                ->label('Borrar Token')
-                ->icon('heroicon-o-trash')
+                ->label('Revocar acceso')
+                ->icon('heroicon-o-no-symbol')
                 ->color('danger')
                 ->requiresConfirmation()
-                ->modalHeading('¿Borrar / Revocar Token?')
-                ->modalDescription('Esto eliminará de forma permanente cualquier token de Sanctum asociado. El cliente se desactivará de inmediato.')
+                ->modalHeading('¿Revocar el acceso de este cliente?')
+                ->modalDescription('El token deja de funcionar de inmediato y el cliente queda inactivo. El registro del cliente se conserva y se puede generar un token nuevo.')
                 ->action(function (Token $record) {
-                $record->tokens()->delete();
+                    $record->revocar();
 
-                $record->forceDelete();
-
-                Notification::make()
-                ->title('Token borrado con éxito')
-                ->success()
-                ->send();
-            }),
+                    Notification::make()
+                    ->title('Acceso revocado')
+                    ->success()
+                    ->send();
+                }),
         ]);
     }
 
