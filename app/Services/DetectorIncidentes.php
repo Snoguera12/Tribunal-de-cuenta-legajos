@@ -241,15 +241,14 @@ class DetectorIncidentes
 
             $admins = User::where('rol', 'administrador')->get();
 
-            if ($admins->isEmpty()) {
-                return;
+            // aunque no haya administradores cargados, el correo a los destinos extra (ALERTAS_DESTINOS) igual sale
+            if ($admins->isNotEmpty()) {
+                Notification::make()
+                    ->title('Incidente de seguridad: ' . (Incidente::tipos()[$incidente->tipo] ?? $incidente->tipo))
+                    ->body($incidente->descripcion)
+                    ->danger()
+                    ->sendToDatabase($admins);
             }
-
-            Notification::make()
-                ->title('Incidente de seguridad: ' . (Incidente::tipos()[$incidente->tipo] ?? $incidente->tipo))
-                ->body($incidente->descripcion)
-                ->danger()
-                ->sendToDatabase($admins);
 
         } catch (\Throwable $e) {
 
