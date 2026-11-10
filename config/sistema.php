@@ -1,6 +1,16 @@
 <?php
 
 return [
+    // modelos que guardan una copia completa de cada fila antes de modificarla (tablas h_<tabla>)
+    'tablas_historico' => [
+        \App\Models\Persona::class, \App\Models\Legajo::class, \App\Models\Documento::class,
+        \App\Models\Historialbaja::class, \App\Models\User::class, \App\Models\Licencia::class,
+        \App\Models\Area::class, \App\Models\Cargo::class, \App\Models\Categoria::class,
+        \App\Models\Estudio::class, \App\Models\Titulo::class, \App\Models\Institucion::class,
+        \App\Models\Idioma::class, \App\Models\Familiar::class, \App\Models\Curso::class,
+        \App\Models\AntecedenteLaboral::class,
+    ],
+
     // Hora de fin de la jornada laboral (HH:MM), usada por la duración "Hasta el fin de la jornada laboral"
     'fin_jornada' => env('FIN_JORNADA', '18:00'),
 

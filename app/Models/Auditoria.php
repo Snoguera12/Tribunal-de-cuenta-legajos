@@ -89,6 +89,7 @@ class Auditoria extends Model
             'eliminado' => ['Eliminado', 'datos', 'aviso'],
             'eliminado_definitivo' => ['Eliminado definitivo', 'datos', 'alta'],
             'restaurado' => ['Restaurado', 'datos', 'info'],
+            'historico_error' => ['No se pudo guardar el historial', 'seguridad', 'alta'],
             'cambio_rol' => ['Cambio de rol', 'seguridad', 'alta'],
             'cambio_password' => ['Cambio de contraseña', 'seguridad', 'aviso'],
             'cambio_email' => ['Cambio de correo', 'seguridad', 'aviso'],

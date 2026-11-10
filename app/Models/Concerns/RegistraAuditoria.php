@@ -3,6 +3,7 @@
 namespace App\Models\Concerns;
 
 use App\Models\Auditoria;
+use App\Services\HistoricoService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -50,7 +51,14 @@ trait RegistraAuditoria
                 return;
             }
 
-            DB::afterCommit(function () use ($modelo, $cambios, $antes) {
+            // fila completa como estaba antes del cambio
+            $filaAnterior = $modelo->getRawOriginal();
+
+            DB::afterCommit(function () use ($modelo, $cambios, $antes, $filaAnterior) {
+
+                if (HistoricoService::cambioReal($cambios) && in_array(get_class($modelo), config('sistema.tablas_historico', []), true)) {
+                    HistoricoService::guardar($modelo, 'UPDATE', $filaAnterior);
+                }
 
                 Auditoria::registrar(
                     evento: 'modificado',
