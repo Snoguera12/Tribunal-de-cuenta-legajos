@@ -173,7 +173,12 @@ class ArchivoPdfOJpeg implements ValidationRule
     private function validarPdf(string $contenido, Closure $fail, UploadedFile $archivo): void
     {
         foreach (self::PDF_PELIGROSO as $palabra) {
-            if (preg_match('#/' . $palabra . '(?![A-Za-z0-9_+.-])#', $contenido)) {
+            // /OpenAction seguido de [ ... ] es solo "al abrir, mostrar esta pagina" (un destino): no ejecuta nada
+            // y lo escriben muchos programas. Si apunta a otro objeto (/OpenAction 5 0 R) o a un diccionario
+            // puede ser una accion real, y eso se sigue rechazando.
+            $permitirDestino = $palabra === 'OpenAction' ? '(?!\s*\[)' : '';
+
+            if (preg_match('#/' . $palabra . $permitirDestino . '(?![A-Za-z0-9_+.-])#', $contenido)) {
                 $this->rechazar($fail, $archivo, "pdf con /{$palabra}",
                     'El PDF contiene contenido activo (JavaScript, acciones automáticas o archivos embebidos) no permitido y fue rechazado por seguridad.');
                 return;

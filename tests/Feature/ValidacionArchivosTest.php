@@ -63,6 +63,21 @@ class ValidacionArchivosTest extends TestCase
         $this->assertTrue($this->falla($this->archivo('accion.pdf', $pdf)));
     }
 
+    public function test_acepta_un_pdf_con_destino_de_apertura(): void
+    {
+        // /OpenAction [pagina /Fit] solo indica que pagina mostrar al abrir: es inofensivo
+        $pdf = $this->pdfDePrueba('<</Type/Catalog/OpenAction [3 0 R /Fit]>>');
+
+        $this->assertFalse($this->falla($this->archivo('destino.pdf', $pdf)));
+    }
+
+    public function test_rechaza_una_apertura_con_accion_de_javascript(): void
+    {
+        $pdf = $this->pdfDePrueba('<</Type/Catalog/OpenAction<</S/JavaScript/JS(app.alert(1))>>>>');
+
+        $this->assertTrue($this->falla($this->archivo('accion.pdf', $pdf)));
+    }
+
     public function test_rechaza_un_pdf_sin_cierre(): void
     {
         $this->assertTrue($this->falla($this->archivo('cortado.pdf', "%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\n")));
