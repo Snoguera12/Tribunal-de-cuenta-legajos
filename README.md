@@ -58,3 +58,11 @@ Nuestro aporte incluye:
 - Adjuntar archivos PDF/JPG.  
 - Buscar legajos por atributos (Nº, Nombre, DNI, cargo).  
 
+
+
+ Requisitos técnicos del servidor
+- PHP 8.4 o superior (con las extensiones mbstring, xml, curl, zip, intl, gd y la del motor de base de datos).
+- Apache 2.4 con PHP, base de datos MySQL/MariaDB y Composer.
+- Node.js y npm, solo para compilar los estilos del panel (npm run build) al instalar o actualizar.
+- Ghostscript, para reducir el tamaño de los PDF.
+- Un proceso de colas y una tarea programada (cron) activos. Los pasos están al final de .env.production.example.
