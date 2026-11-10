@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\AlcanceEmpleado;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use App\Models\Concerns\NoSeBorra;
 use App\Models\Concerns\RegistraAuditoria;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 
+#[ScopedBy([AlcanceEmpleado::class])]
 class Licencia extends Model
 {
     use NoSeBorra, RegistraAuditoria;

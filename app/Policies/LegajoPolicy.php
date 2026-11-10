@@ -12,13 +12,13 @@ class LegajoPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin() || $user->isRRHH() || $user->isFuncionario();
+        return $user->isStaffRoles();
     }
 
     public function view(User $user, Legajo $legajo): bool
     {
-        if ($user->isAdmin() || $user->isRRHH()) {
-            return true;
+        if ($user->isStaffRoles()) {
+            return $user->isStaffRoles();
         }
 
         return $user->persona_id !== null && $user->persona_id === $legajo->persona_id;
@@ -29,7 +29,7 @@ class LegajoPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isAdmin_RRHH();
     }
 
     /**
@@ -37,7 +37,7 @@ class LegajoPolicy
      */
     public function update(User $user, Legajo $legajo): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isAdmin_RRHH();
     }
 
     /**

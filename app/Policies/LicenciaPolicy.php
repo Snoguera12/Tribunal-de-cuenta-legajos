@@ -12,13 +12,13 @@ class LicenciaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return $user->isStaffRoles();
     }
 
     public function view(User $user, Licencia $licencia): bool
     {
-        if ($user->isAdmin() || $user->isRRHH()) {
-            return true;
+        if ($user->isStaffRoles()) {
+            return $user->isStaffRoles();
         }
 
         return $user->persona_id !== null

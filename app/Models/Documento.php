@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\AlcanceEmpleado;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use App\Models\Concerns\NoSeBorra;
 use App\Models\Concerns\RegistraAuditoria;
 use App\Enums\TipodocEnum;
@@ -21,6 +23,7 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Legajo;
 
+#[ScopedBy([AlcanceEmpleado::class])]
 class Documento extends Model
 {
     use NoSeBorra, RegistraAuditoria;
