@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
+use App\Services\ControlIntentosLogin;
 use Filament\Actions\Action;
+use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Auth\Pages\Login as BaseLogin;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Verificado contra Filament v4.11.4 y contra el modelo App\Models\User,
@@ -20,6 +23,28 @@ use Filament\Schemas\Schema;
 class Login extends BaseLogin
 {
     protected string $view = 'filament.pages.auth.login';
+
+    // Control de intentos de clave (ver config/sistema.php, 'login')
+    public function authenticate(): ?LoginResponse
+    {
+        $email = ControlIntentosLogin::normalizar($this->data['email'] ?? '');
+
+        // en espera (20 s) o bloqueado: ni se mira la clave
+        if ($email !== '' && ($bloqueo = ControlIntentosLogin::bloqueoActual($email))) {
+            throw ValidationException::withMessages(['data.email' => $bloqueo]);
+        }
+
+        try {
+            return parent::authenticate();
+        } catch (ValidationException $e) {
+            // si fue clave mala, el mensaje dice cuántos intentos quedan
+            if ($mensaje = request()->attributes->get('login_mensaje')) {
+                throw ValidationException::withMessages(['data.email' => $mensaje]);
+            }
+
+            throw $e;
+        }
+    }
 
     public function form(Schema $schema): Schema
     {

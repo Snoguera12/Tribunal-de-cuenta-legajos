@@ -38,6 +38,9 @@ class User extends Authenticatable implements FilamentUser
         'password',
         'rol',
         'persona_id',
+        'habilitado',
+        'deshabilitado_motivo',
+        'deshabilitado_en',
     ];
     public function persona(): BelongsTo
     {
@@ -63,9 +66,75 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'habilitado' => 'boolean',
+            'deshabilitado_en' => 'datetime',
         ];
     }
     
+    // al deshabilitar se anota el motivo y la fecha; al habilitar se limpian
+    protected static function booted(): void
+    {
+        static::saving(function (User $usuario) {
+            if (! $usuario->isDirty('habilitado')) {
+                return;
+            }
+
+            if ($usuario->isHabilitado()) {
+                $usuario->deshabilitado_motivo = null;
+                $usuario->deshabilitado_en = null;
+            } else {
+                $usuario->deshabilitado_motivo ??= 'manual';
+                $usuario->deshabilitado_en = now();
+            }
+        });
+    }
+
+    // un usuario recién creado todavía no trae la columna: cuenta como habilitado
+    public function isHabilitado(): bool
+    {
+        return (bool) ($this->habilitado ?? true);
+    }
+
+    public function loginIntento(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(LoginIntento::class);
+    }
+
+    // cierra todo lo que tenga abierto el usuario (sesiones del panel y tokens)
+    public function cerrarSesiones(): void
+    {
+        if (\Illuminate\Support\Facades\Schema::hasTable('sessions')) {
+            \Illuminate\Support\Facades\DB::table('sessions')->where('user_id', $this->id)->delete();
+        }
+
+        $this->tokens()?->delete();
+    }
+
+    // lo llama el trait RegistraAuditoria cuando cambia algo sensible del usuario
+    public function auditoriaEspecial(array $cambios, array $antes): void
+    {
+        if (! array_key_exists('habilitado', $cambios)) {
+            return;
+        }
+
+        $habilitado = (bool) $cambios['habilitado'];
+
+        if (! $habilitado) {
+            $this->cerrarSesiones();
+        } else {
+            // si lo habilita el administrador, empieza de cero con los intentos de clave
+            \App\Services\ControlIntentosLogin::reiniciar($this);
+        }
+
+        Auditoria::registrar(
+            evento: $habilitado ? 'usuario_habilitado' : 'usuario_deshabilitado',
+            descripcion: ($habilitado ? 'Se habilitó' : 'Se deshabilitó') . " al usuario {$this->name}"
+                . (! $habilitado ? " (motivo: {$this->deshabilitado_motivo})" : ''),
+            modelo: $this,
+            extra: ['motivo' => $this->deshabilitado_motivo],
+        );
+    }
+
     public function isEmpleado(){
         return $this->rol == 'empleado';
     }
@@ -88,7 +157,8 @@ class User extends Authenticatable implements FilamentUser
     }
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->isAdmin() || $this->isRRHH() || $this->isFuncionario() || $this->isEmpleado();
+        // un usuario deshabilitado no entra aunque tenga la sesión abierta
+        return $this->isHabilitado() && ($this->isAdmin() || $this->isRRHH() || $this->isFuncionario() || $this->isEmpleado());
     }
     public static function getFormSchema(bool $visible_persona_id): array
     {
@@ -132,6 +202,12 @@ class User extends Authenticatable implements FilamentUser
             ->default(request()->query('persona_id'))
             ->options($array_personas),
 
+            \Filament\Forms\Components\Toggle::make('habilitado')
+            ->label('Usuario habilitado')
+            ->helperText('Un usuario deshabilitado no puede ingresar al sistema.')
+            ->default(true)
+            ->visible(fn (): bool => (bool) auth()->user()?->isAdmin())
+            ->disabled(fn ($record): bool => $record?->id === auth()->id()),
         ];
         return $resultado;
     }
