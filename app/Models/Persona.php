@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\NoSeBorra;
+use App\Models\Concerns\RegistraAuditoria;
 use App\Enums\EstadoCivilEnum;
 use App\Enums\GeneroEnum;
 use Filament\Forms\Components\DatePicker;
@@ -16,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Persona extends Model
 {
-    use NoSeBorra;
+    use NoSeBorra, RegistraAuditoria;
 
     protected $casts = [
         'genero' => GeneroEnum::class,

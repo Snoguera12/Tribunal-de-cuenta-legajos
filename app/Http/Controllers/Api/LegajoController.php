@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Auditoria;
 use App\Models\Legajo;
 use App\Models\Persona;
 use App\Models\Token;
@@ -13,8 +14,21 @@ class LegajoController extends Controller
     public function show_dni(Request $request, $dni){
         $client = $request->user();
         if (!($client instanceof Token) || !$client->is_active) {
+            Auditoria::registrar(
+                evento: 'api_denegado',
+                descripcion: 'Consulta de legajo por DNI rechazada',
+                extra: ['dni' => $dni],
+            );
+
             return response()->json(['error' => 'Acceso no autorizado o cliente inactivo.'], 403);
         }
+
+        Auditoria::registrar(
+            evento: 'api_consulta',
+            descripcion: 'Consultó legajos por DNI',
+            actor: $client,
+            extra: ['dni' => $dni],
+        );
 
         $persona = Persona::where('dni', $dni)->firstOrFail();
 

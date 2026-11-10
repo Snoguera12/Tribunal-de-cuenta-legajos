@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\NoSeBorra;
+use App\Models\Concerns\RegistraAuditoria;
 use App\Enums\EstadoLegajoEnum;
 use App\Enums\TipoContratoEnum;
 use App\Filament\Forms\Components\RepeaterAdjuntable;
@@ -22,7 +23,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Legajo extends Model
 {
-    use NoSeBorra;
+    use NoSeBorra, RegistraAuditoria;
 
     protected $attributes = [
         "estado" => true,

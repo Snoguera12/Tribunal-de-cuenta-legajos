@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\NoSeBorra;
+use App\Models\Concerns\RegistraAuditoria;
 use App\Enums\TipodocEnum;
 use App\Filament\Forms\Components\ArchivoDocumento;
 use App\Filament\Forms\Components\RepeaterAdjuntable;
@@ -22,7 +23,7 @@ use App\Models\Legajo;
 
 class Documento extends Model
 {
-    use NoSeBorra;
+    use NoSeBorra, RegistraAuditoria;
 
     private static $TIEMPO_ACCESO = 30;
     protected $casts = [

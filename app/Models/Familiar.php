@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\NoSeBorra;
+use App\Models\Concerns\RegistraAuditoria;
 use App\Enums\FamiliarViveEnum;
 use App\Enums\ParentescoEnum;
 use App\Filament\Forms\Components\RepeaterAdjuntable;
@@ -17,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Familiar extends Model
 {
-    use NoSeBorra;
+    use NoSeBorra, RegistraAuditoria;
 
     protected $casts = [
         'parentesco' => ParentescoEnum::class,

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\NoSeBorra;
+use App\Models\Concerns\RegistraAuditoria;
 use App\Enums\NivelEstudioEnum;
 use App\Filament\Forms\Components\RepeaterAdjuntable;
 use Filament\Actions\Action;
@@ -19,7 +20,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Estudio extends Model
 {
-    use NoSeBorra;
+    use NoSeBorra, RegistraAuditoria;
 
     protected $casts = [
         'nivel_estudio' => NivelEstudioEnum::class,

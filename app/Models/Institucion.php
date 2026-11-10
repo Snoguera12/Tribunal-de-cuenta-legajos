@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\Select;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Institucion extends Model
 {
+    use RegistraAuditoria;
+
     
     private const OTRO = '__otro__';
     protected $fillable = [

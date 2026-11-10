@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Auditoria;
 use App\Models\Token;
 use App\Models\Persona;
 use Illuminate\Http\Request;
@@ -15,8 +16,19 @@ class PersonaController extends Controller
 
         // Validamos si el cliente no está usando el modelo User y si está activo
         if (!($client instanceof Token) || !$client->is_active) {
+            Auditoria::registrar(
+                evento: 'api_denegado',
+                descripcion: 'Consulta del listado de personas rechazada',
+            );
+
             return response()->json(['error' => 'Acceso no autorizado o cliente inactivo.'], 403);
         }
+
+        Auditoria::registrar(
+            evento: 'api_consulta',
+            descripcion: 'Consultó el listado de personas',
+            actor: $client,
+        );
 
         $personas = Persona::all();
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
 use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Titulo extends Model
 {
+    use RegistraAuditoria;
+
     protected $fillable = [
         'nombre',
     ];

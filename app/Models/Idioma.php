@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 
 class Idioma extends Model
 {
+    use RegistraAuditoria;
+
     protected $fillable = [
         'nombre',
     ];

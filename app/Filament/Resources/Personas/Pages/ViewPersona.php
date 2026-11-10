@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Personas\Pages;
 
 use App\Filament\Resources\Personas\PersonaResource;
+use App\Models\Auditoria;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Support\HtmlString;
@@ -11,6 +12,18 @@ use Illuminate\Support\Js;
 class ViewPersona extends ViewRecord
 {
     protected static string $resource = PersonaResource::class;
+
+    // las lecturas también se auditan
+    public function mount(int | string $record): void
+    {
+        parent::mount($record);
+
+        Auditoria::registrar(
+            evento: 'ver_persona',
+            descripcion: 'Abrió el perfil de ' . $this->record->nombre . ' ' . $this->record->apellido,
+            modelo: $this->record,
+        );
+    }
 
     // id del tab => [artículo, nombre]. Se cambia acá y se actualiza el botón.
     protected const EDICION_POR_TAB = [

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraAuditoria;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Filament\Schemas\Components\Utilities\Get;
@@ -21,6 +22,8 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements FilamentUser
 {
+    use RegistraAuditoria;
+
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
 

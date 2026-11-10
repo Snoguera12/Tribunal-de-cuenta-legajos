@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Auditoria;
 use App\Models\Documento;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -14,6 +15,12 @@ class DocumentoDownloadController extends Controller
     public function __invoke(Documento $documento): StreamedResponse
     {
         Gate::authorize('view', $documento);
+
+        Auditoria::registrar(
+            evento: 'ver_documento',
+            descripcion: 'Abrió el documento ' . ($documento->nombre_original ?: basename((string) $documento->ruta)),
+            modelo: $documento,
+        );
 
         abort_unless($documento->ruta && Storage::disk('local')->exists($documento->ruta), 404);
 
