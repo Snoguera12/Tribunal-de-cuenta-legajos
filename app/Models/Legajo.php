@@ -89,7 +89,19 @@ class Legajo extends Model
             ->placeholder('Ej. 1045')
             ->required()
             ->numeric()
-            ->unique(table: 'legajos', column: 'num_legajo', ignoreRecord: true) // Corregido: ignoreRecord evita fallos al editar
+            ->unique(
+                table: 'legajos',
+                column: 'num_legajo',
+                ignoreRecord: true,
+                modifyRuleUsing: function (\Illuminate\Validation\Rules\Unique $rule, $component) {
+                    // dentro del repetidor de la persona, el legajo ya existente figura como "record-<id>"
+                    if (preg_match('/record-(\d+)/', $component->getStatePath(), $m)) {
+                        $rule->ignore((int) $m[1]);
+                    }
+
+                    return $rule;
+                },
+            )
             ->rules(['gt:0'])
             ->minLength(1)
             ->validationMessages([
