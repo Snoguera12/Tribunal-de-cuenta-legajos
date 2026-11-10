@@ -28,6 +28,9 @@ return [
 
     // Optimización de los documentos al guardarlos (se cifran siempre; esto es solo la recompresión)
     'documentos' => [
+        // true: los documentos nuevos se guardan cifrados (AES-256 con la APP_KEY).
+        // false: se guardan sin cifrar (igual se recomprimen). Los ya cifrados se siguen abriendo en los dos casos.
+        'cifrar' => (bool) env('DOC_CIFRAR', true),
         // false: se guarda el archivo tal cual llegó (igual se cifra)
         'optimizar' => (bool) env('DOC_OPTIMIZAR', true),
         // calidad del jpeg al recomprimir (1-100)
@@ -38,6 +41,25 @@ return [
         'pdf_perfil' => env('DOC_PDF_PERFIL', 'ebook'),
         // si no se ahorra al menos esto (0.05 = 5%) se guarda el original
         'ahorro_minimo' => (float) env('DOC_AHORRO_MINIMO', 0.05),
+    ],
+
+    // Copias de seguridad (sistema:backup). Incluyen la base, los documentos y la configuración.
+    'backup' => [
+        // discos donde se copia cada backup (el primero es el principal): backups, backups_externo
+        'discos' => array_filter(explode(',', (string) env('BACKUP_DISCOS', 'backups'))),
+        // clave del zip (AES-256). Sin ella el zip no va cifrado y NO se incluye el .env (que tiene la APP_KEY)
+        'password' => env('BACKUP_ARCHIVE_PASSWORD'),
+        'incluir_env' => (bool) env('BACKUP_INCLUIR_ENV', true),
+        // si el último backup es más viejo que esto, sistema:backup-verificar lo anota como incidente
+        'horas_maximas' => 26,
+
+        // cuánto tiempo se guardan
+        'retencion' => [
+            'todos_dias' => 7,
+            'diarios_dias' => 30,
+            'semanales_semanas' => 12,
+            'mensuales_meses' => 24,
+        ],
     ],
 
     'login' => [

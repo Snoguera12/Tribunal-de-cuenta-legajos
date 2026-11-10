@@ -46,10 +46,11 @@ class ArchivoSeguro
         $extension = str_starts_with($optimizado['contenido'], '%PDF-') ? 'pdf' : 'jpg';
         $ruta = trim($directorio, '/') . '/' . self::nombreDesdeContenido($optimizado['contenido']) . '.' . $extension;
 
+        $cifrar = (bool) config('sistema.documentos.cifrar');
         $repetido = Storage::disk('local')->exists($ruta);
 
         if (! $repetido) {
-            Storage::disk('local')->put($ruta, self::encriptar($optimizado['contenido']));
+            Storage::disk('local')->put($ruta, $cifrar ? self::encriptar($optimizado['contenido']) : $optimizado['contenido']);
         }
 
         Auditoria::registrar(
@@ -63,6 +64,7 @@ class ArchivoSeguro
                 'ahorro' => $optimizado['antes'] > 0 ? round(100 - $optimizado['despues'] * 100 / $optimizado['antes']) . '%' : '0%',
                 'metodo' => $optimizado['metodo'],
                 'sha256_original' => hash('sha256', $original),
+                'cifrado' => $repetido ? 'ya existía' : ($cifrar ? 'si' : 'no'),
                 'ya_existia' => $repetido ? 'si' : 'no',
             ],
         );

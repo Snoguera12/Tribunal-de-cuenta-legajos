@@ -25,3 +25,25 @@ Schedule::command('auditoria:verificar')
 Schedule::command('recordatorios:enviar')
     ->dailyAt('07:30')
     ->onOneServer();
+
+// ---------------------------------------------------------------- copias de seguridad
+
+// backup completo (base + documentos + configuración) todos los días
+Schedule::command('sistema:backup')
+    ->dailyAt('03:00')
+    ->onOneServer();
+
+// solo la base, cada 6 horas
+Schedule::command('sistema:backup --tipo=db')
+    ->everySixHours()
+    ->onOneServer();
+
+// se revisa que el backup exista, sea reciente y no esté roto
+Schedule::command('sistema:backup-verificar')
+    ->dailyAt('03:30')
+    ->onOneServer();
+
+// se borran los backups que ya pasaron el tiempo de retención
+Schedule::command('sistema:backup-limpiar')
+    ->dailyAt('04:00')
+    ->onOneServer();
