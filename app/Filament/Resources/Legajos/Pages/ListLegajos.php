@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources\Legajos\Pages;
 
+use App\Filament\Services\Exports\LegajoExporter;
 use App\Models\Legajo;
 use App\Filament\Resources\Legajos\LegajoResource;
 use App\Filament\Resources\Licencias\LicenciaResource;
 use App\Models\Licencia;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
+use Filament\Actions\ExportAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Icons\Heroicon;
 
@@ -45,6 +47,12 @@ class ListLegajos extends ListRecords
                 ->color('gray')
                 ->url(fn () => LicenciaResource::getUrl('index'))
                 ->visible(fn () => auth()->user()?->can('viewAny', Licencia::class) ?? false),
+
+            // Informe de la lista de legajos en Excel/CSV (el empleado no lo ve)
+            ExportAction::make()
+                ->label('Exportar')
+                ->exporter(LegajoExporter::class)
+                ->visible(fn () => auth()->user()?->isStaffRoles() ?? false),
 
             CreateAction::make(),
         ];
