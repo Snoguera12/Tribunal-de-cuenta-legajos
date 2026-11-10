@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Token;
+use App\Rules\ArchivoPdfOJpeg;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -53,7 +54,7 @@ class StoreLicenciaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'archivo' => ['required', 'file', 'mimes:pdf', 'max:10240'],
+            'archivo' => ['required', 'file', 'mimes:pdf', 'max:10240', new ArchivoPdfOJpeg()],
             'solicitud_id' => ['required', 'integer', 'min:1'],
             'fecha_inicio' => ['required', 'date_format:Y-m-d'],
             'fecha_fin' => ['required', 'date_format:Y-m-d', 'after_or_equal:fecha_inicio'],

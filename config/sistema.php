@@ -15,6 +15,17 @@ return [
         'inactividad_minutos' => (int) env('SESION_UNICA_INACTIVIDAD', 10),
     ],
 
+    // Antivirus para los archivos que se suben o llegan por la API (apagado por defecto).
+    // Necesita un programa instalado en el servidor, por ejemplo ClamAV: sudo apt install clamav
+    'antivirus' => [
+        'activo' => (bool) env('ANTIVIRUS_ACTIVO', false),
+        // el archivo a revisar se agrega al final. Sale con 0 = limpio, 1 = amenaza, otro número = error del programa
+        'comando' => env('ANTIVIRUS_COMANDO', 'clamscan --no-summary'),
+        // si el programa no funciona: 'permitir' (se acepta el archivo y se anota) o 'rechazar'
+        'si_falla' => env('ANTIVIRUS_SI_FALLA', 'permitir'),
+        'timeout' => (int) env('ANTIVIRUS_TIMEOUT', 30),
+    ],
+
     'login' => [
         'intentos_por_tanda' => 5,
         'espera_segundos' => 20,

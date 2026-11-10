@@ -117,6 +117,7 @@ class Auditoria extends Model
             'ver_legajo' => ['Vio un legajo', 'datos', 'info'],
             'ver_documento' => ['Abrió un documento', 'documento', 'info'],
             'archivo_subido' => ['Archivo subido', 'documento', 'info'],
+            'antivirus_error' => ['Antivirus no pudo revisar un archivo', 'seguridad', 'alta'],
             'archivo_rechazado' => ['Archivo rechazado', 'seguridad', 'alta'],
             'archivo_ilegible' => ['Archivo ilegible', 'documento', 'alta'],
 
