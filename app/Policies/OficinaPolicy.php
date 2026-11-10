@@ -44,7 +44,7 @@ class OficinaPolicy
      */
     public function delete(User $user, Oficina $oficina): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 
     /**
@@ -52,7 +52,7 @@ class OficinaPolicy
      */
     public function restore(User $user, Oficina $oficina): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 
     /**
@@ -60,6 +60,6 @@ class OficinaPolicy
      */
     public function forceDelete(User $user, Oficina $oficina): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 }

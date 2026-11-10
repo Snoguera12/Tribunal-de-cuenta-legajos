@@ -44,7 +44,7 @@ class TituloPolicy
      */
     public function delete(User $user, Titulo $titulo): bool
     {
-        return $user->isAdmin();
+        return false;
     }
 
     /**
@@ -52,7 +52,7 @@ class TituloPolicy
      */
     public function restore(User $user, Titulo $titulo): bool
     {
-        return $user->isAdmin();
+        return false;
     }
 
     /**
@@ -60,6 +60,6 @@ class TituloPolicy
      */
     public function forceDelete(User $user, Titulo $titulo): bool
     {
-        return $user->isAdmin();
+        return false;
     }
 }

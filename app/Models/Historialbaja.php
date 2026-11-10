@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\NoSeBorra;
 use App\Enums\MotivoBajaEnum;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 
 class Historialbaja extends Model
 {
+    use NoSeBorra;
+
     protected $casts = [
         "motivo" => MotivoBajaEnum::class,
     ];

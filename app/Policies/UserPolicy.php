@@ -61,7 +61,7 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 
     /**
@@ -69,7 +69,7 @@ class UserPolicy
      */
     public function restore(User $user, User $model): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 
     /**
@@ -77,6 +77,6 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 }

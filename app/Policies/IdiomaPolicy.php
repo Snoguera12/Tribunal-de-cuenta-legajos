@@ -45,7 +45,7 @@ class IdiomaPolicy
      */
     public function delete(User $user, Idioma $idioma): bool
     {
-        return $user->isAdmin();
+        return false;
     }
 
     /**
@@ -53,7 +53,7 @@ class IdiomaPolicy
      */
     public function restore(User $user, Idioma $idioma): bool
     {
-        return $user->isAdmin();
+        return false;
     }
 
     /**
@@ -61,6 +61,6 @@ class IdiomaPolicy
      */
     public function forceDelete(User $user, Idioma $idioma): bool
     {
-        return $user->isAdmin();
+        return false;
     }
 }

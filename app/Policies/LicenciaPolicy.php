@@ -38,7 +38,7 @@ class LicenciaPolicy
 
     public function delete(User $user, Licencia $licencia): bool
     {
-        return $user->isAdmin();
+        return false;
     }
 
     public function restore(User $user, Licencia $licencia): bool

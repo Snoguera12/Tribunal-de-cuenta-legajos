@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('parentesco');
             $table->date('fecha_de_nacimiento')->nullable();
             $table->boolean('vive');
-            $table->foreignId('persona_id')->nullable()->constrained('personas')->cascadeOnDelete();
+            $table->foreignId('persona_id')->nullable()->constrained('personas')->nullOnDelete();
             $table->timestamps();
         });
     }

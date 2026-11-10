@@ -44,7 +44,7 @@ class EstudioPolicy
      */
     public function delete(User $user, Estudio $estudio): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 
     /**
@@ -52,7 +52,7 @@ class EstudioPolicy
      */
     public function restore(User $user, Estudio $estudio): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 
     /**
@@ -60,6 +60,6 @@ class EstudioPolicy
      */
     public function forceDelete(User $user, Estudio $estudio): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 }

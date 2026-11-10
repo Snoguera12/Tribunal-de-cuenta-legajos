@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\NoSeBorra;
 use App\Filament\Tables\ConteoLegajos;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
@@ -9,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Area extends Model
 {
+    use NoSeBorra;
+
     protected $fillable = [
         "nombre",
         'descripcion',

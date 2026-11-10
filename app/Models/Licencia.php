@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\NoSeBorra;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 
 class Licencia extends Model
 {
+    use NoSeBorra;
+
     protected $casts = [
         'fecha_inicio' => 'date',
         'fecha_fin' => 'date',

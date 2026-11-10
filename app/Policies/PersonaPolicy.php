@@ -33,16 +33,16 @@ class PersonaPolicy
 
     public function delete(User $user, Persona $persona): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 
     public function restore(User $user, Persona $persona): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 
     public function forceDelete(User $user, Persona $persona): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 }

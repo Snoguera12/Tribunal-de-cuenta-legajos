@@ -23,8 +23,8 @@ return new class extends Migration
         // Un documento puede estar asignado a varios legajos sin repetir el archivo
         Schema::create('documento_legajo', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('documento_id')->constrained('documentos')->cascadeOnDelete();
-            $table->foreignId('legajo_id')->constrained('legajos')->cascadeOnDelete();
+            $table->foreignId('documento_id')->constrained('documentos')->restrictOnDelete();
+            $table->foreignId('legajo_id')->constrained('legajos')->restrictOnDelete();
             $table->timestamps();
             $table->unique(['documento_id', 'legajo_id']);
         });

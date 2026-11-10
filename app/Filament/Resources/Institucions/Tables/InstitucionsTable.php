@@ -5,7 +5,6 @@ namespace App\Filament\Resources\Institucions\Tables;
 use App\Models\Institucion;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Table;

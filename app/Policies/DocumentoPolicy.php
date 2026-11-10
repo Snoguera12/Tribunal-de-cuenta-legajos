@@ -48,7 +48,7 @@ class DocumentoPolicy
      */
     public function delete(User $user, Documento $documento): bool
     {
-        return $user->isAdmin_RRHH();
+        return false;
     }
 
     /**
@@ -56,7 +56,7 @@ class DocumentoPolicy
      */
     public function restore(User $user, Documento $documento): bool
     {
-        return $user->isAdmin_RRHH();
+        return false;
     }
 
     /**
@@ -64,6 +64,6 @@ class DocumentoPolicy
      */
     public function forceDelete(User $user, Documento $documento): bool
     {
-        return $user->isAdmin_RRHH();
+        return false;
     }
 }

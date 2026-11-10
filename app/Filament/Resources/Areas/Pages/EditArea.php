@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Areas\Pages;
 
 use App\Filament\Resources\Areas\AreaResource;
-use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditArea extends EditRecord
@@ -13,7 +12,6 @@ class EditArea extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make(),
         ];
     }
 }

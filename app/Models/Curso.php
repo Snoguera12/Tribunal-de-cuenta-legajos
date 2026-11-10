@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\NoSeBorra;
 use App\Filament\Forms\Components\RepeaterAdjuntable;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Curso extends Model
 {
+    use NoSeBorra;
+
     protected $fillable = [
         'persona_id',
         'institucion_id',

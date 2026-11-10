@@ -45,7 +45,7 @@ class InstitucionPolicy
      */
     public function delete(User $user, Institucion $institucion): bool
     {
-        return $user->isAdmin();
+        return false;
     }
 
     /**
@@ -53,7 +53,7 @@ class InstitucionPolicy
      */
     public function restore(User $user, Institucion $institucion): bool
     {
-        return $user->isAdmin();
+        return false;
     }
 
     /**
@@ -61,6 +61,6 @@ class InstitucionPolicy
      */
     public function forceDelete(User $user, Institucion $institucion): bool
     {
-        return $user->isAdmin();
+        return false;
     }
 }

@@ -45,7 +45,7 @@ class LegajoPolicy
      */
     public function delete(User $user, Legajo $legajo): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 
     /**
@@ -53,7 +53,7 @@ class LegajoPolicy
      */
     public function restore(User $user, Legajo $legajo): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 
     /**
@@ -61,6 +61,6 @@ class LegajoPolicy
      */
     public function forceDelete(User $user, Legajo $legajo): bool
     {
-        return $user->isAdmin() || $user->isRRHH();
+        return false;
     }
 }

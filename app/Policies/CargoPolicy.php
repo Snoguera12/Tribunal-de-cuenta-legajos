@@ -44,7 +44,7 @@ class CargoPolicy
      */
     public function delete(User $user, Cargo $cargo): bool
     {
-        return $user->isAdmin_RRHH() && ! $cargo->legajos()->exists();;
+        return false;
     }
 
     /**
