@@ -34,6 +34,7 @@ class SistemaResumenDiario extends Command
             'Incidentes nuevos' => Incidente::where('created_at', '>=', $desde)->count(),
             'Incidentes abiertos en total' => Incidente::where('estado', 'abierto')->count(),
             'Usuarios deshabilitados' => User::where('habilitado', false)->count(),
+            'Usuarios con clave provisoria hace más de 7 días' => User::where('debe_cambiar_clave', true)->where('created_at', '<', now()->subDays(7))->count(),
             'Cuentas bloqueadas por claves incorrectas' => \App\Models\LoginIntento::where('permanente', true)->orWhere('bloqueado_hasta', '>', now())->count(),
             'Último backup' => $ultimoBackup ? $ultimoBackup->created_at->format('d/m/Y H:i') : 'NO HAY',
         ];

@@ -40,6 +40,13 @@ class UsersTable
                         default => 'gray',
                     }),
 
+                TextColumn::make('debe_cambiar_clave')
+                    ->label('Clave provisoria')
+                    ->formatStateUsing(fn ($state) => $state ? 'Sí' : 'No')
+                    ->badge()
+                    ->color(fn ($state) => $state ? 'warning' : 'gray')
+                    ->toggleable(),
+
                 TextColumn::make('sesion_activa_desde')
                     ->label('Sesión abierta desde')
                     ->dateTime('d/m/Y H:i')

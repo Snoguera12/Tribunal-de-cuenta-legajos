@@ -2,16 +2,23 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\NoSeBorra;
 use App\Models\Concerns\RegistraAuditoria;
+use App\Models\Concerns\SeFusiona;
+use App\Models\Scopes\SoloVigentes;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 
+#[ScopedBy([SoloVigentes::class])]
 class Titulo extends Model
 {
-    use RegistraAuditoria;
+    use NoSeBorra, RegistraAuditoria, SeFusiona;
+
+    public const LARGO_NOMBRE = 100;
 
     protected $fillable = [
         'nombre',
@@ -64,11 +71,12 @@ class Titulo extends Model
             $this->estudioTitulos()->get()->each(function (EstudioTitulo $et) use ($destino) {
                 EstudioTitulo::where(
                     'estudio_id', $et->estudio_id)->where('titulo_id', $destino->id)->exists()
-                    ? $et->delete()
+                    // el estudio ya tenía el título destino: este queda descartado (no se borra)
+                    ? $et->update(['descartado_en' => now()])
                     : $et->update(['titulo_id' => $destino->id]);
             });
 
-            $this->delete();
+            $this->marcarFusionado($destino);
         });
     }
 }

@@ -2,15 +2,22 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\NoSeBorra;
 use App\Models\Concerns\RegistraAuditoria;
+use App\Models\Concerns\SeFusiona;
+use App\Models\Scopes\SoloVigentes;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
+#[ScopedBy([SoloVigentes::class])]
 class Idioma extends Model
 {
-    use RegistraAuditoria;
+    use NoSeBorra, RegistraAuditoria, SeFusiona;
+
+    public const LARGO_NOMBRE = 100;
 
     protected $fillable = [
         'nombre',
@@ -35,7 +42,7 @@ class Idioma extends Model
                     : ['idioma_id' => $destino->id]);
             });
 
-            $this->delete();
+            $this->marcarFusionado($destino);
         });
     }
 

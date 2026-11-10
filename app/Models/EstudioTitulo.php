@@ -1,6 +1,9 @@
 <?php
 namespace App\Models;
 
+use App\Models\Concerns\NoSeBorra;
+use App\Models\Scopes\SinDescartar;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\Select;
@@ -9,14 +12,18 @@ use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
+#[ScopedBy([SinDescartar::class])]
 class EstudioTitulo extends Model
 {
+    use NoSeBorra;
+
     public const OTRO = '__otro__';
     protected $table = 'estudio_titulos';
     protected $fillable = [
         'estudio_id',
         'titulo_id',
-        'titulo_otro'
+        'titulo_otro',
+        'descartado_en',
     ];
 
     public function estudio() {
@@ -52,7 +59,8 @@ class EstudioTitulo extends Model
                 ->exists();
 
                 $yaLoTiene
-                    ? $registro->delete()
+                    // el estudio ya tenía ese título: el repetido queda descartado (no se borra)
+                    ? $registro->update(['descartado_en' => now()])
                     : $registro->update(['titulo_id' => $tituloId, 'titulo_otro' => null]);
             }
         });

@@ -1,7 +1,11 @@
 <?php
 namespace App\Models;
 
+use App\Models\Concerns\NoSeBorra;
 use App\Models\Concerns\RegistraAuditoria;
+use App\Models\Concerns\SeFusiona;
+use App\Models\Scopes\SoloVigentes;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\Select;
@@ -11,9 +15,12 @@ use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
+#[ScopedBy([SoloVigentes::class])]
 class Institucion extends Model
 {
-    use RegistraAuditoria;
+    use NoSeBorra, RegistraAuditoria, SeFusiona;
+
+    public const LARGO_NOMBRE = 300;
 
     
     private const OTRO = '__otro__';
@@ -41,7 +48,9 @@ class Institucion extends Model
             ->selectRaw("id * 2 + 1 as id, 'Curso' as origen, id as registro_id,
                 institucion_otro, NULL as nivel_estudio, nombre as curso, created_at");
 
-        return static::query()->fromSub($estudios->unionAll($cursos), (new static)->getTable());
+        // es una tabla "virtual" (estudios y cursos con institución pendiente): no tiene la columna fusionado_en_id,
+        // por eso no lleva el filtro de instituciones vigentes
+        return static::withoutGlobalScopes()->fromSub($estudios->unionAll($cursos), (new static)->getTable());
     }
 
     public static function asignarPendientes(\Illuminate\Support\Collection $pendientes, int $institucionId): void
@@ -64,7 +73,7 @@ class Institucion extends Model
         DB::transaction(function () use ($destino) {
             Estudio::where('institucion_id', $this->id)->update(['institucion_id' => $destino->id]);
             Curso::where('institucion_id', $this->id)->update(['institucion_id' => $destino->id]);
-            $this->delete();
+            $this->marcarFusionado($destino);
         });
     }
     public static function getAbmFormSchema(): array

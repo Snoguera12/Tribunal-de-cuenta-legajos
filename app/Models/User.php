@@ -23,6 +23,8 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable implements FilamentUser
 {
     use RegistraAuditoria;
+    // un usuario nunca se borra: se deshabilita
+    use \App\Models\Concerns\NoSeBorra;
 
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
@@ -41,6 +43,9 @@ class User extends Authenticatable implements FilamentUser
         'habilitado',
         'deshabilitado_motivo',
         'deshabilitado_en',
+        'debe_cambiar_clave',
+        'clave_cambiada_en',
+        'primer_ingreso_en',
     ];
     public function persona(): BelongsTo
     {
@@ -68,6 +73,9 @@ class User extends Authenticatable implements FilamentUser
             'password' => 'hashed',
             'habilitado' => 'boolean',
             'deshabilitado_en' => 'datetime',
+            'debe_cambiar_clave' => 'boolean',
+            'clave_cambiada_en' => 'datetime',
+            'primer_ingreso_en' => 'datetime',
             'sesion_activa_desde' => 'datetime',
             'ultima_actividad_en' => 'datetime',
         ];
@@ -76,7 +84,33 @@ class User extends Authenticatable implements FilamentUser
     // al deshabilitar se anota el motivo y la fecha; al habilitar se limpian
     protected static function booted(): void
     {
+        // usuario nuevo: la clave que le pone el administrador es provisoria
+        static::creating(function (User $usuario) {
+            if (! array_key_exists('debe_cambiar_clave', $usuario->getAttributes())) {
+                $usuario->debe_cambiar_clave = true;
+            }
+        });
+
+        // aviso por mail (sin la clave). Si el correo falla no se corta la creación
+        static::created(function (User $usuario) {
+            \Illuminate\Support\Facades\DB::afterCommit(function () use ($usuario) {
+                try {
+                    $usuario->notify(new \App\Notifications\UsuarioCreado());
+                } catch (\Throwable $e) {
+                    logger()->warning('No se pudo mandar el mail al usuario nuevo: ' . $e->getMessage());
+                }
+            });
+        });
+
         static::saving(function (User $usuario) {
+            // si el mismo usuario cambia su clave ya es propia; si se la cambia otro, vuelve a ser provisoria
+            if ($usuario->exists && $usuario->isDirty('password')) {
+                $propia = auth()->id() === $usuario->id;
+
+                $usuario->debe_cambiar_clave = ! $propia;
+                $usuario->clave_cambiada_en = $propia ? now() : null;
+            }
+
             if (! $usuario->isDirty('habilitado')) {
                 return;
             }

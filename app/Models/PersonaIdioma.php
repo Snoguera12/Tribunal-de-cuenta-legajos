@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\IdiomaNivelEnum;
+use App\Models\Concerns\NoSeBorra;
 use App\Filament\Forms\Components\RepeaterAdjuntable;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -17,6 +18,8 @@ use Illuminate\Support\Str;
 
 class PersonaIdioma extends Model
 {
+    use NoSeBorra;
+
     public const OTRO = '__otro__';
 
     protected $table = 'persona_idiomas';

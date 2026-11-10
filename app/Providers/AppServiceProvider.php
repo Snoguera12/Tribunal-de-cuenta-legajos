@@ -37,6 +37,17 @@ class AppServiceProvider extends ServiceProvider
             // clave correcta: se borran los intentos fallidos
             if ($evento->user instanceof User) {
                 ControlIntentosLogin::reiniciar($evento->user);
+
+                // primer ingreso: se anota (la pantalla de cambio de clave la muestra el middleware)
+                if (! $evento->user->primer_ingreso_en) {
+                    \Illuminate\Support\Facades\DB::table('users')->where('id', $evento->user->id)->update(['primer_ingreso_en' => now()]);
+
+                    Auditoria::registrar(
+                        evento: 'primer_ingreso',
+                        descripcion: "{$evento->user->name} ingresó por primera vez" . ($evento->user->debe_cambiar_clave ? ' (debe cambiar su clave provisoria)' : ''),
+                        actor: $evento->user,
+                    );
+                }
             }
 
             Auditoria::registrar(
