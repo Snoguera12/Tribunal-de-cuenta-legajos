@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\TipodocEnum;
 use App\Filament\Forms\Components\ArchivoDocumento;
+use App\Services\ArchivoSeguro;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLicenciaRequest;
 use App\Models\Documento;
@@ -41,8 +42,13 @@ class LicenciaController extends Controller
             return $this->responderReenvio($existente, $legajo, $datos);
         }
 
-        // El archivo se guarda antes de la transacción; si algo falla, se borra
-        $ruta = $archivo->store(ArchivoDocumento::DIRECTORIO, ArchivoDocumento::DISCO);
+        // El archivo se guarda (recomprimido y cifrado) antes de la transacción. Si algo falla NO se borra:
+        // el nombre sale del contenido y otro documento puede estar usando el mismo archivo (y nada se borra nunca)
+        $ruta = ArchivoSeguro::guardarContenido(
+            file_get_contents($archivo->getRealPath()),
+            $archivo->getClientOriginalName(),
+            ArchivoDocumento::DIRECTORIO,
+        );
 
         try {
             $licencia = DB::transaction(function () use ($legajo, $datos, $archivo, $ruta) {
@@ -65,7 +71,6 @@ class LicenciaController extends Controller
             });
         } catch (UniqueConstraintViolationException) {
             // Dos envíos simultáneos del mismo id_solicitud: el segundo se trata como reintento
-            Storage::disk(ArchivoDocumento::DISCO)->delete($ruta);
 
             $existente = $this->buscarExistente($solicitud_id);
             if (! $existente) {
@@ -74,7 +79,6 @@ class LicenciaController extends Controller
 
             return $this->responderReenvio($existente, $legajo, $datos);
         } catch (Throwable $e) {
-            Storage::disk(ArchivoDocumento::DISCO)->delete($ruta);
             throw $e;
         }
 

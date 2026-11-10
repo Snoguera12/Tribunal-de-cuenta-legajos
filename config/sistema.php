@@ -26,6 +26,20 @@ return [
         'timeout' => (int) env('ANTIVIRUS_TIMEOUT', 30),
     ],
 
+    // Optimización de los documentos al guardarlos (se cifran siempre; esto es solo la recompresión)
+    'documentos' => [
+        // false: se guarda el archivo tal cual llegó (igual se cifra)
+        'optimizar' => (bool) env('DOC_OPTIMIZAR', true),
+        // calidad del jpeg al recomprimir (1-100)
+        'jpeg_calidad' => (int) env('DOC_JPEG_CALIDAD', 78),
+        // lado más largo permitido en px (2480 = una hoja A4 a 300 dpi)
+        'jpeg_lado_maximo' => (int) env('DOC_JPEG_LADO', 2480),
+        // ghostscript: screen (72 dpi), ebook (150 dpi), printer (300 dpi). Sin ghostscript instalado los PDF no se recomprimen
+        'pdf_perfil' => env('DOC_PDF_PERFIL', 'ebook'),
+        // si no se ahorra al menos esto (0.05 = 5%) se guarda el original
+        'ahorro_minimo' => (float) env('DOC_AHORRO_MINIMO', 0.05),
+    ],
+
     'login' => [
         'intentos_por_tanda' => 5,
         'espera_segundos' => 20,

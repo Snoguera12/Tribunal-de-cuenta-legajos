@@ -4,9 +4,11 @@ namespace App\Filament\Forms\Components;
 
 use App\Models\Documento;
 use App\Rules\ArchivoPdfOJpeg;
+use App\Services\ArchivoSeguro;
 use Filament\Forms\Components\FileUpload;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 
 class ArchivoDocumento extends FileUpload
 {
@@ -27,7 +29,25 @@ class ArchivoDocumento extends FileUpload
             // además de la extensión, se revisa el contenido real del archivo (firma, contenido activo, antivirus)
             ->rules(['mimes:pdf,jpg,jpeg', new ArchivoPdfOJpeg(registrar: false)]) // al guardar se vuelve a comprobar, sin repetir auditoría ni antivirus
             ->validationMessages(['required' => 'Debe subir un archivo válido.'])
-            ->getUploadedFileNameForStorageUsing(Documento::nombreAleatorio(...))
+            // el archivo se recomprime, se cifra y se guarda con un nombre que sale de su contenido (el mismo archivo no ocupa lugar dos veces)
+            ->saveUploadedFileUsing(fn ($file) => ArchivoSeguro::guardar($file, self::DIRECTORIO))
+            // el archivo guardado está cifrado: para abrirlo hay que pasar por la ruta que lo descifra
+            ->getUploadedFileUsing(function (string $file): ?array {
+                $disco = Storage::disk(self::DISCO);
+
+                if (! $disco->exists($file)) {
+                    return null;
+                }
+
+                $documento = Documento::where('ruta', $file)->first();
+
+                return [
+                    'name' => $documento?->nombre_original ?: basename($file),
+                    'size' => $disco->size($file),
+                    'type' => ArchivoSeguro::tipoMime($file),
+                    'url' => $documento ? (Documento::abrirDocumento($documento) ?? '') : '',
+                ];
+            })
             ->storeFileNamesIn('nombre_original')
             // La revisión del contenido se hace acá, cada vez que cambia el archivo, y no con la regla de Filament:
             // así un archivo rechazado se saca del formulario y el cartel de error se borra solo al reemplazarlo.
