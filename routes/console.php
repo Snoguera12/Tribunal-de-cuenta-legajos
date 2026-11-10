@@ -20,3 +20,8 @@ Schedule::command('auditoria:archivar --si')
 Schedule::command('auditoria:verificar')
     ->dailyAt('02:30')
     ->onOneServer();
+
+// recordatorios del día para administrador y RRHH (campanita del panel)
+Schedule::command('recordatorios:enviar')
+    ->dailyAt('07:30')
+    ->onOneServer();
