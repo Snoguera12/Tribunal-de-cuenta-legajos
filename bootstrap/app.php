@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\SoloRedInterna;
 use App\Models\Auditoria;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,6 +18,15 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(SecurityHeaders::class);
+
+        // detrás de un proxy/balanceador, para que la IP (auditoría y red interna) sea la real
+        // TRUSTED_PROXIES=* o una lista de IP separadas por coma. Sin esto no se confía en ninguno
+        if ($proxies = env('TRUSTED_PROXIES')) {
+            $middleware->trustProxies(at: $proxies === '*' ? '*' : array_map('trim', explode(',', $proxies)));
+        }
+
+        // primero de todos: lo que viene de afuera no llega ni a iniciar sesión
+        $middleware->prepend(SoloRedInterna::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(function (Request $request, Throwable $e): bool {

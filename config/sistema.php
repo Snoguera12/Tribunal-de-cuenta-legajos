@@ -90,6 +90,13 @@ return [
         'desde' => env('ALERTAS_DESDE', 'alta'),
     ],
 
+    // el sistema es solo para la red interna del Tribunal
+    'red_interna' => [
+        'activa' => (bool) env('RED_INTERNA_ACTIVA', false),
+        // IP sueltas o rangos CIDR separados por coma, por ejemplo 10.0.0.0/8,192.168.0.0/16
+        'permitidas' => array_values(array_filter(array_map('trim', explode(',', (string) env('RED_INTERNA_PERMITIDAS', ''))))),
+    ],
+
     'login' => [
         'intentos_por_tanda' => 5,
         'espera_segundos' => 20,
