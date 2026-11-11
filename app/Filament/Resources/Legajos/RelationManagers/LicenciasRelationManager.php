@@ -22,8 +22,18 @@ class LicenciasRelationManager extends RelationManager
 
     public static function canViewForRecord(Model $ownerRecord, string $pageName): bool
     {
-        return $pageName === ViewLegajo::class
-            && parent::canViewForRecord($ownerRecord, $pageName);
+        if ($pageName !== ViewLegajo::class) {
+            return false;
+        }
+
+        // el empleado ve solo lo de su propio legajo (el alcance del modelo ya filtra las filas)
+        $usuario = auth()->user();
+
+        if ($usuario?->isEmpleado()) {
+            return filled($usuario->persona_id) && $ownerRecord->persona_id === $usuario->persona_id;
+        }
+
+        return parent::canViewForRecord($ownerRecord, $pageName);
     }
 
     public function isReadOnly(): bool
