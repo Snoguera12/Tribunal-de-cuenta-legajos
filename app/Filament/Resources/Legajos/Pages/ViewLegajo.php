@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Legajos\Pages;
 
-use App\Filament\Actions\MotivoBajaAction;
+use App\Filament\Actions\DarDeBajaLegajoAction;
+use App\Filament\Actions\DeshabilitarLegajoAction;
+use App\Filament\Actions\HabilitarLegajoAction;
 use Filament\Actions\Action;
 use Filament\Support\Icons\Heroicon;
 use App\Filament\Resources\Legajos\LegajoResource;
@@ -32,7 +34,9 @@ class ViewLegajo extends ViewRecord
         return [
             $this->accionFichaPdf(),
             EditAction::make(),
-            MotivoBajaAction::make(),
+            DeshabilitarLegajoAction::make(),
+            HabilitarLegajoAction::make(),
+            DarDeBajaLegajoAction::make(),
         ];
     }
 

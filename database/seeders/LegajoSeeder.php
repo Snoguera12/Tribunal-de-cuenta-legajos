@@ -16,7 +16,7 @@ class LegajoSeeder extends Seeder
         Legajo::create(
             [
                 'num_legajo' => 1001,
-                'estado' => true,
+                'estado' => 1,
                 'fecha_de_ingreso' => '2015-03-10 08:00:00',
                 'tipo_contrato' => 2, // Permanente
                 'persona_id' => 1, // Roberto Suárez
@@ -28,7 +28,7 @@ class LegajoSeeder extends Seeder
         Legajo::create(
             [
                 'num_legajo' => 1002,
-                'estado' => true,
+                'estado' => 1,
                 'fecha_de_ingreso' => '2020-07-01 08:00:00',
                 'tipo_contrato' => 1, // Locación
                 'persona_id' => 2, // Valentina Acosta
@@ -40,7 +40,7 @@ class LegajoSeeder extends Seeder
         Legajo::create(
             [
                 'num_legajo' => 1003,
-                'estado' => false,
+                'estado' => 0,
                 'fecha_de_ingreso' => '2010-11-22 08:00:00',
                 'tipo_contrato' => 0, // Funcionario
                 'persona_id' => 3, // Facundo Ledesma
@@ -60,7 +60,7 @@ class LegajoSeeder extends Seeder
         Legajo::create(
             [
                 'num_legajo' => 1004,
-                'estado' => true,
+                'estado' => 1,
                 'fecha_de_ingreso' => '2022-02-14 08:00:00',
                 'tipo_contrato' => 2, // Permanente
                 'persona_id' => 4, // Camila Paz

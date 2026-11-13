@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Legajos\Pages;
 
-use App\Filament\Actions\MotivoBajaAction;
+use App\Filament\Actions\DeshabilitarLegajoAction;
 use App\Filament\Resources\Legajos\LegajoResource;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
@@ -30,7 +30,7 @@ class EditLegajo extends EditRecord
                     . "const tab = new URLSearchParams(window.location.search).get('tab');"
                     . "window.location.href = {$vista} + (tab ? '?tab=' + encodeURIComponent(tab) : '');",
             ]),
-            MotivoBajaAction::make()
+            DeshabilitarLegajoAction::make(),
         ];
     }
 }

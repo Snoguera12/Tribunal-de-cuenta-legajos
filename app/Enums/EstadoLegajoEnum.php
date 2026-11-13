@@ -8,12 +8,14 @@ enum EstadoLegajoEnum: int implements HasLabel
 {
     case Baja = 0;
     case Alta = 1;
+    case Deshabilitado = 2;
 
     public function getLabel(): ?string
     {
         return match ($this) {
             self::Baja => 'Baja',
             self::Alta => 'Alta',
+            self::Deshabilitado => 'Deshabilitado',
         };
     }
 }

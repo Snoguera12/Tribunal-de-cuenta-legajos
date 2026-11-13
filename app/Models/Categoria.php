@@ -8,6 +8,7 @@ use App\Filament\Tables\ConteoLegajos;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Categoria extends Model
 {
@@ -30,10 +31,12 @@ class Categoria extends Model
     public static function getCategorias(): array
     {
         return self::query()
-        ->orderBy('nombre')
-        ->orderBy('descripcion')
-        ->get(['id', 'nombre', 'descripcion'])
-        ->toArray();
+            ->get(['id', 'nombre', 'descripcion'])
+            ->mapWithKeys(fn ($item) => [
+                $item->id => "{$item->nombre} {$item->descripcion}"
+            ])
+            ->sort(SORT_NATURAL | SORT_FLAG_CASE)
+            ->toArray();
     }
 
     public static function getFormSchema(): array
@@ -57,7 +60,9 @@ class Categoria extends Model
         return [
             TextColumn::make('nombre')
             ->label('Nombre de la Categoría')
-            ->sortable()
+            ->sortable(query: fn (Builder $query, string $direction): Builder => $query
+            ->orderByRaw('LENGTH(nombre) ' . $direction)
+            ->orderBy('nombre', $direction))
             ->searchable(),
 
             TextColumn::make('descripcion')

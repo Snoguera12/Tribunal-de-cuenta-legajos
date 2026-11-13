@@ -55,8 +55,24 @@ class Legajo extends Model
         return $this->belongsToMany(Documento::class, 'documento_legajo')->withTimestamps();
     }
     public function isAlta(){ return $this->estado == EstadoLegajoEnum::Alta; }
-    public function getIcon(){ return $this->isAlta() ? Heroicon::CheckCircle : Heroicon::XCircle; }
-    public function getColor(){ return $this->isAlta() ? 'success' : 'danger'; }
+    public function isBaja(){ return $this->estado == EstadoLegajoEnum::Baja; }
+    public function isDeshabilitado(){ return $this->estado == EstadoLegajoEnum::Deshabilitado; }
+    public function getIcon()
+    {
+        return match ($this->estado) {
+            EstadoLegajoEnum::Alta => Heroicon::CheckCircle,
+            EstadoLegajoEnum::Deshabilitado => Heroicon::PauseCircle,
+            default => Heroicon::XCircle,
+        };
+    }
+    public function getColor()
+    {
+        return match ($this->estado) {
+            EstadoLegajoEnum::Alta => 'success',
+            EstadoLegajoEnum::Deshabilitado => 'warning',
+            default => 'danger',
+        };
+    }
     public function scopeSinDatos(Builder $query): Builder
     {
         return $query->where(fn (Builder $q) => $q
@@ -241,13 +257,23 @@ class Legajo extends Model
                         return $etiqueta;
                     }
 
+                    if ($record->isDeshabilitado()) {
+                        $desde = $record->deshabilitado_en?->format('d/m/Y');
+
+                        return collect([
+                            $etiqueta,
+                            $record->deshabilitado_motivo,
+                            $desde ? "desde el {$desde}" : null,
+                        ])->filter()->implode(' - ');
+                    }
+
                     $motivo = $record->historial()->latest('fecha_baja')->first()?->motivo;
 
                     return $motivo ? "{$etiqueta} - {$motivo->getLabel()}" : $etiqueta;
                 })
-                ->icon(fn (Legajo $record) => $record->isAlta() ? Heroicon::CheckCircle : Heroicon::XCircle)
-                ->color(fn (Legajo $record) => $record->isAlta() ? 'success' : 'danger')
-                ->iconColor(fn (Legajo $record) => $record->isAlta() ? 'success' : 'danger')
+                ->icon(fn (Legajo $record) => $record->getIcon())
+                ->color(fn (Legajo $record) => $record->getColor())
+                ->iconColor(fn (Legajo $record) => $record->getColor())
                 ->placeholder('-'),
 
                 TextEntry::make('tipo_contrato')

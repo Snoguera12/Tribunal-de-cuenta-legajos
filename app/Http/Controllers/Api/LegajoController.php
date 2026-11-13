@@ -45,8 +45,11 @@ class LegajoController extends Controller
         ->get();
         
         $data_legajo = $legajos->map(function ($legajo) {
-            $dadoDeBaja = $legajo->estado != 1;
-            $baja = $dadoDeBaja ? $legajo->historial->first() : null;
+            $baja = $legajo->isBaja() ? $legajo->historial->first() : null;
+            $deshabilitacion = $legajo->isDeshabilitado() ? [
+                'motivo' => $legajo->deshabilitado_motivo,
+                'fecha' => $legajo->deshabilitado_en?->format('Y-m-d H:i:s'),
+            ] : null;
 
             return $legajo ? [
                 'id' => $legajo->id,
@@ -60,6 +63,8 @@ class LegajoController extends Controller
                     'fecha_baja' => $baja->fecha_baja,
                 ] : null,
 
+                'deshabilitacion' => $deshabilitacion,
+                
                 'categoria' => [
                     'id' => $legajo->categoria->id,
                     'nombre' => $legajo->categoria->nombre,

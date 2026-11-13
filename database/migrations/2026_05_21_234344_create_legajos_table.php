@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('legajos', function (Blueprint $table) {
             $table->id();
             $table->integer("num_legajo")->unique();
-            $table->boolean("estado");
+            $table->unsignedTinyInteger('estado');
+            $table->timestamp('deshabilitado_en')->nullable();
+            $table->string('deshabilitado_motivo')->nullable();
             $table->dateTime("fecha_de_ingreso");
             $table->integer("tipo_contrato")->nullable();
             $table->foreignId("persona_id")->nullable()->constrained()->nullOnDelete();

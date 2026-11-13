@@ -124,9 +124,6 @@ class Auditoria extends Model
             'archivo_rechazado' => ['Archivo rechazado', 'seguridad', 'alta'],
             'archivo_ilegible' => ['Archivo ilegible', 'documento', 'alta'],
 
-            'baja' => ['Baja de legajo', 'datos', 'aviso'],
-            'alta' => ['Alta de legajo', 'datos', 'info'],
-
             'api_consulta' => ['Consulta API', 'api', 'info'],
             'api_denegado' => ['API denegada', 'api', 'alta'],
             'token_generado' => ['Token generado', 'seguridad', 'aviso'],

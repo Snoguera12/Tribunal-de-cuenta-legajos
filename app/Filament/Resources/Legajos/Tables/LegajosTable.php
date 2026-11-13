@@ -3,7 +3,9 @@
 namespace App\Filament\Resources\Legajos\Tables;
 
 use App\Enums\EstadoLegajoEnum;
-use App\Filament\Actions\MotivoBajaAction;
+use App\Filament\Actions\DarDeBajaLegajoAction;
+use App\Filament\Actions\DeshabilitarLegajoAction;
+use App\Filament\Actions\HabilitarLegajoAction;
 use App\Filament\Resources\Legajos\LegajoResource;
 use App\Models\Cargo;
 use App\Models\Legajo;
@@ -48,13 +50,18 @@ class LegajosTable
 
                 SelectFilter::make('estado')
                 ->label('Estado')
-                ->options(EstadoLegajoEnum::class)
-                ->default(true),
+                ->options([
+                    EstadoLegajoEnum::Alta->value => EstadoLegajoEnum::Alta->getLabel(),
+                    EstadoLegajoEnum::Deshabilitado->value => EstadoLegajoEnum::Deshabilitado->getLabel(),
+                ])
+                ->default(EstadoLegajoEnum::Alta->value),
+
                 Filter::make('sin_datos')
                 ->label('Sin área, categoría o cargo')
                 ->toggle()
                 ->query(fn (Builder $query): Builder => $query->sinDatos()),
             ])
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('legajos.estado', '!=', EstadoLegajoEnum::Baja->value))
             ->recordActions([
                 // Botón "Ver": abre la página de vista del legajo (con sus licencias)
                 ViewAction::make()
@@ -72,11 +79,9 @@ class LegajosTable
                 ->icon('heroicon-m-pencil-square'),
 
                 // Tu botón personalizado de baja se mantiene igual
-                MotivoBajaAction::make()
-                ->label('Dar de Baja')
-                ->iconButton()
-                ->color('danger')
-                ->icon('heroicon-m-arrow-down'),
+                DeshabilitarLegajoAction::make()->iconButton(),
+                HabilitarLegajoAction::make()->iconButton(),
+                DarDeBajaLegajoAction::make()->iconButton(),
             ], position: RecordActionsPosition::AfterColumns
             )
             // Clic en la fila: va a la vista (solo lectura), no a la edición.
