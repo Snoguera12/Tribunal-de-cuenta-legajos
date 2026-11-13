@@ -37,7 +37,7 @@ class LegajoPolicy
      */
     public function update(User $user, Legajo $legajo): bool
     {
-        return $user->isAdmin_RRHH();
+        return $user->isAdmin_RRHH() && $legajo->isAlta();
     }
 
     /**
