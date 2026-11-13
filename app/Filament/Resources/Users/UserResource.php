@@ -30,6 +30,11 @@ class UserResource extends Resource
         return UsersTable::configure($table);
     }
 
+    public static function getNavigationUrl(): string
+    {
+        return static::getUrl('index', ['sort' => 'name:asc']);
+    }
+
     public static function getRelations(): array
     {
         return [

@@ -22,7 +22,7 @@ class Cargo extends Model
     }
     public static function getCargos(): array
     {
-        return Cargo::pluck('nombre', 'id')->toArray();
+        return Cargo::orderBy('nombre')->pluck('nombre', 'id')->toArray();
     }
     public static function getFormSchema() : array{
         $resultado = [

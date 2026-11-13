@@ -31,6 +31,11 @@ class CategoriaResource extends Resource
     {
         return CategoriasTable::configure($table);
     }
+    
+    public static function getNavigationUrl(): string
+    {
+        return static::getUrl('index', ['sort' => 'nombre:asc']);
+    }
 
     public static function getRelations(): array
     {

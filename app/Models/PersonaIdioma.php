@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\IdiomaNivelEnum;
 use App\Models\Concerns\NoSeBorra;
+use App\Models\Concerns\RegistraAuditoria;
 use App\Filament\Forms\Components\RepeaterAdjuntable;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -18,7 +19,7 @@ use Illuminate\Support\Str;
 
 class PersonaIdioma extends Model
 {
-    use NoSeBorra;
+    use NoSeBorra, RegistraAuditoria;
 
     public const OTRO = '__otro__';
 

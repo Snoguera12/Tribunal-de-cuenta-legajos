@@ -31,6 +31,11 @@ class AreaResource extends Resource
         return AreasTable::configure($table);
     }
 
+    public static function getNavigationUrl(): string
+    {
+        return static::getUrl('index', ['sort' => 'nombre:asc']);
+    }
+    
     public static function getRelations(): array
     {
         return [

@@ -30,10 +30,9 @@ class Categoria extends Model
     public static function getCategorias(): array
     {
         return self::query()
+        ->orderBy('nombre')
+        ->orderBy('descripcion')
         ->get(['id', 'nombre', 'descripcion'])
-        ->mapWithKeys(fn ($item) => [
-            $item->id => "{$item->nombre} {$item->descripcion}"
-        ])
         ->toArray();
     }
 

@@ -28,7 +28,7 @@ class Area extends Model
         return $this->hasMany(Legajo::class);
     }
     public static function getAreas() : array{
-        return Area::pluck('nombre', 'id')->toArray();
+        return Area::orderBy('nombre')->pluck('nombre', 'id')->toArray();
     }
     public static function getFormSchema() : array{
         $resultado = [

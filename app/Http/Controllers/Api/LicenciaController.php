@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\TipodocEnum;
 use App\Filament\Forms\Components\ArchivoDocumento;
+use App\Models\Auditoria;
 use App\Services\ArchivoSeguro;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLicenciaRequest;
@@ -65,7 +66,13 @@ class LicenciaController extends Controller
                     'documento_id' => $documento->id,
                 ]);
 
-                $documento->legajos()->syncWithoutDetaching([$legajo->id]);
+                $cambios = $documento->legajos()->syncWithoutDetaching([$legajo->id]);
+
+                // solo si el vínculo es nuevo
+                if (!empty($cambios['attached'])) {
+                    Auditoria::registrarVinculo('adjuntado', $legajo, $documento, 'documentos');
+                    Auditoria::registrarVinculo('adjuntado', $documento, $legajo, 'legajos');
+                }
 
                 return $licencia;
             });

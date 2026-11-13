@@ -20,7 +20,8 @@ class PersonaHelper{
         // 3. Traemos las personas que no están asignadas (más la seleccionada, si aplica)
         $resultado = Persona::whereNotIn('id', $personasAsignadasIds)
         ->select('id', 'nombre', 'apellido', 'dni')
-        ->orderBy('id')
+        ->orderBy('nombre')
+        ->orderBy('apellido')
         ->get();
             
         // 4. Mapeamos al formato [id => "Nombre Apellido (DNI: 123)"] que requiere el Select
@@ -32,6 +33,8 @@ class PersonaHelper{
     {
         $resultado = Persona::query()
         ->select('id', 'nombre', 'apellido', 'dni')
+        ->orderBy('nombre')
+        ->orderBy('apellido')
         ->get();
 
         return $resultado->mapWithKeys(fn ($item) => [

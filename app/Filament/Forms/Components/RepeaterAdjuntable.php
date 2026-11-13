@@ -3,6 +3,7 @@
 namespace App\Filament\Forms\Components;
 
 use App\Models\Categoria;
+use App\Models\Auditoria;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
@@ -184,11 +185,9 @@ class RepeaterAdjuntable extends Repeater
 
                 // Hidratar cada item agregado (necesario para los campos de archivo).
                 foreach ($registros as $r) {
-                    foreach ($registros as $r) {
-                        $component->getChildSchema("record-{$r->getKey()}")
-                            ->model($r)
-                            ->fill($r->attributesToArray());
-                    }
+                    $component->getChildSchema("record-{$r->getKey()}")
+                        ->model($r)
+                        ->fill($r->attributesToArray());
                 }
 
                 Notification::make()
@@ -228,7 +227,47 @@ class RepeaterAdjuntable extends Repeater
             ->values()
             ->all();
     }
+    // anota en la auditoria cada registro adjuntado o desadjuntado
+    protected function auditarVinculos(string $evento, Collection $registros): void
+    {
+        $padre = $this->getRecord();
+        $nombre = $this->getRelationshipName();
+        $esPivote = $this->getRelationship() instanceof BelongsToMany;
 
+        foreach ($registros as $r) {
+            Auditoria::registrarVinculo($evento, $padre, $r, $nombre);
+
+            // en muchos a muchos no hay otra fila que lo cuente: el historial del registro movido tambien lo anota
+            if ($esPivote) {
+                Auditoria::registrarVinculo($evento, $r, $padre, $nombre);
+            }
+        }
+    }
+    // ids ya vinculados al registro (solo muchos a muchos): sirve para ver qué vínculos crea el guardado normal
+    protected function idsVinculados(): array
+    {
+        $relacion = $this->getRelationship();
+
+        if (! $this->esAdjuntable || ! $relacion instanceof BelongsToMany) {
+            return [];
+        }
+
+        return $relacion->pluck($relacion->getRelated()->getQualifiedKeyName())->all();
+    }
+
+    // los registros que quedaron vinculados desde la foto anterior
+    protected function vinculadosDespuesDe(array $previos): Collection
+    {
+        $relacion = $this->getRelationship();
+
+        if (! $this->esAdjuntable || ! $relacion instanceof BelongsToMany) {
+            return collect();
+        }
+
+        $nuevos = array_diff($this->idsVinculados(), $previos);
+
+        return $nuevos ? $relacion->whereKey($nuevos)->get() : collect();
+    }
     public function getRegistrosSinAsignar(): Collection
     {
         return $this->consultaSinAsignar(excluirEnFormulario: true)->get();
@@ -355,7 +394,8 @@ class RepeaterAdjuntable extends Repeater
                         $r->save();
                     });
                 }
-
+                
+                $this->auditarVinculos('adjuntado', $registros);
                 $this->getRecord()->unsetRelation($this->getRelationshipName());
                 $this->clearCachedExistingRecords();
                 $existentes = $this->getCachedExistingRecords();
@@ -366,7 +406,12 @@ class RepeaterAdjuntable extends Repeater
                 ->pluck($relacion->getRelated()->getKeyName())
                 ->reject(fn ($id) => array_key_exists("record-{$id}", $state))
                 ->all();
-
+            
+            // se busca antes de soltarlos, para anotar cuáles fueron
+            $aDesadjuntar = filled($idsADesadjuntar)
+                ? $relacion->whereKey($idsADesadjuntar)->get()
+                : collect();
+            
             if (filled($idsADesadjuntar)) {
                 if ($relacion instanceof BelongsToMany) {
                     $relacion->detach($idsADesadjuntar);
@@ -378,10 +423,16 @@ class RepeaterAdjuntable extends Repeater
                         $r->save();
                     });
                 }
+                $this->auditarVinculos('desadjuntado', $aDesadjuntar);
             }
         }
 
         // Ya adjuntados y desadjuntados, el padre solo actualiza los datos de cada item.
+        $previos = $this->idsVinculados();
+
         parent::saveToRelationship();
+
+        // los registros nuevos que se crean desde el formulario también quedan vinculados
+        $this->auditarVinculos('adjuntado', $this->vinculadosDespuesDe($previos));
     }
 }

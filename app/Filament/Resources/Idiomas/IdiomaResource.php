@@ -33,6 +33,11 @@ class IdiomaResource extends Resource
     {
         return IdiomasTable::configure($table);
     }
+    
+    public static function getNavigationUrl(): string
+    {
+        return static::getUrl('index', ['sort' => 'nombre:asc']);
+    }
 
     public static function getNavigationBadge(): ?string
     {

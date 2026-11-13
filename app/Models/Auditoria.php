@@ -89,14 +89,14 @@ class Auditoria extends Model
             'eliminado' => ['Eliminado', 'datos', 'aviso'],
             'eliminado_definitivo' => ['Eliminado definitivo', 'datos', 'alta'],
             'restaurado' => ['Restaurado', 'datos', 'info'],
-            'historico_error' => ['No se pudo guardar el historial', 'seguridad', 'alta'],
+            'adjuntado' => ['Adjuntado', 'datos', 'info'],
+            'desadjuntado' => ['Desadjuntado', 'datos', 'aviso'],
             'cambio_rol' => ['Cambio de rol', 'seguridad', 'alta'],
             'cambio_password' => ['Cambio de contraseña', 'seguridad', 'aviso'],
             'cambio_email' => ['Cambio de correo', 'seguridad', 'aviso'],
             'usuario_deshabilitado' => ['Usuario deshabilitado', 'seguridad', 'aviso'],
             'usuario_habilitado' => ['Usuario habilitado', 'seguridad', 'info'],
             'usuario_no_deshabilitado' => ['Usuario no deshabilitado', 'seguridad', 'alta'],
-            'token_generado' => ['Token de API generado', 'seguridad', 'aviso'],
             'token_revocado' => ['Token de API revocado', 'seguridad', 'alta'],
             'login_advertencia' => ['Último intento de clave', 'acceso', 'aviso'],
             'cuenta_bloqueada_temporal' => ['Usuario bloqueado (temporal)', 'seguridad', 'alta'],
@@ -190,6 +190,11 @@ class Auditoria extends Model
             return null;
         }
 
+        // sin APP_KEY no se puede firmar la cadena: un registro asi nunca verificaria
+        if (blank(config('app.key'))) {
+            return null;
+        }
+        
         try {
 
             $meta = self::catalogo()[$evento] ?? [$evento, 'sistema', 'info'];
@@ -485,7 +490,45 @@ class Auditoria extends Model
             'peticion' => $peticion->attributes->get('peticion_id'),
         ];
     }
+        // anota que un registro se adjuntó a otro o se soltó de él.
+    // $sujeto es el registro en cuyo historial queda la fila; $otro es el que se movió
+    public static function registrarVinculo(string $evento, Model $sujeto, Model $otro, string $relacion): void
+    {
+        $adjunta = $evento === 'adjuntado';
 
+        // espera a que la transaccion termine bien: si hace rollback, no queda nada anotado
+        DB::afterCommit(function () use ($evento, $sujeto, $otro, $relacion, $adjunta) {
+            self::registrar(
+                evento: $evento,
+                descripcion: ($adjunta ? 'Adjuntó ' : 'Desadjuntó ')
+                    . self::etiquetaDe($otro)
+                    . ($adjunta ? ' a ' : ' de ')
+                    . self::etiquetaDe($sujeto),
+                modelo: $sujeto,
+                extra: [
+                    'relacion' => $relacion,
+                    'vinculado_modelo' => class_basename($otro),
+                    'vinculado_id' => $otro->getKey(),
+                ],
+            );
+        });
+    }
+
+    // ej: "Legajo #12 (1045)" (misma idea que etiquetaAuditoria del trait)
+    protected static function etiquetaDe(Model $modelo): string
+    {
+        $texto = class_basename($modelo) . ' #' . $modelo->getKey();
+
+        foreach (['num_legajo', 'name', 'nombre'] as $campo) {
+            $valor = $modelo->getAttribute($campo);
+
+            if ($valor !== null && $valor !== '') {
+                return $texto . ' (' . $valor . ')';
+            }
+        }
+
+        return $texto;
+    }
 
     // oculta secretos y deja todo como texto o numero para guardarlo en json
     public static function limpiar(?array $valores): ?array

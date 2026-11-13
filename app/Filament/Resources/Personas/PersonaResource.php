@@ -48,6 +48,10 @@ class PersonaResource extends Resource
     {
         return PersonasTable::configure($table);
     }
+    public static function getNavigationUrl(): string
+    {
+        return static::getUrl('index', ['sort' => 'nombre:asc']);
+    }
     // Esta función hace que solo se puede ver los datos a su respectivo empleados.
     public static function getEloquentQuery(): Builder
     {

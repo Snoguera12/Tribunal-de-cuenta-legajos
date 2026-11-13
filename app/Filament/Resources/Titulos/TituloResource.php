@@ -29,6 +29,12 @@ class TituloResource extends Resource
     {
         return TitulosTable::configure($table);
     }
+
+    public static function getNavigationUrl(): string
+    {
+        return static::getUrl('index', ['sort' => 'nombre:asc']);
+    }
+
     public static function getNavigationBadge(): ?string
     {
         // Retorna el conteo total de la base de datos
