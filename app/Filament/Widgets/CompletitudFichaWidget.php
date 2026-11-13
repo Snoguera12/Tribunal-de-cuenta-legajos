@@ -81,11 +81,11 @@ class CompletitudFichaWidget extends Widget
                 'url' => $this->url($persona, 'persona'),
             ],
             $this->cantidad($persona, 'Legajos', $persona->legajos()->count(), 'legajo'),
-            $this->cantidad($persona, 'Familiares', $persona->familiares()->count(), 'familiar'),
-            $this->cantidad($persona, 'Idiomas', $persona->idiomas()->count(), 'idioma'),
             $this->cantidad($persona, 'Estudios y títulos', $persona->estudios()->count(), 'estudio'),
             $this->cantidad($persona, 'Cursos', $persona->cursos()->count(), 'curso'),
             $this->cantidad($persona, 'Antecedentes laborales', $persona->antecedentesLaborales()->count(), 'antecedenteslaborales'),
+            $this->cantidad($persona, 'Familiares', $persona->familiares()->count(), 'familiar'),
+            $this->cantidad($persona, 'Idiomas', $persona->idiomas()->count(), 'idioma'),
         ];
     }
 

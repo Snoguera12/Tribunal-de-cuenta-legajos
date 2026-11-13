@@ -45,7 +45,7 @@
     --tcse-tracking: 0.09em;
 
     /* Ajustes finos de la columna izquierda */
-    --tcse-crest-size:  4.5rem;
+    --tcse-crest-size:  7.5rem;
     --tcse-ray-angle:   -13deg;
     --tcse-photo-focus: 32%;   /* subir el % baja el encuadre */
 }
@@ -177,6 +177,11 @@ body {
 
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
     background-color: var(--primary-600);
+}
+
+/* logo (texto) de la barra lateral: blanco sobre el fondo azul oscuro */
+.fi-sidebar .fi-logo {
+    color: #ffffff;
 }
 
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-label,

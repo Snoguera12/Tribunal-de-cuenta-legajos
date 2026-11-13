@@ -15,6 +15,9 @@ class HistoricoService
 {
     // columnas propias del historial
     private const META = ['hist_id', 'hist_operacion', 'hist_version', 'hist_fecha', 'hist_user_id', 'hist_user_nombre', 'hist_ip', 'hist_peticion'];
+    
+    // conexión de la base separada donde vive el historial (ver config/database.php)
+    private const CONEXION = 'historico';
 
     // nunca se copian (el hash de la clave no tiene por que estar duplicado en otra tabla)
     private const IGNORAR = ['remember_token', 'password'];
@@ -64,9 +67,9 @@ class HistoricoService
         $origen = Schema::getColumns($tabla);
         $historica = self::nombre($tabla);
 
-        if (! Schema::hasTable($historica)) {
+        if (! Schema::connection(self::CONEXION)->hasTable($historica)) {
 
-            Schema::create($historica, function (Blueprint $t) use ($origen) {
+            Schema::connection(self::CONEXION)->create($historica, function (Blueprint $t) use ($origen) {
 
                 $t->id('hist_id');
                 $t->string('hist_operacion', 15);
@@ -93,7 +96,7 @@ class HistoricoService
             return 'creada';
         }
 
-        $existentes = Schema::getColumnListing($historica);
+        $existentes = Schema::connection(self::CONEXION)->getColumnListing($historica);
         $faltan = collect($origen)->filter(fn ($c) => ! in_array($c['name'], $existentes, true)
             && ! in_array($c['name'], self::IGNORAR, true)
             && ! in_array($c['name'], self::META, true));
@@ -102,7 +105,7 @@ class HistoricoService
             return 'al día';
         }
 
-        Schema::table($historica, function (Blueprint $t) use ($faltan) {
+        Schema::connection(self::CONEXION)->table($historica, function (Blueprint $t) use ($faltan) {
             foreach ($faltan as $columna) {
                 self::agregarColumna($t, $columna);
             }
@@ -135,7 +138,7 @@ class HistoricoService
 
     private static function columnas(string $historica): array
     {
-        return self::$columnasCache[$historica] ??= Schema::getColumnListing($historica);
+        return self::$columnasCache[$historica] ??= Schema::connection(self::CONEXION)->getColumnListing($historica);
     }
 
 
@@ -176,7 +179,7 @@ class HistoricoService
             $tabla = $modelo->getTable();
             $historica = self::nombre($tabla);
 
-            if (! Schema::hasTable($historica)) {
+            if (! Schema::connection(self::CONEXION)->hasTable($historica)) {
                 self::sincronizarTabla($tabla);
             }
 
@@ -185,9 +188,9 @@ class HistoricoService
             $actor = Auditoria::datosDelActor();
             $peticion = Auditoria::datosDeLaPeticion();
 
-            $version = DB::table($historica)->where('id', $fila['id'] ?? null)->max('hist_version');
+            $version = DB::connection(self::CONEXION)->table($historica)->where('id', $fila['id'] ?? null)->max('hist_version');
 
-            Auditoria::conReintentos(fn () => DB::table($historica)->insert([
+            Auditoria::conReintentos(fn () => DB::connection(self::CONEXION)->table($historica)->insert([
                 ...$datos,
                 'hist_operacion' => $operacion,
                 'hist_version' => ((int) $version) + 1,
@@ -216,14 +219,26 @@ class HistoricoService
     {
         $historica = self::nombre($tabla);
 
-        if (! Schema::hasTable($historica)) {
+        if (! Schema::connection(self::CONEXION)->hasTable($historica)) {
             return collect();
         }
 
-        return DB::table($historica)->where('id', $id)->orderByDesc('hist_version')->get();
+        return DB::connection(self::CONEXION)->table($historica)->where('id', $id)->orderByDesc('hist_version')->get();
+    }
+
+    // dice si la tabla del historial ya existe
+    public static function existe(string $tabla): bool
+    {
+        return Schema::connection(self::CONEXION)->hasTable(self::nombre($tabla));
     }
 
 
+    // los últimos cambios guardados de una tabla (el más nuevo primero)
+    public static function ultimos(string $tabla, int $limite = 50)
+    {
+        return DB::connection(self::CONEXION)->table(self::nombre($tabla))->orderByDesc('hist_id')->limit($limite)->get();
+    }
+    
     // copia lo que hay ahora como version base (para no perder lo ya cargado)
     public static function copiarActual(string $tabla): int
     {
@@ -239,11 +254,11 @@ class HistoricoService
 
                 $fila = (array) $fila;
 
-                if (DB::table($historica)->where('id', $fila['id'])->where('hist_operacion', 'BASE')->exists()) {
+                if (DB::connection(self::CONEXION)->table($historica)->where('id', $fila['id'])->where('hist_operacion', 'BASE')->exists()) {
                     continue;
                 }
 
-                DB::table($historica)->insert([
+                DB::connection(self::CONEXION)->table($historica)->insert([
                     ...self::limpiar($fila, $columnas),
                     'hist_operacion' => 'BASE',
                     'hist_version' => 0,

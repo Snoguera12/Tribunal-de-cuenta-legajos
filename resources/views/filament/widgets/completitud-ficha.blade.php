@@ -27,7 +27,7 @@
                 </div>
             </div>
 
-            <ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); column-gap: 2rem;">
+            <ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr)); column-gap: 2rem;">
                 @foreach ($items as $item)
                     <li style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.625rem 0; {{ $loop->last ? '' : 'border-bottom: 1px solid color-mix(in oklab, currentColor 10%, transparent);' }}">
                         <div style="display: flex; align-items: center; gap: 0.625rem; min-width: 0;">

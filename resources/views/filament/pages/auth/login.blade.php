@@ -19,11 +19,11 @@
         <header class="tcse-brand">
             <img
                 class="tcse-brand__crest"
-                src="{{ asset('images/escudo-tcse.svg') }}"
+                src="{{ asset('images/logo-tcse-blanco.png') }}"
                 alt=""
                 aria-hidden="true"
-                width="72"
-                height="88"
+                height="62"
+                height="36"
                 onerror="this.style.display='none'"
             >
 
@@ -84,11 +84,10 @@
              no se muestra. Sin esto la marca desaparece por completo. --}}
         <div class="tcse-brand--compact">
             <img
-                src="{{ asset('images/escudo-tcse.svg') }}"
+                src="{{ asset('images/logo-tcse-blanco.png') }}"
                 alt=""
                 aria-hidden="true"
-                width="40"
-                height="49"
+                height="36"
             >
             <p class="tcse-brand__wordmark">
                 <span class="tcse-brand__name">Tribunal de Cuentas</span>

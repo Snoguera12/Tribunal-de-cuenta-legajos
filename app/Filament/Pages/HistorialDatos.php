@@ -6,8 +6,6 @@ use App\Services\HistoricoService;
 use BackedEnum;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 
 // solo el administrador: cada versión guardada de un registro y la opción de volver a ella
@@ -52,9 +50,7 @@ class HistorialDatos extends Page
             return collect();
         }
 
-        $historica = HistoricoService::nombre($this->tabla);
-
-        if (! Schema::hasTable($historica)) {
+        if (! HistoricoService::existe($this->tabla)) {
             return collect();
         }
 
@@ -62,7 +58,7 @@ class HistorialDatos extends Page
             return HistoricoService::versiones($this->tabla, $this->registro);
         }
 
-        return DB::table($historica)->orderByDesc('hist_id')->limit(50)->get();
+        return HistoricoService::ultimos($this->tabla);
     }
 
 

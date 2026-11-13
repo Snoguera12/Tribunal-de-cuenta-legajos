@@ -83,6 +83,25 @@ return [
                 (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
+        
+        // base separada solo para el historial de datos (tablas h_*)
+        'historico' => [
+            'driver' => env('DB_HISTORICO_CONNECTION', 'sqlite'),
+            'url' => env('DB_HISTORICO_URL'),
+            'host' => env('DB_HISTORICO_HOST', '127.0.0.1'),
+            'port' => env('DB_HISTORICO_PORT', '3306'),
+            'database' => env('DB_HISTORICO_DATABASE', database_path('historico.sqlite')),
+            'username' => env('DB_HISTORICO_USERNAME', 'root'),
+            'password' => env('DB_HISTORICO_PASSWORD', ''),
+            'unix_socket' => env('DB_HISTORICO_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'foreign_key_constraints' => true,
+        ],
 
         'pgsql' => [
             'driver' => 'pgsql',

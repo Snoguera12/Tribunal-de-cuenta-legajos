@@ -100,7 +100,7 @@ class Login extends BaseLogin
             ->prefixIcon('heroicon-m-user')
             ->required()
             ->autofocus()
-            ->autocomplete('username')
+            ->autocomplete('off')
             ->extraInputAttributes(['tabindex' => 1]);
     }
 
@@ -112,7 +112,7 @@ class Login extends BaseLogin
             ->prefixIcon('heroicon-m-lock-closed')
             ->revealable(filament()->arePasswordsRevealable())
             ->required()
-            ->autocomplete('current-password')
+            ->autocomplete('new-password')
             ->extraInputAttributes(['tabindex' => 2]);
     }
 
