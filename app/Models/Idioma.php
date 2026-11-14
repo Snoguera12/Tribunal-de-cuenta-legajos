@@ -51,10 +51,11 @@ class Idioma extends Model
         return match ($modeForm) {
             'table' => [
                 TextInput::make('nombre')
-                    ->label('Nombre del Idioma')
-                    ->maxLength(100)
-                    ->unique(ignoreRecord: true)
-                    ->required(),
+                ->label('Nombre del Idioma')
+                ->maxLength(100)
+                ->autocomplete(false)
+                ->unique(ignoreRecord: true)
+                ->required(),
             ],
             'list' => [],
         };

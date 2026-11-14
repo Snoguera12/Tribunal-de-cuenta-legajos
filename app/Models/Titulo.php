@@ -33,6 +33,7 @@ class Titulo extends Model
                 TextInput::make('nombre')
                 ->label('Nombre del Título')
                 ->maxLength(100)
+                ->autocomplete(false)
                 ->unique(ignoreRecord: true)
                 ->required(),
             ],

@@ -100,6 +100,7 @@ class PersonaIdioma extends Model
             ->label('Escriba el idioma')
             ->helperText('Use esta opción solo si el idioma no está en la lista.')
             ->maxLength(100)
+            ->autocomplete(false)
             ->visible(fn (Get $get) => $get('idioma_id') === self::OTRO)
             ->required(fn (Get $get) => $get('idioma_id') === self::OTRO)
             ->dehydratedWhenHidden()

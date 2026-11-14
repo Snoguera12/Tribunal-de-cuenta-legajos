@@ -214,16 +214,21 @@ class User extends Authenticatable implements FilamentUser
         $resultado = [
             TextInput::make('name')
             ->label('Nombre de Usuario')
+            ->autocomplete(false)
+            ->maxLength(100)
             ->required(),
                 
             TextInput::make('email')
             ->label('Correo Electrónico')
+            ->autocomplete(false)
+            ->maxLength(100)
             ->required()
             ->email()
             ->unique(ignoreRecord: true),
 
             TextInput::make('password')
             ->label('Contraseña')
+            ->autocomplete(false)
             ->password()
             ->required(fn ($record): bool => ! $record?->exists)
             ->dehydrated(fn (?string $state) => filled($state))

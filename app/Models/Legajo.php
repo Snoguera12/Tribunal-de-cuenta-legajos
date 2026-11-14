@@ -103,6 +103,7 @@ class Legajo extends Model
             TextInput::make('num_legajo')
             ->label('Número de legajo')
             ->placeholder('Ej. 1045')
+            ->autocomplete(false)
             ->required()
             ->numeric()
             ->unique(

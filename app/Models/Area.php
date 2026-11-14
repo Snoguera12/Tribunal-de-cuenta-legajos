@@ -34,6 +34,7 @@ class Area extends Model
         $resultado = [
             TextInput::make('nombre')
             ->label('Nombre del Área')
+            ->autocomplete(false)
             ->required()
             ->validationMessages([
                 "required" => "Requiere introducir el Nombre del Área.",

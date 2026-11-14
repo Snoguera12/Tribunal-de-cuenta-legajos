@@ -104,6 +104,7 @@ class Documento extends Model
                 Textarea::make('descripcion')
                 ->label('Descripción / Notas')
                 ->placeholder('Ej. Copia certificada del título...')
+                ->autocomplete(false)
                 ->required()
                 ->rows(2),
 

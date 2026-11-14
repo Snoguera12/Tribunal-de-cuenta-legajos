@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tokens', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
+            $table->string('nombre', 100);
             $table->boolean('is_active')->default(false);
             $table->boolean('is_created')->default(false);
             $table->json('enviados')->nullable();

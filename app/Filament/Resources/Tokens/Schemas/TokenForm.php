@@ -13,6 +13,7 @@ class TokenForm
         ->components([
             TextInput::make('nombre')
             ->label("Nombre")
+            ->maxLength(100)
             ->autocomplete(false)
             ->required(),
         ]);

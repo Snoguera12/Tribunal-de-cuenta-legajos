@@ -46,11 +46,13 @@ class Categoria extends Model
             ->label('Nombre de la Categoría')
             ->required()
             ->maxLength(10)
+            ->autocomplete(false)
             ->unique(ignoreRecord: true),
 
             TextInput::make('descripcion')
             ->label('Descripción')
             ->required()
+            ->autocomplete(false)
             ->maxLength(50),
         ];
     }

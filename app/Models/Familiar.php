@@ -42,14 +42,20 @@ class Familiar extends Model
         $resultado = [
             TextInput::make('nombre')
             ->label('Nombre')
+            ->maxLength(100)
+            ->autocomplete(false)
             ->required(),
 
             TextInput::make('apellido')
             ->label('Apellido')
+            ->maxLength(100)
+            ->autocomplete(false)
             ->required(),
 
             TextInput::make('dni')
             ->label('DNI')
+            ->autocomplete(false)
+            ->maxLength(9)
             ->required()
             ->rules(['regex:/^[0-9]{7,9}$/']),
 

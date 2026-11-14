@@ -6,6 +6,7 @@ use App\Models\Concerns\RegistraAuditoria;
 use App\Models\Concerns\SeFusiona;
 use App\Models\Scopes\SoloVigentes;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\Select;
@@ -53,7 +54,7 @@ class Institucion extends Model
         return static::withoutGlobalScopes()->fromSub($estudios->unionAll($cursos), (new static)->getTable());
     }
 
-    public static function asignarPendientes(\Illuminate\Support\Collection $pendientes, int $institucionId): void
+    public static function asignarPendientes(Collection $pendientes, int $institucionId): void
     {
         DB::transaction(function () use ($pendientes, $institucionId) {
             foreach (['Estudio' => Estudio::class, 'Curso' => Curso::class] as $origen => $modelo) {
@@ -80,11 +81,12 @@ class Institucion extends Model
     {
         return [
             TextInput::make('nombre')
-                ->label('Nombre de la institución')
-                ->required()
-                ->maxLength(300)
-                ->unique(ignoreRecord: true)
-                ->dehydrateStateUsing(fn ($state) => Str::squish((string) $state)),
+            ->label('Nombre de la institución')
+            ->required()
+            ->autocomplete(false)
+            ->maxLength(300)
+            ->unique(ignoreRecord: true)
+            ->dehydrateStateUsing(fn ($state) => Str::squish((string) $state)),
         ];
     }
 
@@ -114,6 +116,7 @@ class Institucion extends Model
             TextInput::make('institucion_otro')
             ->label('Escriba la institución')
             ->helperText('Use esta opción solo si la institución no está en la lista.')
+            ->autocomplete(false)
             ->maxLength(300)
             ->visible(fn (Get $get) => $get('institucion_id') === self::OTRO)
             ->required(fn (Get $get) => $get('institucion_id') === self::OTRO)

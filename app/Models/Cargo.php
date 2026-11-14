@@ -26,7 +26,7 @@ class Cargo extends Model
     }
     public static function getFormSchema() : array{
         $resultado = [
-            TextInput::make('nombre')->required(),
+            TextInput::make('nombre')->required()->autocomplete(false),
         ];
         return $resultado;
     }

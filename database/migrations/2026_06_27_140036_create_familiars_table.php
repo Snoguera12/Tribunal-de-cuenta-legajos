@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('familiars', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->string('apellido');
+            $table->string('nombre', 100);
+            $table->string('apellido', 100);
             $table->integer('dni',)->nullable();
             $table->integer('parentesco');
             $table->date('fecha_de_nacimiento')->nullable();

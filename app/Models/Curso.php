@@ -57,12 +57,14 @@ class Curso extends Model
             TextInput::make('nombre')
             ->label('Nombre del curso')
             ->required()
+            ->autocomplete(false)
             ->maxLength(255),
 
             ...Institucion::getFormSchema(),
 
             TextInput::make('duracion')
             ->label('Duración')
+            ->autocomplete(false)
             ->required(),
 
             DatePicker::make('fecha')

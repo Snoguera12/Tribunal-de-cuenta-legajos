@@ -82,6 +82,7 @@ class EstudioTitulo extends Model
             TextInput::make('titulo_otro')
             ->label('Escriba el título')
             ->helperText('Use esta opción solo si el título no está en la lista.')
+            ->autocomplete(false)
             ->maxLength(100)
             ->visible(fn (Get $get) => $get('titulo_id') === self::OTRO)
             ->required(fn (Get $get) => $get('titulo_id') === self::OTRO)
