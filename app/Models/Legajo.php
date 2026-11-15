@@ -34,10 +34,13 @@ class Legajo extends Model
     protected $casts = [
         "estado" => EstadoLegajoEnum::class,
         "tipo_contrato" => TipoContratoEnum::class,
+        'deshabilitado_en' => 'datetime',
     ];
     protected $fillable = [
         "num_legajo",
         "estado",
+        'deshabilitado_en',
+        'deshabilitado_motivo',
         "fecha_de_ingreso",
         "tipo_contrato",
         "persona_id",
