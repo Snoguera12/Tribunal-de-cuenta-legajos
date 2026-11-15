@@ -42,7 +42,7 @@ class LegajosPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('legajos')
-            ->path('legajos')
+            ->path('sistema')
             ->brandName('TCSE Legajos')
             ->sidebarCollapsibleOnDesktop()
             ->login(Login::class)
