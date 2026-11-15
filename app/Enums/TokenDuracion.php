@@ -11,7 +11,7 @@ enum TokenDuracion: string implements HasLabel
     case UnaHora = 'una_hora';
     case TresHoras = 'tres_horas';
     case SeisHoras = 'seis_horas';
-    case ToceHoras = 'Toce_horas';
+    case DoceHoras = 'Doce_horas';
     case UnDia = 'un_dia';
 
     public function getLabel(): string
@@ -22,7 +22,7 @@ enum TokenDuracion: string implements HasLabel
             self::UnaHora => 'Una hora',
             self::TresHoras => 'Tres horas',
             self::SeisHoras => 'Seis horas',
-            self::ToceHoras => 'Toce horas',
+            self::DoceHoras => 'Doce horas',
             self::UnDia => 'Un día',
         };
     }
@@ -35,7 +35,7 @@ enum TokenDuracion: string implements HasLabel
             self::UnaHora => now()->addHour(),
             self::TresHoras => now()->addHour(3),
             self::SeisHoras => now()->addHours(6),
-            self::ToceHoras => now()->addHour(12),
+            self::DoceHoras => now()->addHour(12),
             self::UnDia => now()->addDay(),
         };
     }
