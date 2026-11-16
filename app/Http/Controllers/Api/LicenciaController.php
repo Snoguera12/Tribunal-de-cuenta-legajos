@@ -35,6 +35,11 @@ class LicenciaController extends Controller
     {
         /** @var Token $client */
         $datos = Arr::except($request->validated(), ['archivo']);
+
+        // Observaciones que dejaron los aprobadores en el Sistema de Licencias (opcional).
+        $datos['observaciones'] = $request->validate([
+            'observaciones' => ['nullable', 'string', 'max:500'],
+        ])['observaciones'] ?? null;
         $archivo = $request->file('archivo');
         $solicitud_id = (int) $datos['solicitud_id'];
 

@@ -29,6 +29,7 @@ class Licencia extends Model
         'fecha_fin',
         'dias_solicitados',
         'motivo',
+        'observaciones',
         'nro_resolucion',
         'fecha_aprobacion',
     ];
@@ -48,60 +49,6 @@ class Licencia extends Model
             && (string) $this->motivo === (string) ($datos['motivo'] ?? '')
             && (string) $this->nro_resolucion === (string) ($datos['nro_resolucion'] ?? '')
             && $this->fecha_aprobacion->toDateString() === $datos['fecha_aprobacion'];
-    }
-
-    /**
-     * Cosas que conviene revisar con el otro grupo. Son solo informativas:
-     * la licencia se guarda igual. Lista vacía = sin observaciones.
-     *
-     * Sobre los días: todavía no hay catálogo de tipos, así que no se sabe si
-     * la licencia cuenta días corridos o hábiles. Por eso solo se marca lo que
-     * no cierra en NINGUNO de los dos casos.
-     *
-     * @return array<int, string>
-     */
-    public function observaciones(): array
-    {
-        $observaciones = [];
-        $legajos = $this->documento?->legajos ?? collect();
-
-        // 1) Legajo dado de baja
-        if ($legajos->contains(fn ($legajo) => ! $legajo->isAlta())) {
-            $observaciones[] = 'Hay un legajo vinculado dado de baja.';
-        }
-
-        // 2) Días solicitados vs. rango de fechas
-        $dias = (int) $this->dias_solicitados;
-        $corridos = (int) abs($this->fecha_inicio->diffInDays($this->fecha_fin)) + 1;
-
-        $habiles = 0;
-        for ($dia = $this->fecha_inicio->copy(); $dia->lte($this->fecha_fin); $dia->addDay()) {
-            if ($dia->isWeekday()) {
-                $habiles++;
-            }
-        }
-
-        if ($dias > $corridos) {
-            $observaciones[] = "Los días solicitados ({$dias}) superan los días del rango ({$corridos}).";
-        } elseif ($dias < $corridos && $dias > $habiles) {
-            $observaciones[] = "Los días solicitados ({$dias}) no coinciden con el rango ({$corridos} corridos, {$habiles} hábiles).";
-        }
-
-        // 3) Superposición con otras licencias del mismo legajo
-        if ($legajos->isNotEmpty()) {
-            $solapadas = static::query()
-                ->whereKeyNot($this->getKey())
-                ->whereHas('documento.legajos', fn ($q) => $q->whereIn('legajos.id', $legajos->pluck('id')))
-                ->whereDate('fecha_inicio', '<=', $this->fecha_fin->toDateString())
-                ->whereDate('fecha_fin', '>=', $this->fecha_inicio->toDateString())
-                ->count();
-
-            if ($solapadas > 0) {
-                $observaciones[] = "Se superpone con {$solapadas} licencia(s) del mismo legajo.";
-            }
-        }
-
-        return $observaciones;
     }
 
     public static function getFormSchema(): array{
@@ -169,9 +116,7 @@ class Licencia extends Model
 
             TextColumn::make('observaciones')
             ->label('Observaciones')
-            ->state(fn (Licencia $record) => implode(' · ', $record->observaciones()) ?: null)
             ->placeholder('-')
-            ->color('warning')
             ->wrap()
             ->toggleable(isToggledHiddenByDefault: true),
 
