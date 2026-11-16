@@ -94,42 +94,23 @@ class Persona extends Model
                 'inputmode' => 'numeric',
                 'oninvalid' => "this.setCustomValidity('Por favor, introducir el DNI.')",
                 'oninput' => "this.setCustomValidity('')",
-            ])
-            ->dehydrateStateUsing(fn (string|null $state) => $state ? (int) preg_replace('/\D/', '', $state) : null)
-            // Se ejecuta al perder el foco si el CUIL está vacío
-            ->afterStateUpdated(function (string|null $state, Set $set, Get $get) {
-                if (blank($state) || filled($get('cuil'))) {
-                    return;
-                }
-
-                if ($cuil = Persona::generarCuil($state)) {
-                    $set('cuil', $cuil);
-                }
-            }),
+            ]),
 
             TextInput::make('cuil')->label("CUIL")
             ->required()
             ->unique(ignoreRecord: true)
             ->autocomplete(false)
             ->maxLength(12)
-            // Pasamos un Closure a rules() para que Filament nos inyecte la instancia de Get correctamente
-            ->rules(fn (Get $get): array => [
-                function (string $attribute, $value, $fail) use ($get) {
-                    if ($mensaje = Persona::errorCuil((string) $value, (string) $get('dni'))) {
-                        $fail($mensaje);
-                    }
-                },
-            ])
+            ->rules(['required', 'regex:/^[0-9]{10,12}$/'])
             ->validationMessages([
                 "required" => "Requiere introducir el CUIL.",
                 "unique" => "Ya se registró el CUIL.",
-                "regex" => "El CUIL debe contener exactamente 12 números sin guiones.",
+                "regex" => "El CUIL debe contener entre 10 y 12 dígitos, sin guiones.",
             ])
             ->extraInputAttributes([
                 'type' => 'text',
                 'inputmode' => 'numeric',
-            ])
-            ->dehydrateStateUsing(fn (string|null $state) => $state ? (int) preg_replace('/\D/', '', $state) : null),
+            ]),
 
             TextInput::make('email')->label('Correo Electrónico')
             ->email()
@@ -308,77 +289,5 @@ class Persona extends Model
         };
 
         return $resultado;
-    }
-
-        // ── CUIL: prefijo (2 dígitos) + documento + verificador (el último). El estándar tiene 11 dígitos; se aceptan de 10 a 12 ──
-
-    // CUIL propuesto a partir del DNI. Devuelve null si no se puede armar (se carga a mano)
-    private static function generarCuil(?string $dni, string $prefijo = '20'): ?string
-    {
-        $dni = preg_replace('/\D/', '', (string) $dni);
-
-        if (strlen($dni) < 7 || strlen($dni) > 8) {
-            return null;
-        }
-
-        $diez = $prefijo . str_pad($dni, 8, '0', STR_PAD_LEFT);
-        $verificador = self::verificadorCuil($diez);
-
-        // caso especial de la fórmula: el prefijo pasa a 23 y el verificador es 9 (hombre) o 4 (mujer)
-        if ($verificador === 10) {
-            $diez = '23' . substr($diez, 2);
-            $verificador = $prefijo === '27' ? 4 : 9;
-        }
-
-        return $diez . $verificador;
-    }
-
-
-    // texto del error, o null si el CUIL está bien
-    private static function errorCuil(?string $cuil, ?string $dni): ?string
-    {
-        $cuil = preg_replace('/\D/', '', (string) $cuil);
-        $dni = preg_replace('/\D/', '', (string) $dni);
-        
-        if (substr($cuil, 0, 2) === '00') {
-            return 'El prefijo del CUIL no puede ser 00.';
-        }
-
-        if (! in_array(strlen($cuil), [10, 11, 12], true)) {
-            return 'El CUIL debe tener entre 10 y 12 números, sin guiones.';
-        }
-
-        if ($dni !== '') {
-            // entre el prefijo (2 dígitos) y el verificador (el último) va el documento
-            $enCuil = substr($cuil, 2, -1);
-
-            if ($enCuil !== str_pad($dni, strlen($enCuil), '0', STR_PAD_LEFT)) {
-                return "El documento dentro del CUIL ({$enCuil}) no coincide con el DNI ingresado ({$dni}).";
-            }
-        }
-
-        // el de 10 se completa con el cero que falta; el de 12 no tiene fórmula, solo se controla la estructura
-        $estandar = strlen($cuil) === 10 ? substr($cuil, 0, 2) . '0' . substr($cuil, 2) : $cuil;
-
-        if (strlen($estandar) === 11 && (int) $estandar[10] !== self::verificadorCuil(substr($estandar, 0, 10))) {
-            return 'El dígito verificador del CUIL no es válido.';
-        }
-
-        return null;
-    }
-
-
-    // dígito verificador de los 10 primeros dígitos (10 = la fórmula no da un CUIL válido con ese prefijo)
-    private static function verificadorCuil(string $diez): int
-    {
-        $suma = 0;
-
-        foreach ([5, 4, 3, 2, 7, 6, 5, 4, 3, 2] as $i => $peso) {
-            $suma += (int) $diez[$i] * $peso;
-        }
-
-        $resto = $suma % 11;
-
-        return $resto === 0 ? 0 : 11 - $resto;
     }
 }
