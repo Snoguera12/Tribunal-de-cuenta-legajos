@@ -28,6 +28,24 @@ class TokensTable
         DB::beginTransaction();
 
         try {
+            // Un solo token vivo por cliente y por destino. Se controla acá y no solo ocultando el botón.
+            // Primero se bloquean los clientes (son pocos): dos envíos a la vez se hacen en fila y el segundo ve al primero.
+            Token::query()->lockForUpdate()->pluck('id');
+
+            if ($record->tokens()->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))->exists()) {
+                DB::rollBack();
+
+                return ['ok' => false, 'mensaje' => 'Este cliente ya tiene un token vigente. Revoca su acceso antes de generar otro.'];
+            }
+
+            if ($ocupante = Token::ocupanteDelDestino($destino, $record->id)) {
+                DB::rollBack();
+
+                $nombreDestino = config("buzones.{$destino}.nombre") ?? $destino;
+
+                return ['ok' => false, 'mensaje' => "{$nombreDestino} ya tiene un token vigente (cliente «{$ocupante->nombre}»). Revoca ese acceso antes de enviar otro."];
+            }
+
             $record->update([
                 'is_active' => true,
                 'is_created' => true,
@@ -105,7 +123,7 @@ class TokensTable
 
                     Notification::make()
                     ->title('No se generó el token')
-                    ->body('No se pudo enviar al destino, así que no se creó ningún token. ' . $resultado['mensaje'])
+                    ->body($resultado['mensaje'] . ' No se creó ningún token.')
                     ->danger()
                     ->persistent()
                     ->send();
@@ -130,41 +148,5 @@ class TokensTable
                     ->send();
                 }),
         ]);
-    }
-
-    /**
-     * Activa el cliente, crea el token de Sanctum y programa su borrado al vencer.
-     * @return array{texto: string, vence: \Illuminate\Support\Carbon}
-     */
-    private static function generarToken(Token $record, TokenDuracion|string $duracion): array
-    {
-        $duracion = $duracion instanceof TokenDuracion ? $duracion : TokenDuracion::from($duracion);
-
-        // Se calcula UNA sola vez y se usa en todo
-        $expiraEn = $duracion->expiraEn()->startOfSecond();
-
-        $record->update([
-            'is_active' => true,
-            'is_created' => true,
-            'enviados' => null,
-        ]);
-
-        $tokenName = 'Token-' . $record->nombre . '-' . now()->format('YmdHis');
-        $texto = $record->createToken($tokenName, ['*'], $expiraEn)->plainTextToken;
-
-        // Programa el borrado para el momento del vencimiento
-        EliminarTokenVencido::dispatch()->delay($expiraEn->copy()->addSeconds(2));
-
-        return ['texto' => $texto, 'vence' => $expiraEn];
-    }
-
-    private static function cajaDelToken(string $texto): string
-    {
-        return "
-            <p class='mb-2 text-sm text-gray-600 dark:text-gray-400'>Copia este token ahora. No volverá a mostrarse por seguridad:</p>
-            <div class='flex items-center gap-2 p-2 bg-gray-100 rounded dark:bg-gray-800'>
-                <code class='flex-1 font-mono text-xs select-all text-danger-600 dark:text-danger-400'>{$texto}</code>
-            </div>
-        ";
     }
 }

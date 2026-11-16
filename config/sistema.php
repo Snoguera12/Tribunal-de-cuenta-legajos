@@ -10,7 +10,12 @@ return [
         \App\Models\Idioma::class, \App\Models\Familiar::class, \App\Models\Curso::class,
         \App\Models\AntecedenteLaboral::class,
     ],
-
+    
+    'admin' => [
+        'nombre' => env('ADMIN_NOMBRE'),
+        'email' => env('ADMIN_EMAIL'),
+        'clave' => env('ADMIN_CLAVE'),
+    ],
     // Intentos de clave: 5 por tanda con 20 s entre intentos; al agotar la 1ra tanda se
     // bloquea 1 hora; al agotar la 2da el bloqueo es definitivo (lo levanta el administrador).
     // Si se frena en 4 intentos, a los 10 min se devuelven (hasta 3 veces). Tope total: 12 claves mal.

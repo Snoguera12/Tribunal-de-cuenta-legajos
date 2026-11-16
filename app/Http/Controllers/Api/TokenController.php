@@ -12,6 +12,12 @@ class TokenController extends Controller
     // si la petición llegó hasta acá el token sigue vigente: si fue revocado o venció, Sanctum ya respondió 401
     public function estado(Request $request): JsonResponse
     {
+        $cliente = $request->user();
+
+        if (!$cliente->is_active) {
+            return response()->json(['valido' => false, 'message' => 'Cliente inactivo.'], 403);
+        }
+
         $credencial = $request->user()->currentAccessToken();
 
         return response()->json([

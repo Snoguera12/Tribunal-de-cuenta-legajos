@@ -76,8 +76,8 @@ class RedInternaTest extends TestCase
 
     public function test_la_aplicacion_completa_rechaza_desde_afuera(): void
     {
-        $this->withServerVariables(['REMOTE_ADDR' => '8.8.8.8'])->get('/legajos/login')->assertForbidden();
-        $this->withServerVariables(['REMOTE_ADDR' => '10.0.0.9'])->get('/legajos/login')->assertSuccessful();
+        $this->withServerVariables(['REMOTE_ADDR' => '8.8.8.8'])->get('/sistema/login')->assertForbidden();
+        $this->withServerVariables(['REMOTE_ADDR' => '10.0.0.9'])->get('/sistema/login')->assertSuccessful();
     }
 
 

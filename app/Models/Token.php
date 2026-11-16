@@ -132,4 +132,15 @@ class Token extends Model
             return $vencidos->count();
         });
     }
+
+    // cliente que ya tiene un token vigente enviado a ese destino (null si el destino está libre).
+    // Solo cuenta si la credencial sigue viva: un token vencido o revocado no ocupa el destino
+    public static function ocupanteDelDestino(string $destino, ?int $exceptoId = null): ?self
+    {
+        return static::query()
+            ->when($exceptoId, fn ($q) => $q->where('id', '!=', $exceptoId))
+            ->whereHas('tokens', fn ($q) => $q->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now())))
+            ->get()
+            ->first(fn (self $cliente) => array_key_exists($destino, $cliente->enviados ?? []));
+    }
 }

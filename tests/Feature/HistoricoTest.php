@@ -35,7 +35,7 @@ class HistoricoTest extends TestCase
         $persona = $this->crearLegajo(['nombre' => 'Ana'])->persona;
         $persona->forceFill(['nombre' => 'Beatriz'])->save();
 
-        $filas = DB::table('h_personas')->where('id', $persona->id)->get();
+        $filas = DB::connection('historico')->table('h_personas')->where('id', $persona->id)->get();
 
         $this->assertCount(1, $filas);
         $this->assertEquals('Ana', $filas[0]->nombre);
@@ -45,7 +45,7 @@ class HistoricoTest extends TestCase
 
         $persona->forceFill(['nombre' => 'Carla'])->save();
 
-        $segunda = DB::table('h_personas')->where('id', $persona->id)->where('hist_version', 2)->first();
+        $segunda = DB::connection('historico')->table('h_personas')->where('id', $persona->id)->where('hist_version', 2)->first();
         $this->assertEquals('Beatriz', $segunda->nombre);
     }
 
@@ -56,7 +56,7 @@ class HistoricoTest extends TestCase
 
         $usuario->forceFill(['ultima_actividad_en' => now(), 'sesion_activa_ip' => '10.0.0.1'])->save();
 
-        $this->assertTrue(! Schema::hasTable('h_users') || DB::table('h_users')->count() === 0);
+        $this->assertTrue(! Schema::connection('historico')->hasTable('h_users') || DB::connection('historico')->table('h_users')->count() === 0);
     }
 
 
@@ -67,8 +67,8 @@ class HistoricoTest extends TestCase
 
         $usuario->forceFill(['name' => 'Otro nombre', 'password' => 'ClaveNueva12345'])->save();
 
-        $this->assertFalse(Schema::hasColumn('h_users', 'password'));
-        $this->assertStringNotContainsString($hash, json_encode(DB::table('h_users')->get()));
+        $this->assertFalse(Schema::connection('historico')->hasColumn('h_users', 'password'));
+        $this->assertStringNotContainsString($hash, json_encode(DB::connection('historico')->table('h_users')->get()));
     }
 
 
@@ -83,7 +83,7 @@ class HistoricoTest extends TestCase
 
         $this->assertEquals('Ana', $persona->fresh()->nombre);
         // lo que había antes de restaurar también quedó guardado
-        $this->assertEquals('Beatriz', DB::table('h_personas')->where('id', $persona->id)->where('hist_version', 2)->value('nombre'));
+        $this->assertEquals('Beatriz', DB::connection('historico')->table('h_personas')->where('id', $persona->id)->where('hist_version', 2)->value('nombre'));
         $this->assertTrue(Auditoria::where('descripcion', 'like', 'Restauró personas #' . $persona->id . '%')->exists());
     }
 
@@ -102,7 +102,7 @@ class HistoricoTest extends TestCase
         $this->artisan('historico:sincronizar', ['--copiar-actual' => true])->assertSuccessful();
         $this->artisan('historico:sincronizar', ['--copiar-actual' => true])->assertSuccessful();
 
-        $this->assertEquals(1, DB::table('h_personas')->where('id', $persona->id)->where('hist_operacion', 'BASE')->count());
+        $this->assertEquals(1, DB::connection('historico')->table('h_personas')->where('id', $persona->id)->where('hist_operacion', 'BASE')->count());
     }
 
 

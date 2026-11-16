@@ -40,7 +40,6 @@ class PersonaController extends Controller
             return response()->json($data, 404);
         }
         $data = [
-            'is_active' => !$request->user()->is_active,
             'personas' => $personas
         ];
         return response()->json($data, 200);
