@@ -19,7 +19,7 @@
         <header class="tcse-brand">
             <img
                 class="tcse-brand__crest"
-                src="{{ asset('images/logo-tcse-blanco.png') }}"
+                src="{{ asset('images/logo-tcse-blanco.svg') }}"
                 alt=""
                 aria-hidden="true"
                 height="62"
@@ -84,7 +84,7 @@
              no se muestra. Sin esto la marca desaparece por completo. --}}
         <div class="tcse-brand--compact">
             <img
-                src="{{ asset('images/logo-tcse-blanco.png') }}"
+                src="{{ asset('images/logo-tcse-blanco.svg') }}"
                 alt=""
                 aria-hidden="true"
                 height="36"
