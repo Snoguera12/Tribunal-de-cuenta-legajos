@@ -52,3 +52,5 @@ Schedule::command('sistema:backup-limpiar')
 Schedule::command('sistema:resumen-diario')
     ->dailyAt('07:00')
     ->onOneServer();
+
+Schedule::command('historico:enviar')->everyFiveMinutes()->withoutOverlapping();

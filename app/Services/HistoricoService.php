@@ -5,19 +5,26 @@ namespace App\Services;
 use App\Models\Auditoria;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
 
-// copia completa de cada fila ANTES de modificarla, en la tabla h_<tabla> (solo se agrega, nunca se borra ni se cambia)
+// copia completa de cada fila ANTES de modificarla, en la tabla h_<tabla> (solo se agrega, nunca se borra ni se cambia).
+// Se guarda SIEMPRE en la base principal y, además, se copia al otro servidor (conexión "historico").
+// Si el otro servidor no responde, el sistema sigue funcionando: lo que no llegó queda marcado como pendiente
+// (hist_sincronizado_en vacío) y se manda después con "php artisan historico:enviar".
 class HistoricoService
 {
     // columnas propias del historial
-    private const META = ['hist_id', 'hist_operacion', 'hist_version', 'hist_fecha', 'hist_user_id', 'hist_user_nombre', 'hist_ip', 'hist_peticion'];
-    
-    // conexión de la base separada donde vive el historial (ver config/database.php)
-    private const CONEXION = 'historico';
+    private const META = ['hist_id', 'hist_operacion', 'hist_version', 'hist_fecha', 'hist_user_id', 'hist_user_nombre', 'hist_ip', 'hist_peticion', 'hist_sincronizado_en'];
+
+    // conexión del OTRO servidor, donde vive la copia del historial (ver config/database.php)
+    private const ESPEJO = 'historico';
+
+    // mientras exista esta marca no se intenta escribir en el otro servidor (evita demoras si está apagado)
+    private const CLAVE_CAIDO = 'historico_otro_servidor_caido';
 
     // nunca se copian (el hash de la clave no tiene por que estar duplicado en otra tabla)
     private const IGNORAR = ['remember_token', 'password'];
@@ -61,15 +68,33 @@ class HistoricoService
     }
 
 
-    // crea la tabla historica o le agrega las columnas que le falten
+    // crea la tabla historica (en la principal y en el otro servidor) o le agrega las columnas que le falten.
+    // Si el otro servidor no responde lo avisa en el texto y sigue
     public static function sincronizarTabla(string $tabla): string
     {
+        $estado = 'principal: ' . self::sincronizarEn(null, $tabla);
+
+        try {
+            $estado .= ' · otro servidor: ' . self::sincronizarEn(self::ESPEJO, $tabla);
+        } catch (\Throwable $e) {
+            $estado .= ' · otro servidor: NO DISPONIBLE (' . mb_strimwidth($e->getMessage(), 0, 120, '…') . ')';
+        }
+
+        return $estado;
+    }
+
+
+    // $conexion null = base principal. Solo la principal lleva la columna hist_sincronizado_en
+    private static function sincronizarEn(?string $conexion, string $tabla): string
+    {
+        $esquema = Schema::connection($conexion);
+        $esPrincipal = $conexion === null;
         $origen = Schema::getColumns($tabla);
         $historica = self::nombre($tabla);
 
-        if (! Schema::connection(self::CONEXION)->hasTable($historica)) {
+        if (! $esquema->hasTable($historica)) {
 
-            Schema::connection(self::CONEXION)->create($historica, function (Blueprint $t) use ($origen) {
+            $esquema->create($historica, function (Blueprint $t) use ($origen, $esPrincipal) {
 
                 $t->id('hist_id');
                 $t->string('hist_operacion', 15);
@@ -79,6 +104,11 @@ class HistoricoService
                 $t->string('hist_user_nombre')->nullable();
                 $t->string('hist_ip', 45)->nullable();
                 $t->string('hist_peticion', 36)->nullable();
+
+                if ($esPrincipal) {
+                    // vacío = todavía no llegó al otro servidor
+                    $t->timestamp('hist_sincronizado_en')->nullable()->index();
+                }
 
                 foreach ($origen as $columna) {
                     if (in_array($columna['name'], self::IGNORAR, true) || in_array($columna['name'], self::META, true)) {
@@ -96,16 +126,22 @@ class HistoricoService
             return 'creada';
         }
 
-        $existentes = Schema::connection(self::CONEXION)->getColumnListing($historica);
+        $existentes = $esquema->getColumnListing($historica);
         $faltan = collect($origen)->filter(fn ($c) => ! in_array($c['name'], $existentes, true)
             && ! in_array($c['name'], self::IGNORAR, true)
             && ! in_array($c['name'], self::META, true));
+        $faltaMarca = $esPrincipal && ! in_array('hist_sincronizado_en', $existentes, true);
 
-        if ($faltan->isEmpty()) {
+        if ($faltan->isEmpty() && ! $faltaMarca) {
             return 'al día';
         }
 
-        Schema::connection(self::CONEXION)->table($historica, function (Blueprint $t) use ($faltan) {
+        $esquema->table($historica, function (Blueprint $t) use ($faltan, $faltaMarca) {
+
+            if ($faltaMarca) {
+                $t->timestamp('hist_sincronizado_en')->nullable()->index();
+            }
+
             foreach ($faltan as $columna) {
                 self::agregarColumna($t, $columna);
             }
@@ -113,7 +149,9 @@ class HistoricoService
 
         self::$columnasCache = [];
 
-        return 'columnas agregadas: ' . $faltan->pluck('name')->implode(', ');
+        $agregadas = $faltan->pluck('name')->when($faltaMarca, fn ($c) => $c->prepend('hist_sincronizado_en'));
+
+        return 'columnas agregadas: ' . $agregadas->implode(', ');
     }
 
 
@@ -136,9 +174,11 @@ class HistoricoService
     }
 
 
-    private static function columnas(string $historica): array
+    // $conexion null = base principal
+    private static function columnas(string $historica, ?string $conexion = null): array
     {
-        return self::$columnasCache[$historica] ??= Schema::connection(self::CONEXION)->getColumnListing($historica);
+        return self::$columnasCache[($conexion ?? 'principal') . '.' . $historica]
+            ??= Schema::connection($conexion)->getColumnListing($historica);
     }
 
 
@@ -167,20 +207,24 @@ class HistoricoService
     }
 
 
-    // guarda la fila tal como estaba. operacion: UPDATE o BASE. Si falla no corta el guardado: lo deja en la auditoria
+    // guarda la fila tal como estaba. operacion: UPDATE o BASE.
+    // 1) se guarda en la principal (si esto falla no corta el guardado: queda en la auditoria)
+    // 2) se copia al otro servidor (si falla, queda pendiente y no se nota)
     public static function guardar(Model $modelo, string $operacion, array $fila): void
     {
         if (! Auditoria::$activo) {
             return;
         }
 
+        $histId = null;
+
         try {
 
             $tabla = $modelo->getTable();
             $historica = self::nombre($tabla);
 
-            if (! Schema::connection(self::CONEXION)->hasTable($historica)) {
-                self::sincronizarTabla($tabla);
+            if (! Schema::hasTable($historica)) {
+                self::sincronizarEn(null, $tabla);
             }
 
             $datos = self::limpiar($fila, self::columnas($historica));
@@ -188,18 +232,20 @@ class HistoricoService
             $actor = Auditoria::datosDelActor();
             $peticion = Auditoria::datosDeLaPeticion();
 
-            $version = DB::connection(self::CONEXION)->table($historica)->where('id', $fila['id'] ?? null)->max('hist_version');
+            $version = DB::table($historica)->where('id', $fila['id'] ?? null)->max('hist_version');
 
-            Auditoria::conReintentos(fn () => DB::connection(self::CONEXION)->table($historica)->insert([
-                ...$datos,
-                'hist_operacion' => $operacion,
-                'hist_version' => ((int) $version) + 1,
-                'hist_fecha' => now(),
-                'hist_user_id' => $actor['actor_tipo'] === 'usuario' ? $actor['actor_id'] : null,
-                'hist_user_nombre' => $actor['actor_nombre'],
-                'hist_ip' => $peticion['ip'] ?? null,
-                'hist_peticion' => $peticion['peticion'] ?? null,
-            ]));
+            Auditoria::conReintentos(function () use ($historica, $datos, $operacion, $version, $actor, $peticion, &$histId) {
+                $histId = DB::table($historica)->insertGetId([
+                    ...$datos,
+                    'hist_operacion' => $operacion,
+                    'hist_version' => ((int) $version) + 1,
+                    'hist_fecha' => now(),
+                    'hist_user_id' => $actor['actor_tipo'] === 'usuario' ? $actor['actor_id'] : null,
+                    'hist_user_nombre' => $actor['actor_nombre'],
+                    'hist_ip' => $peticion['ip'] ?? null,
+                    'hist_peticion' => $peticion['peticion'] ?? null,
+                ], 'hist_id');
+            });
 
         } catch (\Throwable $e) {
 
@@ -210,39 +256,148 @@ class HistoricoService
                 descripcion: 'No se pudo guardar el historial de ' . $modelo->getTable() . ' #' . $modelo->getKey(),
                 extra: ['error' => $e->getMessage()],
             );
+
+            return;
+        }
+
+        if ($histId) {
+            self::enviarFila($historica, (int) $histId);
         }
     }
 
 
-    // todas las versiones guardadas de un registro (la mas nueva primero)
+    // copia una versión recién guardada al otro servidor. NUNCA lanza error: si no puede, queda pendiente
+    private static function enviarFila(string $historica, int $histId): void
+    {
+        if (Cache::has(self::CLAVE_CAIDO)) {
+            return;
+        }
+
+        try {
+
+            $fila = DB::table($historica)->where('hist_id', $histId)->first();
+
+            if (! $fila) {
+                return;
+            }
+
+            self::copiarAlOtroServidor($historica, [(array) $fila]);
+
+            DB::table($historica)->where('hist_id', $histId)->update(['hist_sincronizado_en' => now()]);
+
+        } catch (\Throwable $e) {
+
+            // un minuto sin insistir, para no demorar cada guardado mientras el otro servidor está apagado
+            Cache::put(self::CLAVE_CAIDO, true, now()->addMinute());
+
+            Log::warning('El otro servidor del historial no responde, queda pendiente: ' . $e->getMessage());
+        }
+    }
+
+
+    // inserta filas (con el mismo hist_id) en el otro servidor. Si ya estaban, no las repite. Lanza error si no responde
+    private static function copiarAlOtroServidor(string $historica, array $filas): void
+    {
+        if (empty($filas)) {
+            return;
+        }
+
+        $tabla = substr($historica, 2);
+
+        if (! Schema::connection(self::ESPEJO)->hasTable($historica)) {
+            self::sincronizarEn(self::ESPEJO, $tabla);
+        }
+
+        $columnas = self::columnas($historica, self::ESPEJO);
+        $faltan = array_diff(array_keys($filas[0]), $columnas, ['hist_sincronizado_en']);
+
+        // la tabla del otro servidor quedó atrasada (se agregó una columna): se actualiza
+        if (! empty($faltan)) {
+            self::sincronizarEn(self::ESPEJO, $tabla);
+            $columnas = self::columnas($historica, self::ESPEJO);
+        }
+
+        $lote = array_map(fn ($fila) => array_intersect_key($fila, array_flip($columnas)), $filas);
+
+        DB::connection(self::ESPEJO)->table($historica)->insertOrIgnore($lote);
+    }
+
+
+    // manda al otro servidor todo lo que todavía no llegó. Devuelve [enviadas, quedan pendientes].
+    // Si el otro servidor no responde lanza el error (lo atrapa el comando)
+    public static function enviarPendientes(string $tabla): array
+    {
+        $historica = self::nombre($tabla);
+
+        if (! Schema::hasTable($historica) || ! in_array('hist_sincronizado_en', self::columnas($historica), true)) {
+            return [0, 0];
+        }
+
+        $enviadas = 0;
+
+        DB::table($historica)->whereNull('hist_sincronizado_en')->chunkById(100, function ($filas) use ($historica, &$enviadas) {
+
+            $filas = $filas->map(fn ($f) => (array) $f)->all();
+
+            self::copiarAlOtroServidor($historica, $filas);
+
+            DB::table($historica)->whereIn('hist_id', array_column($filas, 'hist_id'))->update(['hist_sincronizado_en' => now()]);
+
+            $enviadas += count($filas);
+
+        }, 'hist_id');
+
+        return [$enviadas, DB::table($historica)->whereNull('hist_sincronizado_en')->count()];
+    }
+
+
+    // marca todo el historial como "pendiente" (para volver a mandarlo entero si el otro servidor perdió los datos)
+    public static function marcarTodoPendiente(string $tabla): void
+    {
+        $historica = self::nombre($tabla);
+
+        if (Schema::hasTable($historica) && in_array('hist_sincronizado_en', self::columnas($historica), true)) {
+            DB::table($historica)->update(['hist_sincronizado_en' => null]);
+        }
+    }
+
+
+    // vuelve a intentar con el otro servidor aunque haya fallado hace poco
+    public static function olvidarCaida(): void
+    {
+        Cache::forget(self::CLAVE_CAIDO);
+    }
+
+
+    // todas las versiones guardadas de un registro (la mas nueva primero). Se lee de la principal
     public static function versiones(string $tabla, int|string $id)
     {
         $historica = self::nombre($tabla);
 
-        if (! Schema::connection(self::CONEXION)->hasTable($historica)) {
+        if (! Schema::hasTable($historica)) {
             return collect();
         }
 
-        return DB::connection(self::CONEXION)->table($historica)->where('id', $id)->orderByDesc('hist_version')->get();
+        return DB::table($historica)->where('id', $id)->orderByDesc('hist_version')->get();
     }
 
     // dice si la tabla del historial ya existe
     public static function existe(string $tabla): bool
     {
-        return Schema::connection(self::CONEXION)->hasTable(self::nombre($tabla));
+        return Schema::hasTable(self::nombre($tabla));
     }
 
 
     // los últimos cambios guardados de una tabla (el más nuevo primero)
     public static function ultimos(string $tabla, int $limite = 50)
     {
-        return DB::connection(self::CONEXION)->table(self::nombre($tabla))->orderByDesc('hist_id')->limit($limite)->get();
+        return DB::table(self::nombre($tabla))->orderByDesc('hist_id')->limit($limite)->get();
     }
-    
-    // copia lo que hay ahora como version base (para no perder lo ya cargado)
+
+    // copia lo que hay ahora como version base (para no perder lo ya cargado). Queda pendiente de mandar al otro servidor
     public static function copiarActual(string $tabla): int
     {
-        self::sincronizarTabla($tabla);
+        self::sincronizarEn(null, $tabla);
 
         $historica = self::nombre($tabla);
         $columnas = self::columnas($historica);
@@ -254,11 +409,11 @@ class HistoricoService
 
                 $fila = (array) $fila;
 
-                if (DB::connection(self::CONEXION)->table($historica)->where('id', $fila['id'])->where('hist_operacion', 'BASE')->exists()) {
+                if (DB::table($historica)->where('id', $fila['id'])->where('hist_operacion', 'BASE')->exists()) {
                     continue;
                 }
 
-                DB::connection(self::CONEXION)->table($historica)->insert([
+                DB::table($historica)->insert([
                     ...self::limpiar($fila, $columnas),
                     'hist_operacion' => 'BASE',
                     'hist_version' => 0,
