@@ -10,7 +10,7 @@ class HistoricoSincronizar extends Command
 {
     protected $signature = 'historico:sincronizar {--copiar-actual : copia también los datos que ya están cargados (versión base)}';
 
-    protected $description = 'Crea o actualiza las tablas h_* del historial de datos';
+    protected $description = 'Crea o actualiza las tablas h_* del historial (en la principal y en el otro servidor) y manda lo pendiente';
 
 
     public function handle(): int
@@ -26,6 +26,9 @@ class HistoricoSincronizar extends Command
 
             $this->line($linea);
         }
+
+        // lo que quedó sin mandar al otro servidor (si no responde, lo avisa y sigue)
+        $this->call('historico:enviar');
 
         return self::SUCCESS;
     }
