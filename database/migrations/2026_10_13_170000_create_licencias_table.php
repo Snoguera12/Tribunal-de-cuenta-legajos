@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('motivo', 500)->nullable();
             $table->string('nro_resolucion', 50)->nullable();
             $table->date('fecha_aprobacion');
-            $table->string('observaciones', 500)->nullable()->after('motivo');
+            $table->string('observaciones', 500)->nullable();
             $table->timestamps();
         });
     }
